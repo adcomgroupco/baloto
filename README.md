@@ -1,10 +1,11 @@
-# Baloto
+# Master Baloto
 
-Sitio de consulta de reportes, análisis y propuestas de pauta digital para Baloto.
+Sitio de consulta de flows, reportes, análisis y propuestas de pauta digital para Baloto.
 
 ## Contenido
 
-- `index.html`: página principal con enlace a todos los documentos.
+- `index.html`: Master Baloto, página principal con enlace a todos los documentos.
+- `flow-octubre-2026.html`: flow de medios de octubre 2026 (Meta, TikTok y Google Ads).
 - `reporte-cobro-premios-meta.html`: Cobro de premios · Meta Ads · ago 2026.
 - `reporte-engagement-baloto-miloto.html`: Engagement Baloto y Miloto · jul 2026.
 - `dashboard-acumulado.html`: Dashboard acumulado · jun 2026.
@@ -19,7 +20,7 @@ Sitio de consulta de reportes, análisis y propuestas de pauta digital para Balo
 - `informe-telomereces-mayo-2026.html`: Videos Telomereces · may 2026.
 - `informe-telomereces-abril-2026.html`: Videos Telomereces · abr 2026.
 - `recomendacion-presupuesto.html`: Recomendación de presupuesto · may 2026.
-- `assets/`: recursos visuales y estilos del sitio.
+- `assets/`: recursos visuales y estilos del sitio. `master.css` agrega el negro y amarillo del índice; `reportes.css` es el estilo de las páginas de flow.
 
 ## Uso local
 
