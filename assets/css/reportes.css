@@ -1,0 +1,77 @@
+/* ADCOM client template for Baloto report pages. Black rounded header, yellow accent, white cards on light gray. Light only, like the other client reports. */
+:root {
+  --bg: #F5F5F5; --card: #FFFFFF; --ink: #141414; --muted: #63635E; --line: #E6E6E1; --panel: #F7F7F5;
+  --accent: #FFC000; --accent-soft: #FFF5D1; --head: #141414; --head-ink: #FFFFFF;
+  --f: "Poppins", "Segoe UI", Helvetica, Arial, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); margin: 0; }
+body { color: var(--ink); font-family: var(--f); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 64px; display: grid; gap: 44px; }
+h1, h2, h3 { margin: 0; line-height: 1.2; text-wrap: balance; }
+p, ul, ol { margin: 0; }
+a { color: inherit; }
+.muted { color: var(--muted); }
+.eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+
+/* Header */
+.top { background: var(--head); color: var(--head-ink); border-radius: 20px; padding: clamp(24px, 4vw, 44px); display: grid; gap: 14px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .16em; font-size: 13px; }
+.brand i { width: 12px; height: 12px; border-radius: 3px; background: var(--accent); }
+.brand .sep { color: #8A8A85; font-weight: 400; letter-spacing: 0; }
+.top h1 { font-size: clamp(28px, 4.6vw, 42px); font-weight: 700; }
+.top h1 span { color: var(--accent); }
+.top p { max-width: 62ch; color: #D6D6D2; font-size: 16px; }
+.back { color: #D6D6D2; font-size: 13px; text-decoration: none; justify-self: start; }
+.back:hover, .back:focus-visible { color: var(--accent); }
+
+/* Sections */
+.section { display: grid; gap: 16px; }
+.section-head { display: grid; gap: 4px; padding-bottom: 12px; border-bottom: 3px solid var(--accent); }
+.section-head h2 { font-size: clamp(21px, 3vw, 26px); }
+
+/* Link cards */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
+.card { background: var(--card); border-radius: 16px; padding: 22px; display: grid; gap: 10px; align-content: start;
+  border: 1px solid var(--line); border-bottom: 4px solid var(--accent); text-decoration: none; color: var(--ink); }
+a.card:hover, a.card:focus-visible { background: var(--accent-soft); outline: none; }
+.card h3 { font-size: 19px; }
+.card p { font-size: 14px; color: var(--muted); }
+.card .go { font-size: 14px; font-weight: 600; margin-top: 4px; }
+.card.soon { border-bottom-color: var(--line); border-style: dashed; border-bottom-style: dashed; background: transparent; }
+.tag { justify-self: start; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  background: var(--accent); color: var(--ink); border-radius: 99px; padding: 2px 10px; }
+.tag.off { background: var(--line); color: var(--muted); }
+.facts { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; }
+.facts li { background: var(--panel); border-radius: 99px; padding: 2px 10px; font-size: 12px; }
+
+/* Buttons */
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; border-radius: 99px; padding: 10px 18px; font-weight: 600; font-size: 14px;
+  text-decoration: none; background: var(--accent); color: var(--ink); border: 2px solid var(--accent); }
+.btn:hover, .btn:focus-visible { background: var(--head); color: var(--accent); border-color: var(--head); outline: none; }
+.btn.ghost { background: transparent; color: var(--head-ink); border-color: #5A5A56; }
+.btn.ghost:hover, .btn.ghost:focus-visible { border-color: var(--accent); color: var(--accent); background: transparent; }
+.btn.off { background: transparent; color: var(--muted); border: 2px dashed #8A8A85; cursor: not-allowed; }
+
+/* KPIs */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+.kpi { background: var(--card); border-radius: 16px; padding: 20px; display: grid; gap: 4px; border: 1px solid var(--line); }
+.kpi b { font-size: clamp(26px, 3.4vw, 32px); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.kpi b::after { content: ""; display: block; width: 36px; height: 4px; border-radius: 2px; background: var(--accent); margin-top: 10px; }
+.kpi span { font-size: 13px; color: var(--muted); }
+
+/* Tables */
+.table-wrap { overflow-x: auto; background: var(--card); border-radius: 16px; border: 1px solid var(--line); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 640px; }
+th, td { padding: 11px 14px; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left; }
+thead th { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border-bottom: 2px solid var(--line); }
+tbody tr + tr td { border-top: 1px solid var(--line); }
+tr.hi td { background: var(--accent-soft); }
+tfoot td { font-weight: 700; border-top: 2px solid var(--ink); }
+
+.note { font-size: 13px; color: var(--muted); max-width: 72ch; }
+.panel { background: var(--card); border-radius: 16px; padding: clamp(18px, 3vw, 26px); border: 1px solid var(--line); display: grid; gap: 10px; }
+footer { font-size: 12px; color: var(--muted); }

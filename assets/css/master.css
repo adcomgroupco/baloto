@@ -1,0 +1,54 @@
+/* Master Baloto: el índice con más negro y amarillo. Va después de adcom.css
+   y solo agrega énfasis; el sistema de base no cambia. */
+
+/* hero negro con la franja amarilla de cierre */
+.hero{background:var(--ground); color:var(--fg); padding-block:var(--s-6) calc(var(--s-6) + 8px);
+  border-bottom:8px solid var(--accent)}
+.hero h1{max-width:none}
+.hero h1 em{color:var(--accent); background:none; padding:0}
+.hero .lede{color:var(--fg-secondary)}
+.hero .categorias a{background:var(--raised); border-color:var(--rule); color:var(--fg)}
+.hero .categorias a b{color:var(--accent)}
+.hero .categorias a:hover{border-color:var(--accent)}
+
+.acciones{display:flex; flex-wrap:wrap; gap:12px; margin-top:var(--s-5)}
+.boton{display:inline-flex; align-items:center; gap:10px; padding:13px 22px; border-radius:999px;
+  font-weight:700; font-size:.95rem; text-decoration:none; border:2px solid var(--accent);
+  transition:background .2s var(--ease), color .2s var(--ease)}
+.boton-lleno{background:var(--accent); color:#050505}
+.boton-lleno:hover{background:transparent; color:var(--accent)}
+.boton-linea{background:transparent; color:var(--accent)}
+.boton-linea:hover{background:var(--accent); color:#050505}
+.boton .ico{width:18px; height:18px}
+
+/* cabeceras de grupo: regla negra gruesa y barra amarilla bajo el título */
+.grupo-head{border-top:3px solid var(--ink)}
+.grupo-head h2::after{content:""; display:block; width:56px; height:6px; margin-top:12px;
+  border-radius:3px; background:var(--accent)}
+
+/* fichas: icono en cuadro amarillo, borde inferior amarillo, y negras al pasar */
+.card{border-bottom:4px solid var(--accent)}
+.card.is-empty{border-bottom-style:dashed}
+.card-top .ico-lg{box-sizing:content-box; padding:8px; border-radius:8px;
+  background:var(--accent); color:#050505}
+@media (prefers-reduced-motion:no-preference){
+  a.card{transition:background .2s var(--ease), border-color .2s var(--ease), transform .25s var(--ease)}
+}
+a.card:hover{background:#050505; border-color:#050505; border-bottom-color:var(--accent)}
+a.card:hover h3{color:var(--accent)}
+a.card:hover p,a.card:hover .card-top{color:#f4f4f1}
+.card .go:hover{color:#050505; background:var(--accent)}
+
+/* la franja de flows va en negro, como un momento aparte */
+.franja{background:var(--ground); color:var(--fg); padding-block:var(--s-5) var(--s-6)}
+.franja .grupo{padding-block:0}
+.franja .grupo-head{border-top-color:var(--accent)}
+.franja .card{background:var(--raised); border-color:var(--rule); border-bottom-color:var(--accent)}
+.franja a.card:hover{background:var(--accent); border-color:var(--accent)}
+.franja a.card:hover h3,.franja a.card:hover p,.franja a.card:hover .card-top{color:#050505}
+.franja a.card:hover .card-top .ico-lg{background:#050505; color:var(--accent)}
+
+/* pie negro */
+.footer{background:#050505; color:#f4f4f1; border-top:6px solid var(--accent)}
+.footer span:first-child::before{content:""; display:inline-block; width:9px; height:9px;
+  margin-right:9px; border-radius:50%; background:var(--accent)}
