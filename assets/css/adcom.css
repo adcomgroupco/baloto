@@ -1,0 +1,1679 @@
+/* ============================================================================
+   Sistema de diseño Adcom · documentos de cliente
+   ----------------------------------------------------------------------------
+   Poppins, el amarillo de Adcom, y DOS SUELOS: papel o tinta.
+
+   Cada documento elige uno, en el <html>:
+
+     <html lang="es">                      papel  (el suelo por defecto)
+     <html lang="es" data-suelo="tinta">   tinta
+
+   Los dos vienen de la casa: el framework del área digital es tinta, genius
+   es papel. La estructura, la escala, los contenedores, el índice y el
+   vocabulario son idénticos en los dos. Solo cambia el juego de tokens.
+
+   LO QUE SIGUE PROHIBIDO es alternar dentro de un documento. Ese era el
+   defecto de raza: oscuro, claro, oscuro, y el lector sentía que lo habían
+   cambiado de sitio. Para un único momento invertido está `.slab`, una vez
+   por documento, y en tinta se invierte al revés solo.
+
+   ESTE ARCHIVO ES LA FUENTE DE VERDAD. Vive en adcom/sistema/adcom.css.
+   Las copias en cada repo (assets/css/adcom.css) se generan con sync.ps1.
+   No edites una copia: se sobrescribe en el siguiente sync.
+
+   Cómo hacer un ajuste: DESIGN.md, sección "Cómo cambiar algo".
+   El archivo tiene dos mitades:
+     1. El vocabulario canónico. Es lo que se escribe en documentos nuevos.
+     2. La capa de compatibilidad (al final). Neutraliza los nombres de clase
+        de los informes viejos, para migrarlos sin reescribir su HTML.
+   ========================================================================= */
+
+/* @tokens:inicio — desde aquí hasta @tokens:fin, sync.ps1 extrae
+   assets/css/adcom-tokens.css: SOLO los tokens, sin una sola regla de
+   componente ni de elemento. Es lo que enlazan los documentos legados, que
+   traen su propio CSS completo y no pueden recibir encima el `table`, el
+   `img` ni el `h1..h4` del sistema sin que se les mueva el suelo.
+   No metas reglas aquí dentro: se copian a los catorce repos. */
+:root{
+  /* --- marca Adcom (bloqueada, idéntica en los dos suelos) ---
+     El amarillo viene del framework del área digital, que es la declaración
+     canónica de la marca. Coincide con genius. El #FFC000 que aparece en
+     gana, uan, yajuego y westfield es deriva y se corrige al migrar. */
+  --accent:#ffd400;
+  --accent-hi:#ffdf3d;          /* el amarillo al pasar el cursor */
+  --accent-ink:#3d3300;         /* texto SOBRE el amarillo · 8.8:1 en los dos */
+
+  /* ======================= SUELO PAPEL (por defecto) =======================
+     Contrastes medidos, no estimados. */
+  --ground:#f4f4f1;
+  --fg:#050505;                 /* 18.5:1 */
+  --fg-secondary:#4a4a47;       /* 8.1:1 · prosa secundaria, pasa AAA */
+  --fg-muted:#656560;           /* 5.3:1 sobre el suelo y 4.7:1 sobre --sunken.
+                                   Tiene que pasar en las dos: las etiquetas
+                                   viven también en filas y listas activas. */
+  --raised:#fcfcfa;             /* superficie elevada: la ficha */
+  --sunken:#e7e6e1;             /* superficie hundida: la pista de una barra */
+  --rule:rgba(5,5,5,.13);       /* regla que separa sin llamar la atención */
+  --rule-strong:rgba(5,5,5,.88);/* regla que abre una sección */
+  --scroll-thumb:#c6c5be;
+
+  /* Sobre papel el amarillo de marca da 1.3:1: es inservible como texto o
+     como relleno de barra. Para eso existe --accent-fg. */
+  --accent-fg:#7d6800;          /* el amarillo cuando es dato o texto · 4.9:1 */
+  --neg:#c2261c;                /* 5.3:1 · el dato que está mal */
+  --pos:#16693a;                /* 6.1:1 · el dato que está bien */
+
+  /* el único momento invertido de la página: el otro suelo */
+  --inv-ground:#050505;
+  --inv-fg:#f4f4f1;
+  --inv-secondary:#aaa9a4;
+  --inv-rule:rgba(244,244,241,.18);
+  --inv-rule-strong:rgba(244,244,241,.85);
+  --inv-accent:#ffd400;         /* sobre el slab oscuro el amarillo da 14.2:1 */
+
+  /* --- escala de gráfico (reservada) ---
+     Tres ranuras categóricas para un gráfico de varias series. NO es la
+     marca: el amarillo no entra aquí, porque el lector no sabría cuándo el
+     amarillo significa Adcom y cuándo significa "serie 2".
+     Validada sobre todos los pares: ver DESIGN.md. */
+  --serie-1:#2a78d6;
+  --serie-2:#eb6834;
+  --serie-3:#1baf7a;
+  --serie-fg:#050505;           /* texto encima de una serie · 6.4 / 4.6 / 7.2:1 */
+
+  /* --- rampa secuencial ---
+     Para un ORDEN, no para identidades: un embudo, una escala de intensidad,
+     una serie de etapas. Corre del suelo hacia el primer plano.
+     Regla de texto, idéntica en los dos suelos porque la rampa siempre va en
+     la misma dirección: los pasos 1 a 3 llevan --fg, el paso 4 lleva --ground.
+     Medido en papel: 16.3, 11.5, 7.1 y 8.1:1. */
+  --ramp-1:#e7e6e1;
+  --ramp-2:#c4c3bc;
+  --ramp-3:#9a9992;
+  --ramp-4:#4a4a47;
+
+  /* --- el shell de navegación lateral ---
+     Mueble persistente, no contenido: los documentos de educación con menú
+     lateral (rutas, tableros) llevan un riel de navegación fijo que NO seguía
+     el suelo del documento en el original (sidebar negra con .main blanco), y
+     aquí tampoco lo sigue. No es el mismo concepto que `.slab` — el slab es un
+     momento de contenido, una vez por documento; el shell es la estructura de
+     navegación, siempre presente mientras el documento tiene menú lateral.
+     Contraste medido: 17.6:1, 5.6:1, 13.6:1. */
+  --shell-bg:#0d0d0c;
+  --shell-fg:#f4f4f1;
+  --shell-fg-muted:#8a8a86;
+  --shell-rule:rgba(244,244,241,.12);
+  --shell-active:rgba(244,244,241,.08);
+
+  /* --- forma ---
+     Un sistema de forma con dos roles declarados, no una mezcla al gusto:
+       superficies y medios  ->  --radius
+       controles compactos   ->  --radius-sm
+       marcas de dato        ->  0, siempre (una barra cuadrada mide mejor)
+     Viene del framework del área digital (20/12px), un poco más contenido. */
+  --radius:12px;
+  --radius-sm:8px;
+
+  /* --- piso tipografico ---
+     Nada funcional por debajo de --fs-min, y nada de prosa por debajo de
+     --fs-body-min. No era regla escrita y los informes bajaban a 9.5px en
+     cabeceras de tabla y etiquetas de eje: ilegible en pantalla y peor
+     impreso. El piso se fija en rem para que respete el zoom del navegador. */
+  --fs-min:.75rem;              /* 12px · etiquetas, cabeceras, ejes */
+  --fs-body-min:.8rem;          /* 12.8px · prosa, notas al pie, subtextos.
+                                   Era .82rem. Se baja a .8 porque es lo que
+                                   usa raza en sus notas de ficha, y dos
+                                   decimas de pixel no son una diferencia de
+                                   legibilidad: tener DOS valores para el
+                                   mismo piso si lo es. */         /* 13px · prosa, notas al pie, subtextos */
+
+  /* --- escala de titular ---
+     El techo son 6rem y el tracking no baja de -.04em: por debajo de ahí las
+     letras pierden su forma. Se llega a "fuerte" con TAMAÑO y peso, y con
+     copy corto, no apretando el tracking. */
+  --fs-display:clamp(2.6rem,7vw,6rem);
+  --tk-display:-.04em;
+  --lh-display:.95;
+
+
+  /* --- escala de espacio ---
+     Siete pasos, y cada uno tiene un trabajo. Antes había 67 valores
+     verticales distintos, 40 de ellos clamp(): pares como
+     clamp(18px,2.4vw,26px) y clamp(16px,2vw,26px) hacían lo mismo con 2px de
+     diferencia, invisibles para el lector y caros de mantener.
+
+     Es el mismo arreglo que el framework del área digital hizo con su
+     tipografía, por la misma razón.
+
+     La regla de jerarquía: más espacio ARRIBA de un encabezado que abajo.
+     Una sección abre con --s-7 y separa su encabezado del contenido con
+     --s-5, así que la apertura siempre gana. */
+  --s-1:4px;                     /* dentro de una línea: icono a texto */
+  --s-2:8px;                     /* dentro de un grupo: etiqueta a dato */
+  --s-3:14px;                    /* elemento a elemento dentro de una ficha */
+  --s-4:clamp(18px,2.4vw,26px);  /* ficha a ficha, fila a fila */
+  --s-5:clamp(26px,3.4vw,44px);  /* bloque a bloque, encabezado a contenido */
+  --s-6:clamp(44px,6vw,84px);    /* apertura de una sección o de una portada */
+  --s-7:clamp(72px,8vw,128px);   /* entre franjas */
+  --s-col:clamp(24px,4vw,64px);  /* separación entre columnas anchas */
+
+  /* --- la tipografía ---
+     Va como token para que viaje a la capa adoptable: es la señal más
+     visible de que un documento es de la casa, y era justo la que no
+     llegaba a los documentos que solo pueden recibir tokens. */
+  --fuente:Poppins,ui-sans-serif,-apple-system,"Segoe UI",sans-serif,
+    "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji";
+  --fuente-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+
+  /* --- medida y ritmo (idéntico en los dos suelos) --- */
+  --measure:68ch;               /* medida de lectura */
+  --gutter:clamp(20px,5vw,72px);
+  --max:1240px;
+  --step:var(--s-7);            /* alias heredado del paso de franja */
+  --ease:cubic-bezier(.2,.7,.3,1);
+  color-scheme:light;
+
+  /* --- alias heredados ---
+     El vocabulario se escribió con --ink y --paper. Se quedan como alias de
+     los roles para no reescribir catorce repos, y para que un documento que
+     cambia de suelo funcione sin tocar una línea de su CSS propio. */
+  --ink:var(--fg);
+  --paper:var(--ground);
+  --ink-secondary:var(--fg-secondary);
+  --ink-muted:var(--fg-muted);
+  --accent-deep:var(--accent-fg);
+  --inv-text:var(--inv-fg);
+  /* --- enfasis del titular ---
+     Se declara como token, no como selector de ancestro: el valor que
+     hereda un <em> es el del suelo MAS CERCANO, que es justo lo que
+     hace falta en un documento con franjas de los dos suelos. */
+  --em-fg:var(--fg);
+  --em-bg:linear-gradient(transparent 58%, var(--accent) 58%);
+  --em-pad:.06em
+
+}
+
+/* Suelo papel declarado a mano: hace falta para una franja clara dentro de un
+   documento en tinta. Repite los valores de :root a propósito, porque una
+   franja no puede depender de cuál sea el suelo de la página que la contiene. */
+[data-suelo="papel"],[data-roles="papel"],.section-light,.s-light{
+  --ground:#f4f4f1;
+  --fg:#050505;
+  --fg-secondary:#4a4a47;
+  --fg-muted:#656560;
+  --raised:#fcfcfa;
+  --sunken:#e7e6e1;
+  --rule:rgba(5,5,5,.13);
+  --rule-strong:rgba(5,5,5,.88);
+  --scroll-thumb:#c6c5be;
+  --accent-fg:#7d6800;
+  --neg:#c2261c;
+  --pos:#16693a;
+  --inv-ground:#050505;
+  --inv-fg:#f4f4f1;
+  --inv-secondary:#aaa9a4;
+  --inv-rule:rgba(244,244,241,.18);
+  --inv-rule-strong:rgba(244,244,241,.85);
+  --inv-accent:#ffd400;
+  --serie-1:#2a78d6;
+  --serie-2:#eb6834;
+  --serie-3:#1baf7a;
+  --serie-fg:#050505;
+  --ramp-1:#e7e6e1;
+  --ramp-2:#c4c3bc;
+  --ramp-3:#9a9992;
+  --ramp-4:#4a4a47;
+  color-scheme:light;
+  /* Los alias se REDECLARAN en cada suelo a proposito. Un alias es una
+     sustitucion que se resuelve donde se declara: si solo vive en :root,
+     su valor queda congelado en el suelo de la raiz y una franja del otro
+     suelo lo hereda ya resuelto, con el color contrario. */
+  --ink:var(--fg);
+  --paper:var(--ground);
+  --ink-secondary:var(--fg-secondary);
+  --ink-muted:var(--fg-muted);
+  --accent-deep:var(--accent-fg);
+  --inv-text:var(--inv-fg);
+  /* --- enfasis del titular ---
+     Se declara como token, no como selector de ancestro: el valor que
+     hereda un <em> es el del suelo MAS CERCANO, que es justo lo que
+     hace falta en un documento con franjas de los dos suelos. */
+  --em-fg:var(--fg);
+  --em-bg:linear-gradient(transparent 58%, var(--accent) 58%);
+  --em-pad:.06em
+}
+
+/* ========================== SUELO TINTA ===================================
+   Los mismos roles, resueltos contra un suelo oscuro. Se activa con
+   data-suelo="tinta" en el <html>. Nada más cambia. */
+[data-suelo="tinta"],[data-roles="tinta"],.section-dark,.s-dark{
+  --ground:#050505;
+  --fg:#f4f4f1;                 /* 18.5:1 · nunca #fff puro */
+  --fg-secondary:#aaa9a4;       /* 8.7:1 · el mismo que usa el .slab de genius */
+  --fg-muted:#949289;           /* 6.5:1 sobre el suelo y 4.9:1 sobre --sunken */
+  --raised:#141413;
+  --sunken:#262624;
+  --rule:rgba(244,244,241,.18);
+  --rule-strong:rgba(244,244,241,.85);
+  --scroll-thumb:#3a3a37;
+
+  /* Aquí el amarillo de marca YA es legible: 14.2:1 sobre el suelo. El
+     amarillo de dato y el de marca son el mismo, y por eso este suelo se ve
+     más asertivo que el papel. Es la razón de ser de este suelo. */
+  --accent-fg:var(--accent);
+  --neg:#ff6b6b;                /* 7.3:1 · #c2261c se queda en 3.5:1 aquí */
+  --pos:#2fb574;                /* 7.7:1 · #16693a se queda en 3.0:1 aquí */
+
+  --inv-ground:#f4f4f1;
+  --inv-fg:#050505;
+  --inv-secondary:#4a4a47;
+  --inv-rule:rgba(5,5,5,.16);
+  --inv-rule-strong:rgba(5,5,5,.88);
+  --inv-accent:#7d6800;         /* aquí el slab es CLARO: el amarillo de marca
+                                   daría 1.3:1 encima, así que va el profundo */
+
+  /* los mismos tres hues, escalonados para el suelo oscuro */
+  --serie-1:#3987e5;
+  --serie-2:#d95926;
+  --serie-3:#199e70;
+  --serie-fg:#050505;           /* 5.6 / 5.3 / 6.0:1 */
+
+  /* la misma rampa, del suelo oscuro hacia el primer plano claro.
+     Medido: 13.8, 9.7, 4.9 y 8.7:1 con la misma regla de texto. */
+  --ramp-1:#262624;
+  --ramp-2:#3f3e3b;
+  --ramp-3:#6b6a64;
+  --ramp-4:#aaa9a4;
+
+  color-scheme:dark;
+  /* Los alias se REDECLARAN en cada suelo a proposito. Un alias es una
+     sustitucion que se resuelve donde se declara: si solo vive en :root,
+     su valor queda congelado en el suelo de la raiz y una franja del otro
+     suelo lo hereda ya resuelto, con el color contrario. */
+  --ink:var(--fg);
+  --paper:var(--ground);
+  --ink-secondary:var(--fg-secondary);
+  --ink-muted:var(--fg-muted);
+  --accent-deep:var(--accent-fg);
+  --inv-text:var(--inv-fg);
+  /* Aqui el amarillo si puede ser texto: 14.2:1 sobre el suelo. Es el
+     enfasis que tenia el raza original. */
+  --em-fg:var(--accent);
+  --em-bg:none;
+  --em-pad:0
+}
+/* @tokens:fin */
+
+/* ---------------------------------------------------------------- base --- */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:no-preference){ html{scroll-behavior:smooth} }
+
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--fuente);
+  font-size:17px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased
+}
+
+/* Las superficies que no dibujamos también son parte del diseño.
+   Selección, caret, scrollbar y anillo de foco vienen con defaults del
+   navegador que no pertenecen a ningún sistema. Se visten desde la paleta. */
+::selection{background:var(--accent); color:var(--accent-ink)}
+html{caret-color:var(--ink); accent-color:var(--ink)}
+::-webkit-scrollbar{width:12px; height:12px}
+::-webkit-scrollbar-track{background:var(--sunken)}
+::-webkit-scrollbar-thumb{background:var(--scroll-thumb); border:3px solid var(--sunken); border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-secondary)}
+html{scrollbar-color:var(--scroll-thumb) var(--sunken); scrollbar-width:thin}
+:focus-visible{outline:2px solid var(--ink); outline-offset:3px; border-radius:2px}
+
+img{display:block; max-width:100%}
+h1,h2,h3,h4{margin:0; font-weight:800; letter-spacing:-.045em; line-height:1.03; text-wrap:balance}
+p{margin:0; text-wrap:pretty}
+strong,b{font-weight:700}
+a{color:inherit; text-decoration-thickness:1px; text-underline-offset:3px}
+button,input,select,textarea{font:inherit}
+.tnum{font-variant-numeric:tabular-nums}
+.sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+
+/* Que las anclas de categoría no queden debajo de la cabecera fija. */
+[id]{scroll-margin-top:88px}
+
+.skip-link{
+  position:fixed; top:10px; left:10px; z-index:120; transform:translateY(-180%);
+  background:var(--accent); color:var(--accent-ink); padding:12px 18px;
+  border-radius:var(--radius-sm);
+  font-weight:600; font-size:.85rem; text-decoration:none
+}
+.skip-link:focus{transform:translateY(0)}
+
+/* ------------------------------------------------------------- cabecera --- */
+.masthead{
+  position:sticky; top:0; z-index:60;
+  display:flex; align-items:center; justify-content:space-between; gap:24px;
+  height:64px; padding-inline:var(--gutter);
+  background:color-mix(in srgb, var(--paper) 86%, transparent);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--rule)
+}
+.wordmark{
+  display:inline-flex; align-items:center; gap:9px; text-decoration:none;
+  font-weight:800; font-size:.92rem; letter-spacing:-.02em; white-space:nowrap
+}
+.wordmark i{width:9px; height:9px; border-radius:50%; background:var(--accent); flex:0 0 auto}
+.wordmark img{height:20px; width:auto; flex:0 0 auto}
+.wordmark span{color:var(--ink-muted); font-weight:500}
+.masthead nav{display:flex; gap:var(--s-4); font-size:.83rem; font-weight:500; min-width:0}
+.masthead nav a{color:var(--ink-secondary); text-decoration:none; white-space:nowrap;
+  transition:color .2s var(--ease)}
+.masthead nav a:hover{color:var(--ink)}
+.masthead nav a[aria-current]{color:var(--ink); font-weight:700}
+.masthead .stamp{font-size:.76rem; font-weight:600; color:var(--ink-muted);
+  border-left:1px solid var(--rule); padding-left:16px; white-space:nowrap}
+@media (max-width:1000px){ .masthead nav{display:none} }
+@media (max-width:520px){ .masthead .stamp{display:none} }
+
+/* volver al índice desde un documento interno */
+.al-indice{
+  display:inline-flex; align-items:center; gap:8px; text-decoration:none;
+  font-size:.82rem; font-weight:700; color:var(--ink-secondary);
+  transition:color .2s var(--ease)
+}
+.al-indice:hover{color:var(--ink)}
+
+/* --------------------------------------------------------------- iconos ---
+   Iconos DIBUJADOS, no glifos. Un `↗` o un `!` de texto se renderiza con la
+   fuente de cada sistema: cambia de peso, de tamaño y a veces sale en color de
+   emoji. Un icono del sistema tiene un solo trazo y hereda el color del texto.
+
+   El juego vive en adcom.js, que inyecta un <symbol> por icono una sola vez.
+   Se usa así, y el rótulo de texto SIEMPRE va al lado:
+
+     <span class="go">Abrir <svg class="ico" aria-hidden="true">
+       <use href="#i-abrir"></use></svg></span>
+
+   Si el JS no corre no hay icono, y no pasa nada: son decorativos y el texto
+   dice lo mismo. Por eso van aria-hidden y nunca solos. */
+.ico{
+  width:1em; height:1em; flex:0 0 auto;
+  fill:none; stroke:currentColor; stroke-width:1.7;
+  stroke-linecap:round; stroke-linejoin:round;
+  vertical-align:-.12em
+}
+.ico-sm{width:.85em; height:.85em}
+.ico-lg{width:1.35em; height:1.35em; stroke-width:1.5}
+
+/* -------------------------------------------------------------- botones ---
+   Rectangulares, como todo el sistema. El primario es tinta llena (papel
+   sobre tinta, 18.5:1); el fantasma es una regla. Ninguno usa el amarillo
+   de fondo: a 1.3:1 el borde del botón desaparecería. */
+.button{
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  min-height:46px; padding:0 20px; border:1px solid var(--ink);
+  border-radius:var(--radius-sm);
+  font-size:.86rem; font-weight:700; text-decoration:none; cursor:pointer;
+  white-space:nowrap;
+  transition:background .2s var(--ease), color .2s var(--ease)
+}
+.button-primary{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.button-primary:hover{background:var(--accent-hi); border-color:var(--accent-hi)}
+.button-ghost{background:none; color:var(--ink)}
+.button-ghost:hover{background:var(--sunken)}
+.button[disabled]{opacity:.45; cursor:not-allowed}
+.acciones{display:flex; flex-wrap:wrap; gap:12px}
+
+/* -------------------------------------------------------------- franjas ---
+   Un documento largo se lee mejor por capítulos, y la franja ES el capítulo:
+   una sección que declara su propio suelo y lo pinta de borde a borde.
+
+     <section class="franja" data-suelo="tinta">
+       <div class="wrap"> ... </div>
+     </section>
+
+   Los tokens se heredan, así que todo lo de adentro (fichas, barras, tablas,
+   gráficos, el amarillo de dato) resuelve con el contraste correcto sin
+   escribir una regla más.
+
+   LA REGLA: la franja es un ritmo, no un parche.
+     · Alterna de forma regular, no aleatoria. Si el lector no puede predecir
+       el patrón, siente que lo cambiaron de sitio: ese era el problema de
+       raza, no el color.
+     · Cada franja tiene contenido para leerse como capítulo. Dos párrafos en
+       otro suelo no son un capítulo, son una raya.
+     · Dos franjas seguidas del mismo suelo son una sola franja.
+     · El `.slab` es otra cosa: un momento invertido dentro de una franja, una
+       vez por documento. No se usan los dos para lo mismo. */
+/* Declarar el suelo y PINTARLO son dos cosas distintas, y hacen falta las
+   dos por separado.
+
+   `data-suelo` hace las dos: es para una franja, que pinta su suelo de borde
+   a borde. `data-roles` solo declara: es para un panel que YA tiene su
+   propio fondo -- una tarjeta con un blanco translucido, una fila de tabla
+   con su tinte -- y que lo unico que necesita es que los roles de dentro
+   (--fg, --fg-muted, --rule) se resuelvan contra ese fondo y no contra el de
+   la pagina.
+
+   Sin esta distincion, marcar una tarjeta para arreglarle el texto le
+   repintaba el fondo. Medido: en una pasada sobre el corpus eso empeoro
+   quince documentos, uno de ellos en 167 defectos. */
+[data-suelo],.section-dark,.section-light,.s-dark,.s-light{
+  background:var(--ground); color:var(--fg)
+}
+.franja{padding-block:var(--step)}
+/* la primera franja del documento arranca pegada a la cabecera */
+main > .franja:first-child{padding-top:var(--s-6)}
+
+/* ----------------------------------------------------------- estructura --- */
+.wrap{max-width:var(--max); margin-inline:auto; padding-inline:var(--gutter)}
+.band{padding-block:var(--step)}
+.band + .band{padding-top:0}
+.lede{max-width:var(--measure); color:var(--ink-secondary); font-size:1.075rem}
+.note{max-width:var(--measure); color:var(--ink-muted); font-size:.9rem; line-height:1.55}
+.head{margin-bottom:var(--s-5)}
+.head h2{font-size:clamp(1.9rem,4.2vw,3.4rem); max-width:20ch}
+.head .lede{margin-top:18px}
+.divider{border:0; border-top:1px solid var(--rule-strong); margin:0 0 var(--s-5)}
+
+/* ------------------------------------------------------------- portada --- */
+.opening{padding-top:var(--s-6); padding-bottom:var(--step)}
+/* El titular de portada usa la escala de display: grande, pesado y corto.
+   `text-wrap:balance` reparte las líneas, así que no hace falta partirlo a
+   mano con <br>. */
+.opening h1,.display{
+  font-size:var(--fs-display);
+  letter-spacing:var(--tk-display);
+  line-height:var(--lh-display);
+  max-width:18ch
+}
+/* --------------------------------------------------------------- énfasis ---
+   Una palabra destacada dentro de un titular. Nunca con otra familia ni con
+   una itálica suelta: eso se lee como error, no como énfasis.
+
+   Cada suelo lleva su versión, y no por gusto:
+     papel  ->  subrayado de acento. El amarillo da 1.3:1 como texto aquí.
+     tinta  ->  el amarillo directo. Da 14.2:1, y es el énfasis que tenía el
+                raza original ("Tres resultados posibles" en amarillo). */
+/* Sin lista de clases de contenedor. La lista anterior nombraba doce
+   envoltorios (.opening, .head, .hero, .trends-hero, .s-head...) y por eso
+   fallaba: el <em> de `section.rule-intro` en raza no estaba en la lista, se
+   quedaba sin regla y salia en italica suelta, que es justo lo que el sistema
+   prohibe. Mantener una lista de nombres de contenedor ES el problema de los
+   ochenta documentos con ochenta nombres. Un <em> dentro de un titular es un
+   enfasis, y punto. */
+:is(h1,h2,h3,.display) em,.portada h1 em{
+  font-style:normal;
+  color:var(--em-fg);
+  background:var(--em-bg);
+  padding-inline:var(--em-pad);
+  box-decoration-break:clone; -webkit-box-decoration-break:clone
+}
+.opening .lede{margin-top:var(--s-5); font-size:clamp(1.05rem,1.55vw,1.22rem);max-width:var(--measure)}
+.opening-meta{
+  display:flex; flex-wrap:wrap; gap:22px var(--s-col);
+  margin-top:var(--s-5); padding-top:22px; border-top:1px solid var(--rule);
+  font-size:.82rem; color:var(--ink-muted)
+}
+.opening-meta div{display:grid; gap:3px}
+.opening-meta b{font-weight:700; color:var(--ink); font-size:1.05rem;
+  font-variant-numeric:tabular-nums; letter-spacing:-.03em}
+
+/* =========================================================================
+   ÍNDICE CON CATEGORÍAS
+   La navegación de categorías no es decoración: lleva el conteo real y salta
+   al grupo. Por eso se queda, mientras que la etiqueta numerada (01/02/03)
+   se fue: el orden de los grupos no le dice nada al lector.
+   ========================================================================= */
+.categorias{
+  display:flex; flex-wrap:wrap; gap:10px;
+  margin-top:var(--s-5)
+}
+.categorias a{
+  display:inline-flex; align-items:baseline; gap:9px; text-decoration:none;
+  padding:9px 15px; border:1px solid var(--rule); border-radius:var(--radius-sm);
+  background:var(--raised);
+  font-size:.86rem; font-weight:600; color:var(--ink-secondary);
+  transition:border-color .2s var(--ease), color .2s var(--ease)
+}
+.categorias a:hover{border-color:var(--ink); color:var(--ink)}
+.categorias a b{font-weight:700; font-size:.78rem; color:var(--ink-muted);
+  font-variant-numeric:tabular-nums}
+.categorias a:hover b{color:var(--accent-deep)}
+/* la categoría que el lector tiene en pantalla. adcom.js pone el atributo. */
+.categorias a[aria-current]{border-color:var(--ink); color:var(--ink);
+  box-shadow:inset 0 -2px 0 var(--accent)}
+.categorias a[aria-current] b{color:var(--accent-deep)}
+
+/* un grupo de documentos: la categoría */
+.grupo{padding-block:var(--step)}
+.grupo + .grupo{padding-top:0}
+.grupo-head{
+  display:grid; gap:14px; align-items:end;
+  padding-top:var(--s-5); margin-bottom:var(--s-5);
+  border-top:1px solid var(--rule-strong)
+}
+.grupo-head h2{font-size:clamp(1.6rem,3.4vw,2.6rem)}
+.grupo-head p{max-width:var(--measure); color:var(--ink-secondary); font-size:.98rem}
+@media (min-width:900px){
+  .grupo-head{grid-template-columns:minmax(0,1fr) minmax(0,.9fr);
+    gap:var(--s-col)}
+  .grupo-head p{padding-bottom:.35em}
+}
+
+/* @tipografia:inicio — la UNICA regla de elemento desnudo de la capa
+   adoptable, y va aquí a propósito.
+
+   El resto de esta capa está acotado por clase porque un documento legado
+   trae sus tablas, sus titulares y sus tarjetas ya resueltos, y una regla
+   sobre `table` o `img` le movería cosas que estaban bien. La familia del
+   cuerpo es distinta: es precisamente lo que se quiere estandarizar, y es la
+   señal más visible de que un documento pertenece a la casa. Un documento
+   que declare su propia familia sigue ganando, porque su hoja carga después.
+
+   Hace falta enlazar la fuente en el <head> del documento:
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
+   Sin el enlace, la pila cae en la del sistema operativo y no falla nada,
+   pero el documento no se ve de la casa. */
+body{font-family:var(--fuente)}
+/* En el telefono una tabla ancha se desplaza DENTRO DE SI, no arrastra la
+   pagina. El sistema le pone min-width:620px para que las columnas no se
+   aplasten, y eso, sin contenedor propio, sacaba el cuerpo entero de la
+   ventana: medido, 390px de ventana contra 636 de tabla. Convertida en su
+   propio contenedor de scroll, la regla de los 620 sigue valiendo y el
+   cuerpo deja de moverse.
+
+   Va aqui, en la capa adoptable, porque los documentos que mas tablas tienen
+   son justo los que solo pueden recibir tokens. */
+@media (max-width:560px){
+  table{display:block; overflow-x:auto; -webkit-overflow-scrolling:touch}
+}
+/* El navegador le da a <small> el 80% del tamano heredado, asi que dentro de
+   una etiqueta que ya esta en el piso (12px) cae a 10px. El piso deja de ser
+   un piso. Se fija: <small> es letra pequena, no letra ilegible.
+
+   Es el segundo y ultimo selector de elemento desnudo de esta capa, y va por
+   la misma razon que el primero: corrige algo que el documento no eligio,
+   sino que heredo del navegador. */
+small{font-size:var(--fs-min)}
+/* @tipografia:fin */
+
+/* @portada:inicio — sync.ps1 copia desde aquí hasta @portada:fin al final de
+   adcom-tokens.css, para que un documento legado pueda adoptar la portada sin
+   recibir la capa de componentes completa. Todo va acotado por clase o por el
+   atributo canónico de suelo: ni un selector de elemento desnudo. */
+
+/* Un suelo declarado tiene que PINTARSE. En adcom.css eso lo hace la regla de
+   franja del vocabulario base, que un documento legado no recibe. Sin ella,
+   data-suelo="tinta" cambia los tokens (el texto se vuelve claro) pero nadie
+   pinta el fondo: queda texto claro sobre blanco. Va solo el ATRIBUTO
+   canónico, no los nombres de clase heredados, porque un documento legado
+   recibe data-suelo únicamente donde se lo pongo a mano. */
+[data-suelo]{background:var(--ground); color:var(--fg)}
+
+/* -------------------------------------------------------------- portada ---
+   La portada del documento: la pieza que fija el carácter. Titular grande, el
+   amarillo como marcador sobre UNA PARTE del titular, entradilla, acciones, la
+   tira de cifras y la pieza gráfica al lado.
+
+   Estaba escrita en raza/styles.css, en un repo solo. Por eso ningún otro
+   documento se le parecía. Aquí es vocabulario.
+
+   Son DOS niveles, como cualquier franja del sistema:
+     .portada       sangra de borde a borde y pinta su suelo
+     .portada-wrap  acota el contenido a --max y lo centra
+   Meter la rejilla directamente en .portada deja el contenido pegado a los
+   bordes de la pantalla, y poner el max-width en la columna de texto la
+   centra DENTRO de su columna, que no es lo mismo. */
+.portada{
+  /* El inset horizontal va AQUI, en el elemento que pinta: el contenido no
+     debe tocar nunca el borde de la pintura. Si el canal se pone en el
+     envoltorio, el fondo llega hasta el borde y el detector lo canta.
+     Simetrico: una portada que es solo titular no puede dejar una franja
+     vacia debajo. Cuando hay cifras, son ellas las que agregan su aire. */
+  padding:var(--s-6) var(--gutter);
+  background:var(--ground); color:var(--fg)
+}
+.portada-wrap{
+  max-width:var(--max); margin-inline:auto;
+  display:grid; gap:var(--s-col); align-items:end;
+  grid-template-columns:minmax(0,1fr) minmax(0,.62fr)
+}
+/* Sin pieza gráfica la copia toma todo el ancho, sin dejar una columna vacía
+   ni obligar a buscar una foto de relleno. */
+.portada-wrap:not(:has(.portada-visual)){grid-template-columns:minmax(0,1fr)}
+.portada-copy{min-width:0}
+
+/* El antetítulo: cliente y tipo de documento. Ubica, no compite. */
+/* Corto, siempre: en mayúsculas la lectura se degrada con la longitud. Si no
+   cabe en unas tres palabras, la fecha y el detalle van en la entradilla. */
+.portada-kicker{
+  display:block; margin-bottom:var(--s-4);
+  font-size:.78rem; font-weight:600;
+  color:var(--fg-muted)
+}
+.portada h1{
+  font-size:var(--fs-display);
+  letter-spacing:var(--tk-display);
+  line-height:var(--lh-display);
+  max-width:18ch
+}
+/* El marcador amarillo. Arranca al 58% de la altura para que se lea como
+   trazo y no como fondo, y clona la decoración para cortarse bien al pasar
+   de línea. El <em> NO es énfasis tipográfico: es el marcador. */
+.portada-lede{
+  max-width:var(--measure); margin-top:var(--s-5);
+  color:var(--fg-secondary); font-size:clamp(1.05rem,1.55vw,1.22rem)
+}
+.portada-lede b{color:var(--fg)}
+.portada-acciones{display:flex; flex-wrap:wrap; gap:12px; margin-top:var(--s-5)}
+
+/* La tira de cifras es OPCIONAL, y la excepcion antes que la regla.
+   Va solo cuando el documento tiene dos o tres cifras que son su titular:
+   la inversion, el cumplimiento, el CPL. Si hay que estrujarse para llenarla
+   ("1 vista por pieza"), no va. La portada aloja el titulo; los datos se
+   rinden mas abajo, donde tienen su tabla y su contexto.
+
+   En rejilla y no en flex, para que las columnas midan igual y el aire entre
+   ellas sea real: en flex, dos cifras largas se tocaban. */
+.portada-cifras{
+  display:grid; gap:var(--s-5) var(--s-6);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));
+  margin:var(--s-6) 0 0; padding-top:var(--s-5);
+  border-top:1px solid var(--rule)
+}
+.portada-cifras div{display:grid; gap:3px; min-width:0; padding:0; background:none; border:0}
+.portada-cifras dt{font-size:.82rem; color:var(--fg-muted); font-weight:500; order:2}
+.portada-cifras dd{
+  margin:0; color:var(--fg); font-size:1.35rem; font-weight:800;
+  letter-spacing:-.02em; order:1
+}
+/* La línea de apoyo de una cifra (contra qué se compara). Dentro del dd, para
+   que quede pegada a su número. Los informes la traían en
+   rgba(255,255,255,.35): 3.05:1 sobre el suelo oscuro. */
+.portada-cifras dd small{
+  display:block; margin-top:4px;
+  font-size:.8rem; font-weight:400; letter-spacing:0; color:var(--fg-muted)
+}
+.portada-cifras dd small b{color:var(--fg-secondary); font-weight:700}
+
+.portada-visual{position:relative; min-height:0; display:grid; place-items:center}
+.portada-pieza{width:min(100%,420px); z-index:1}
+/* Los anillos: forma, y quietos. Una rotación infinita no informa nada. */
+.orbita{
+  position:absolute; border:1px dashed var(--rule); border-radius:50%;
+  pointer-events:none
+}
+.orbita-1{width:min(92%,520px); aspect-ratio:1}
+.orbita-2{width:min(112%,640px); aspect-ratio:1}
+@media (max-width:820px){
+  .portada-wrap{grid-template-columns:minmax(0,1fr); align-items:start}
+  .portada-pieza{max-width:420px}
+  .orbita{display:none}
+}
+@media print{
+  .portada-wrap{grid-template-columns:minmax(0,1fr)}
+  .portada-acciones,.orbita{display:none}
+}
+/* @portada:fin */
+
+/* @cuerpo:inicio — componentes de CUERPO adoptables. Igual que la portada:
+   todo acotado por clase, ni un selector de elemento desnudo, y con nombres
+   nuevos (cero colision comprobada) para que el CSS propio del documento no
+   tenga con quien pelear.
+
+   Estos son los patrones que el censo encontro repetidos en mas de la mitad
+   de los documentos, cada uno escrito a mano y distinto:
+     etiqueta/chip 90%, ficha 87%, cifra 65%, tabla 63%, titulillo 58%,
+     aviso 54%. */
+
+/* ------------------------------------------------- titulillo de seccion ---
+   Abre una seccion. Es tipografia, NO una pastilla de color: gana lo tenia
+   como recuadro amarillo en mayusculas y eso compite con el titular de la
+   portada en vez de subordinarse a el. El amarillo va en el <em>, igual que
+   en la portada, y sobre una parte.
+
+     <div class="titulo-seccion">
+       <h2>Donde se puso <em>la plata</em></h2>
+       <p>El complemento del titular, si hace falta.</p>
+     </div>
+
+   El parrafo va al lado en pantalla ancha, no debajo: es complemento del
+   titular y tiene que leerse con el. */
+.titulo-seccion{
+  display:grid; gap:var(--s-4) var(--s-col); align-items:start;
+  grid-template-columns:minmax(0,1fr);
+  margin:0 0 var(--s-5)
+}
+.titulo-seccion:has(> p){grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)}
+.titulo-seccion h2{
+  margin:0; font-size:clamp(1.6rem,3.4vw,2.6rem);
+  letter-spacing:-.035em; line-height:1.05; max-width:22ch; text-wrap:balance
+}
+.titulo-seccion > p{
+  margin:0; max-width:46ch; color:var(--fg-secondary);
+  font-size:clamp(.95rem,1.2vw,1.05rem); align-self:end
+}
+.titulo-seccion > p b{color:var(--fg)}
+
+/* -------------------------------------------------------------- la ficha ---
+   Superficie elevada con una regla fina. Se distingue por eso, NO por una
+   franja de color al borde ni por un fondo hundido: un fondo igual al de la
+   pagina no eleva nada, y la franja sobre esquina redonda se lee como
+   pestana suelta.
+
+     <article class="panel-dato"> … </article>
+     <article class="panel-dato es-acento"> … </article>   una sola por grupo */
+.panel-dato{
+  background:var(--raised); border:1px solid var(--rule);
+  border-radius:var(--radius); padding:var(--s-5)
+}
+/* El acento se aplica al RELLENO, no al borde: una ficha amarilla entera
+   destaca de verdad, y su texto tiene pareja definida (--accent-ink, 8.8:1).
+   Se usa una vez por grupo, si no deja de destacar. */
+.panel-dato.es-acento{
+  background:var(--accent); border-color:var(--accent); color:var(--accent-ink)
+}
+.panel-dato.es-acento :is(h2,h3,h4,strong,b){color:var(--accent-ink)}
+
+/* --------------------------------------------------------- tira de cifras ---
+   Dos o tres cifras en fila, con una regla arriba. Las mismas reglas que la
+   tira de la portada, para que una cifra se lea igual en toda la casa. */
+.tira-cifras{
+  display:grid; gap:var(--s-5) var(--s-6);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));
+  margin:var(--s-5) 0 0; padding-top:var(--s-5);
+  border-top:1px solid var(--rule)
+}
+.tira-cifras div{display:grid; gap:3px; min-width:0}
+.tira-cifras dt{font-size:var(--fs-min); color:var(--fg-muted); font-weight:500; order:2}
+.tira-cifras dd{
+  margin:0; color:var(--fg); font-size:clamp(1.3rem,2.4vw,1.9rem);
+  font-weight:800; letter-spacing:-.02em; order:1
+}
+.tira-cifras dd small{
+  display:block; margin-top:4px; font-size:var(--fs-body-min);
+  font-weight:400; letter-spacing:0; color:var(--fg-muted)
+}
+.tira-cifras dd small b{color:var(--fg-secondary); font-weight:700}
+
+/* ------------------------------------------------------------- el rotulo ---
+   La etiqueta corta: un estado, un canal, un periodo. En minuscula: en
+   versales la lectura se degrada, y estas acaban llevando frases. */
+.rotulo{
+  display:inline-block; padding:4px 10px;
+  border:1px solid var(--rule); border-radius:var(--radius-sm);
+  font-size:var(--fs-min); font-weight:600; color:var(--fg-secondary);
+  background:var(--raised)
+}
+.rotulo.es-acento{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.rotulo.es-bien{color:var(--pos)}
+.rotulo.es-mal{color:var(--neg)}
+
+/* ------------------------------------------------------------- el aviso ---
+   Lo que hay que leer aunque se salte el resto. Enmarcado con el acento
+   COMPLETO, no con una barra lateral gruesa: la barra sobre esquina redonda
+   se lee como pestana, y es un patron fechado. */
+.bloque-aviso{
+  border:1px solid var(--accent); border-radius:var(--radius);
+  padding:var(--s-5); background:var(--raised); color:var(--fg-secondary)
+}
+.bloque-aviso :is(h2,h3,h4){margin:0 0 8px; font-size:1.05rem; color:var(--fg)}
+.bloque-aviso b,.bloque-aviso strong{color:var(--fg)}
+
+/* ------------------------------------------------------------- la tabla ---
+   Abierta. Sin caja, sin esquina redonda, sin cabecera de relleno oscuro:
+   la estructura la da la regla bajo el encabezado. El relleno oscuro con
+   texto en rol es lo que producia cabeceras invisibles al imprimir. */
+.tabla-abierta{overflow-x:auto; margin:var(--s-5) 0}
+.tabla-abierta table{width:100%; border-collapse:collapse}
+.tabla-abierta th{
+  text-align:left; font-size:var(--fs-min); font-weight:700; color:var(--fg-muted);
+  text-transform:none; padding:0 14px 12px 0;
+  border-bottom:1px solid var(--rule-strong); white-space:nowrap
+}
+.tabla-abierta td{
+  padding:12px 14px 12px 0; color:var(--fg-secondary);
+  border-bottom:1px solid var(--rule); vertical-align:top
+}
+.tabla-abierta tr:last-child td{border-bottom:0}
+.tabla-abierta .es-total td{color:var(--fg); font-weight:800; border-top:1px solid var(--rule-strong)}
+/* Las marcas de dato no redondean: una barra cuadrada mide mejor. */
+.tabla-abierta .barra{height:6px; background:var(--sunken); border-radius:0}
+.tabla-abierta .barra i{display:block; height:100%; background:var(--accent-fg)}
+
+@media (max-width:820px){
+  .titulo-seccion:has(> p){grid-template-columns:minmax(0,1fr)}
+}
+/* @cuerpo:fin */
+
+/* --------------------------------------------------------------- fichas --- */
+.shelf{display:grid; gap:var(--s-4);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr))}
+/* Una categoría con un solo documento no lo estira a todo el ancho: sigue
+   siendo una ficha, no un cartel. */
+.shelf > .card:only-child{max-width:560px}
+.card{display:grid; align-content:start; gap:14px; padding:var(--s-5);
+  background:var(--raised); border:1px solid var(--rule); border-radius:var(--radius);
+  text-decoration:none; color:inherit;
+  transition:border-color .25s var(--ease), transform .25s var(--ease)}
+@media (prefers-reduced-motion:no-preference){
+  a.card:hover{transform:translateY(-3px); border-color:var(--ink)}
+}
+a.card:focus-visible{border-color:var(--ink)}
+/* la clase de documento, que es lo que el lector busca primero */
+.card .kind{font-size:.78rem; font-weight:700; color:var(--ink-muted)}
+.card h2,.card h3{font-size:clamp(1.28rem,2.1vw,1.75rem)}
+.card p{color:var(--ink-secondary); font-size:var(--fs-body-min)}
+/* los datos del documento, no una fila de tarjetas dentro de la tarjeta */
+.card dl{display:flex; flex-wrap:wrap; gap:14px 24px; margin:4px 0 0; padding-top:16px;
+  border-top:1px solid var(--rule)}
+.card dl > div{min-width:0}
+.card dt{font-size:.75rem; color:var(--ink-muted); font-weight:600}
+.card dd{margin:3px 0 0; font-weight:700; font-size:.95rem; font-variant-numeric:tabular-nums;
+  letter-spacing:-.02em}
+.card .go{display:inline-flex; align-items:center; gap:8px; font-size:.82rem; font-weight:700}
+.card .go .ico,.card .go svg{transition:transform .25s var(--ease)}
+@media (prefers-reduced-motion:no-preference){ a.card:hover .go svg{transform:translate(3px,-3px)} }
+/* --------------------------------------------------------- ficha breve ---
+   El patrón por defecto del índice: el documento y su enlace, y nada más.
+
+   El índice NO argumenta, aloja. El lector está eligiendo a dónde ir, no
+   leyendo el informe: una bajada, una fecha y tres cifras por ficha le dan
+   trabajo de lectura antes de haber entrado a ningún sitio, y en una
+   biblioteca de quince documentos eso convierte la puerta de entrada en un
+   muro. El nombre del documento y su icono de tipo alcanzan.
+
+     <a class="card card-breve" href="ruta-estrategica.html">
+       <span class="card-top">
+         <svg class="ico ico-lg" aria-hidden="true"><use href="#i-ruta"></use></svg>
+         <svg class="ico" aria-hidden="true"><use href="#i-abrir"></use></svg>
+       </span>
+       <h3>Ruta estratégica</h3>
+     </a>
+
+   Iconos de tipo: `i-ruta` `i-grafico` `i-tendencia` `i-documento` `i-tabla`
+   `i-pieza` `i-buscar` `i-reloj`.
+
+   Regla: `.kind` O categorías, nunca los dos. Si las fichas viven dentro de un
+   `.grupo` que ya se llama "Informes", repetir "Informe" en cada ficha no
+   agrega nada. `.kind` es para un índice sin grupos, como el de genius. */
+.card-breve{padding:var(--s-4); gap:var(--s-3)}
+.card-breve h2,.card-breve h3{font-size:clamp(1.1rem,1.7vw,1.35rem)}
+.card-breve .go{margin-top:2px}
+/* la fila de arriba: el tipo a la izquierda, la salida a la derecha */
+.card-top{
+  display:flex; align-items:center; justify-content:space-between; gap:var(--s-3);
+  color:var(--fg-muted)
+}
+.card-top .ico-lg{color:var(--accent-fg)}
+.card-top .ico:last-child{transition:transform .25s var(--ease)}
+@media (prefers-reduced-motion:no-preference){
+  a.card:hover .card-top .ico:last-child{transform:translate(2px,-2px)}
+}
+.card.is-empty .card-top,.card.is-empty .card-top .ico-lg{color:var(--fg-muted)}
+
+/* el estado vacío: existe, y dice cómo se llena */
+.card.is-empty{background:none; border-style:dashed}
+.card.is-empty h2,.card.is-empty h3,.card.is-empty p{color:var(--ink-muted)}
+
+/* Toda superficie del sistema comparte el mismo redondeo. Se declara aquí en
+   una lista para que no se olvide ninguna al agregar un componente: si algo
+   tiene fondo o borde propio, va en esta lista o lleva --radius en su regla. */
+.chart-shell,.table-wrap,.empty-state,.filters,.specific-explorer,
+.universe-card,.channel-card,.journey-card,.insight-panel,.performance-panel,
+.trend-chart-shell,.signal-table-wrap{border-radius:var(--radius)}
+.filters select,.filters input,.reset-button,.term-button,
+.opcion,.categorias a,.category-nav a,.button{border-radius:var(--radius-sm)}
+/* las marcas de dato NO redondean: una barra cuadrada mide mejor */
+.bar-track,.bar-track i,.share-bar,.share-bar i,.demand-track,.demand-track i,
+.ranking-track,.ranking-track i,.funnel-level,.legend i,.legend-swatch,
+.table-dot,.mini-month i,.signal-bars i,.channel-icon{border-radius:0}
+
+/* ---------------------------------------------------------- menú lateral ---
+   Para un documento largo de Operate (una ruta estratégica, un tablero) que
+   necesita orientación constante: qué sección estoy viendo, cuántas faltan.
+   Riel fijo a la izquierda, siempre oscuro (mueble, no contenido, ver los
+   tokens `--shell-*`), con una topbar y el contenido normal del sistema
+   adentro — el contenido SÍ sigue el suelo del documento.
+
+     <body class="con-shell">
+       <nav class="app-sidebar">
+         <div class="app-sidebar-top">
+           <a class="app-sidebar-brand" href="index.html"><i></i>Adcom</a>
+           <div class="app-sidebar-client">
+             <span class="app-sidebar-client-label">Cliente</span>
+             <strong class="app-sidebar-client-name">…</strong>
+             <span class="app-sidebar-client-period">…</span>
+           </div>
+         </div>
+         <div class="app-sidebar-nav">
+           <span class="app-sidebar-nav-title">Contenido</span>
+           <a href="#s-reto"><b></b>El reto<small>01</small></a>
+           …
+         </div>
+         <div class="app-sidebar-foot">Uso interno, no compartir sin autorización</div>
+       </nav>
+       <div class="app-main">
+         <div class="app-topbar">
+           <span class="app-topbar-crumb">Ruta estratégica</span>
+           <span class="app-topbar-section">El reto</span>
+         </div>
+         <div class="app-content wrap"> … franjas, paneles, tablas normales … </div>
+       </div>
+     </body>
+
+   `adcom.js` marca `.active` en el enlace de la sección visible y actualiza
+   `.app-topbar-section`; sin JS el riel sigue siendo una tabla de contenidos
+   funcional, solo sin el resaltado. */
+body.con-shell{display:flex; align-items:stretch; min-height:100vh}
+
+.app-sidebar{
+  width:248px; flex:0 0 auto; position:sticky; top:0; align-self:flex-start;
+  height:100vh; overflow-y:auto; scrollbar-width:none;
+  display:flex; flex-direction:column;
+  background:var(--shell-bg); color:var(--shell-fg)
+}
+.app-sidebar::-webkit-scrollbar{display:none}
+
+.app-sidebar-top{padding:22px 18px 18px; border-bottom:1px solid var(--shell-rule)}
+.app-sidebar-brand{
+  display:inline-flex; align-items:center; gap:8px; margin-bottom:16px;
+  color:var(--shell-fg); text-decoration:none; font-weight:800; font-size:.85rem
+}
+.app-sidebar-brand i{width:8px; height:8px; border-radius:50%; background:var(--accent); flex:0 0 auto}
+.app-sidebar-client{
+  padding:10px 12px; background:rgba(244,244,241,.04);
+  border:1px solid var(--shell-rule); border-radius:var(--radius-sm)
+}
+.app-sidebar-client-label{display:block; font-size:var(--fs-min); font-weight:600; color:var(--shell-fg-muted)}
+.app-sidebar-client-name{display:block; margin-top:3px; font-size:.86rem; font-weight:700; line-height:1.3}
+.app-sidebar-client-period{display:block; margin-top:3px; font-size:var(--fs-min); color:var(--shell-fg-muted)}
+
+.app-sidebar-nav{padding:14px 10px; flex:1}
+.app-sidebar-nav-title{
+  display:block; padding:6px 10px 8px; font-size:var(--fs-min); font-weight:700; color:var(--shell-fg-muted)
+}
+.app-sidebar-nav a{
+  display:flex; align-items:center; gap:9px; padding:8px 10px; margin-bottom:1px;
+  border-radius:var(--radius-sm); color:var(--shell-fg-muted); text-decoration:none;
+  font-size:.78rem; font-weight:600; line-height:1.3;
+  transition:background .15s var(--ease), color .15s var(--ease)
+}
+.app-sidebar-nav a b{width:6px; height:6px; border-radius:50%; background:currentColor; opacity:.4; flex:0 0 auto}
+.app-sidebar-nav a small{
+  margin-left:auto; padding-left:8px; font-size:var(--fs-min); font-weight:600;
+  color:var(--shell-fg-muted); font-variant-numeric:tabular-nums; white-space:nowrap
+}
+.app-sidebar-nav a:hover{background:rgba(244,244,241,.06); color:var(--shell-fg)}
+.app-sidebar-nav a.active{background:var(--shell-active); color:var(--shell-fg)}
+.app-sidebar-nav a.active b{background:var(--accent); opacity:1}
+.app-sidebar-nav a:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
+
+.app-sidebar-foot{
+  padding:14px 18px; border-top:1px solid var(--shell-rule);
+  color:var(--shell-fg-muted); font-size:var(--fs-min); line-height:1.5
+}
+
+.app-main{flex:1; min-width:0; display:flex; flex-direction:column}
+.app-topbar{
+  position:sticky; top:0; z-index:40; display:flex; align-items:center; gap:10px;
+  padding:14px var(--gutter);
+  background:color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--rule)
+}
+.app-topbar-crumb{color:var(--fg-muted); font-size:.8rem; font-weight:600; white-space:nowrap}
+.app-topbar-section{font-weight:700; font-size:.85rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.app-topbar-crumb + .app-topbar-section::before{content:"›"; margin-right:10px; color:var(--fg-muted); font-weight:400}
+.app-topbar-meta{margin-left:auto; color:var(--fg-muted); font-size:.78rem; font-weight:600; white-space:nowrap}
+.app-content{padding-block:var(--s-6)}
+
+/* Bajo 900px el riel deja de ser columna: se acuesta arriba como una franja
+   angosta de navegación horizontal. Sigue siendo la misma tabla de
+   contenidos, solo en otra forma; no se oculta detrás de un botón que el
+   lector tiene que descubrir. */
+@media (max-width:900px){
+  body.con-shell{flex-direction:column; min-height:0}
+  .app-sidebar{
+    position:sticky; top:0; z-index:50; width:100%; height:auto;
+    flex-direction:row; align-items:center; overflow-x:auto; overflow-y:hidden
+  }
+  .app-sidebar-top{
+    padding:10px 14px; border-bottom:0; border-right:1px solid var(--shell-rule);
+    flex:0 0 auto; display:flex; align-items:center
+  }
+  .app-sidebar-brand{margin:0}
+  .app-sidebar-client{display:none}
+  .app-sidebar-nav{
+    display:flex; align-items:center; gap:2px; padding:8px 10px; flex:0 0 auto
+  }
+  .app-sidebar-nav-title{display:none}
+  .app-sidebar-nav a{white-space:nowrap}
+  .app-sidebar-foot{display:none}
+  .app-topbar{top:0}
+}
+
+/* ---------------------------------------------------------------- marco ---
+   Un grupo enmarcado, con el borde en acento. Es para cuando varias piezas
+   forman UNA decisión (elegir un escenario, comparar tres opciones) y hay que
+   verlas como un bloque, no como tres cosas suerpas por la página.
+
+   Se usa poco: si todo va enmarcado, el marco deja de significar. */
+.marco{
+  padding:var(--s-5);
+  border:1px solid var(--accent);
+  border-radius:var(--radius);
+  background:var(--raised)
+}
+.marco > * + *{margin-top:var(--s-4)}
+.marco-head h2,.marco-head h3{font-size:clamp(1.3rem,2.4vw,1.9rem); max-width:22ch}
+.marco-head p{max-width:var(--measure); margin-top:12px; color:var(--fg-secondary);
+  font-size:.93rem; line-height:1.55}
+@media (min-width:900px){
+  .marco-duo{display:grid; grid-template-columns:minmax(240px,.8fr) minmax(0,1.6fr);
+    gap:var(--s-5); align-items:start}
+  .marco-duo > * + *{margin-top:0}
+}
+
+/* ------------------------------------------------------------- opciones ---
+   Un grupo de controles donde uno está elegido. El elegido va en AMARILLO
+   LLENO, con --accent-ink encima (8.8:1): es el estado más visible que
+   tiene el sistema, y por eso se reserva para "esto es lo que estás viendo". */
+.opciones{display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))}
+.opcion{
+  display:grid; align-content:start; gap:6px; padding:14px 16px; text-align:left;
+  cursor:pointer; background:var(--raised); color:var(--fg);
+  border:1px solid var(--rule); border-radius:var(--radius-sm);
+  transition:border-color .2s var(--ease), background .2s var(--ease)
+}
+.opcion:hover{border-color:var(--fg)}
+.opcion > span{color:var(--fg-muted); font-size:.75rem; font-weight:700;
+  font-variant-numeric:tabular-nums}
+.opcion > strong{font-size:1rem; font-weight:800; letter-spacing:-.02em; line-height:1.2}
+.opcion > small{color:var(--fg-secondary); font-size:.82rem; line-height:1.4}
+.opcion[aria-pressed="true"],.opcion.is-active{
+  background:var(--accent); border-color:var(--accent); color:var(--accent-ink)
+}
+.opcion[aria-pressed="true"] > span,.opcion.is-active > span,
+.opcion[aria-pressed="true"] > small,.opcion.is-active > small{color:var(--accent-ink); opacity:.78}
+
+/* ------------------------------------------------------------- paneles ---
+   Prosa separada por una regla, no metida en una caja. Las cajas anidadas
+   son siempre un error, y una ficha dentro de una ficha lo es dos veces. */
+.duo{display:grid; gap:var(--s-5);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+.panel{padding:24px 0 0; border:0; border-top:2px solid var(--rule-strong);
+  background:none; box-shadow:none; color:var(--ink)}
+.panel h3{font-size:1.3rem; margin:0 0 12px}
+.panel p{color:var(--ink-secondary); font-size:.96rem; margin:0 0 .8em}
+.panel p:last-child{margin-bottom:0}
+.panel p b{color:var(--ink)}
+.panel-hi{border-top-color:var(--accent)}
+
+/* el bloque de énfasis: una regla de acento y tipografía grande, no un cartel */
+.quote{margin-top:var(--s-5); padding:var(--s-5) 0 0;
+  border-top:2px solid var(--accent); background:none; color:var(--ink)}
+.quote p{margin:0; max-width:24ch; font-size:clamp(1.4rem,3vw,2.2rem);
+  font-weight:800; letter-spacing:-.045em; line-height:1.1}
+.quote p.sub{max-width:var(--measure); margin-top:16px; font-size:1rem; font-weight:400;
+  line-height:1.55; letter-spacing:0; color:var(--ink-secondary)}
+.quote cite{display:block; margin-top:18px; font-style:normal; font-size:.86rem;
+  font-weight:600; color:var(--ink-muted)}
+
+/* --------------------------------------------------------------- medios ---
+   Una foto con la esquina blanda se lee como PIEZA; una tabla o una barra con
+   la esquina blanda solo se lee como descuido. De ahí la regla de forma:
+   superficies y medios llevan --radius, las marcas de dato llevan 0. */
+.media{
+  position:relative; overflow:hidden; margin:0;
+  border-radius:var(--radius); background:var(--sunken)
+}
+.media img{width:100%; height:100%; object-fit:cover; display:block}
+.media-4-5 img{aspect-ratio:4/5}
+.media-1-1 img{aspect-ratio:1/1}
+.media-16-9 img{aspect-ratio:16/9}
+/* Rótulo dentro de la pieza: sobre un velo, no sobre la foto pelada, porque
+   una foto cualquiera no garantiza contraste. */
+.media figcaption{
+  position:absolute; inset-inline:0; bottom:0; z-index:1;
+  padding:var(--s-4);
+  background:linear-gradient(transparent, rgba(5,5,5,.78) 62%);
+  color:#f4f4f1; font-weight:800; letter-spacing:-.03em; line-height:1.05;
+  font-size:clamp(1.1rem,2.4vw,1.7rem); text-wrap:balance
+}
+/* Marca de la pieza: un motivo de marca, no un control. Va aria-hidden. */
+.media-motif{
+  position:absolute; z-index:2; top:14px; left:14px;
+  display:flex; align-items:center; width:64px; height:32px; padding:4px;
+  background:var(--inv-ground); border-radius:999px
+}
+.media-motif i{width:24px; height:24px; border-radius:50%; background:var(--accent)}
+
+/* ------------------------------------------------------------- figuras --- */
+.figure{margin:0}
+.figure figcaption{margin-top:22px; padding-top:16px; border-top:1px solid var(--rule);
+  color:var(--ink-muted); font-size:.88rem; max-width:var(--measure)}
+.figure figcaption b{color:var(--ink)}
+.axis{display:flex; justify-content:space-between; align-items:baseline; gap:16px;
+  font-size:.78rem; font-weight:600; color:var(--ink-muted); margin-bottom:20px}
+
+/* --------------------------------------------------------------- barras ---
+   El gráfico del sistema. No hay librería: una pista, un relleno y el dato
+   en tabular. Imprime bien, no pesa, y se lee sin leyenda. */
+.bars{display:grid; gap:var(--s-4)}
+.bar-row{display:grid; gap:9px}
+.bar-head{display:flex; justify-content:space-between; align-items:baseline; gap:16px}
+.bar-head .name{font-weight:600; font-size:.95rem}
+.bar-head .val{font-weight:800; font-size:1.28rem; letter-spacing:-.04em;
+  font-variant-numeric:tabular-nums}
+.bar-track{position:relative; height:14px; background:var(--sunken)}
+.bar-track i{display:block; height:100%; background:var(--ink); transform-origin:left center}
+.bar-track i.is-over{background:var(--neg)}
+.bar-track i.is-best{background:var(--accent-deep)}
+.bar-mark{position:absolute; inset-block:-7px; width:1px; background:var(--rule-strong)}
+.bar-foot{display:flex; justify-content:space-between; gap:16px; font-size:.76rem;
+  color:var(--ink-muted)}
+
+/* reparto: la misma gramática, en fila compacta */
+.share{display:grid; gap:11px}
+.share-row{display:grid; grid-template-columns:minmax(64px,84px) 1fr 44px; gap:12px;
+  align-items:center; font-size:.77rem}
+.share-row span{color:var(--ink-muted); font-weight:600}
+.share-row b{text-align:right; font-weight:700; font-variant-numeric:tabular-nums}
+.share-bar{height:10px; background:var(--sunken)}
+.share-bar i{display:block; height:100%; background:var(--ink); transform-origin:left center}
+.share-row.is-accent .share-bar i{background:var(--accent-deep)}
+
+/* rango entre el mejor y el peor de una familia */
+.ranges{display:grid; gap:var(--s-5)}
+.range-head{display:flex; justify-content:space-between; align-items:baseline; gap:16px}
+.range-head .name{font-weight:600; font-size:.95rem}
+.range-head .span{font-size:.77rem; color:var(--ink-muted); font-variant-numeric:tabular-nums}
+.range-track{position:relative; height:14px; background:var(--sunken); margin-top:26px}
+.range-fill{position:absolute; top:0; height:14px; transform-origin:left center;
+  background:linear-gradient(90deg,var(--accent-deep),var(--neg))}
+.range-mark{position:absolute; inset-block:-7px; width:1px; background:var(--rule-strong)}
+.range-pin{position:absolute; top:-4px; width:22px; height:22px; margin-left:-11px;
+  border-radius:50%; background:var(--paper); border:3px solid var(--ink)}
+.range-pin.lo{border-color:var(--accent-deep)}
+.range-pin.hi{border-color:var(--neg)}
+.range-pin em{position:absolute; left:50%; transform:translateX(-50%); top:-23px;
+  font-style:normal; font-size:.76rem; font-weight:800;
+  font-variant-numeric:tabular-nums; white-space:nowrap}
+.range-foot{display:flex; justify-content:space-between; gap:20px; margin-top:12px;
+  font-size:.76rem; color:var(--ink-muted)}
+.range-foot b{color:var(--ink-secondary); font-weight:600}
+
+/* -------------------------------------------------------------- gráfico ---
+   Encabezado de un gráfico cualquiera, incluido Chart.js. No es una isla
+   oscura ni una caja con sombra: es un título, el dibujo, y un pie que
+   explica qué se está mirando. */
+.chart{padding:0; border:0; background:none; box-shadow:none; color:var(--ink)}
+.chart-top{display:flex; justify-content:space-between; align-items:baseline; gap:16px;
+  margin-bottom:20px}
+.chart-top h3{margin:0; font-size:1.05rem; font-weight:600; letter-spacing:-.02em}
+.chart-hint{font-size:.78rem; font-weight:600; color:var(--ink-muted);
+  text-align:right; flex:0 0 auto}
+.chart-canvas{position:relative; width:100%}
+.chart-foot{margin-top:20px; padding-top:16px; border-top:1px solid var(--rule);
+  color:var(--ink-muted); font-size:.88rem; max-width:var(--measure); line-height:1.55}
+.chart-foot b{color:var(--ink)}
+/* leyenda escrita a mano cuando la del gráfico no alcanza */
+.legend{display:flex; flex-wrap:wrap; gap:10px 22px; margin-bottom:18px;
+  font-size:.78rem; font-weight:600; color:var(--ink-muted)}
+.legend span{display:inline-flex; align-items:center; gap:8px}
+.legend i{width:12px; height:12px; background:var(--ink); flex:0 0 auto}
+.legend i.is-accent{background:var(--accent-deep)}
+.legend i.is-neg{background:var(--neg)}
+.legend i.is-mute{background:var(--sunken); border:1px solid var(--rule)}
+
+/* ---------------------------------------------------------------- tabla --- */
+.table-scroll,.table-wrap{overflow-x:auto; border:0; background:none}
+table{width:100%; min-width:620px; border-collapse:collapse; font-size:.92rem}
+caption{text-align:left; font-size:.88rem; color:var(--ink-muted); padding-bottom:14px}
+thead th{text-align:left; font-size:.78rem; font-weight:700; color:var(--ink-muted);
+  padding:0 18px 12px 0; border-bottom:1px solid var(--rule-strong)}
+thead th + th{text-align:right; padding-inline:18px 0}
+tbody th{text-align:left; font-weight:600; padding:16px 18px 16px 0; vertical-align:top}
+tbody td{text-align:right; padding:16px 0 16px 18px; color:var(--ink-secondary);
+  font-variant-numeric:tabular-nums; vertical-align:top}
+tbody tr + tr th, tbody tr + tr td{border-top:1px solid var(--rule)}
+tbody td b{color:var(--ink); font-weight:700}
+td.is-neg,.is-neg > b{color:var(--neg)}
+
+/* --------------------------------------------------------------- piezas ---
+   Rejilla de creativos: la imagen manda, el dato va debajo. Sin etiquetas
+   encima de la foto. */
+.works{display:grid; gap:var(--s-4);
+  grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr))}
+.work{min-width:0}
+.work figure{margin:0; position:relative; overflow:hidden; background:var(--sunken)}
+.work figure img{width:100%; aspect-ratio:4/5; object-fit:cover;
+  transition:transform .5s var(--ease)}
+@media (prefers-reduced-motion:no-preference){ .work:hover figure img{transform:scale(1.03)} }
+.work-body{padding-top:14px; display:grid; gap:7px; min-width:0}
+/* los nombres de anuncio no tienen dónde partir y ensanchan la columna */
+.work-body h3{font-size:.97rem; letter-spacing:-.03em; line-height:1.25; overflow-wrap:anywhere}
+.work-kind{font-size:.78rem; color:var(--ink-muted); font-weight:600}
+.work-body p{font-size:.86rem; color:var(--ink-secondary); line-height:1.5}
+.work-stats{display:flex; flex-wrap:wrap; gap:12px 20px; padding-top:11px;
+  border-top:1px solid var(--rule); font-size:.76rem; color:var(--ink-muted)}
+.work-stats b{display:block; color:var(--ink); font-size:.94rem; font-weight:700;
+  font-variant-numeric:tabular-nums; letter-spacing:-.02em}
+
+/* --------------------------------------------------------------- listas ---
+   Una lista larga no se arregla alargándola. Dos columnas, numeración solo
+   cuando el orden significa algo, y la regla arriba del grupo, no bajo
+   cada fila. */
+.orders{margin:0; padding:0; list-style:none}
+.orders li{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);
+  gap:var(--s-col); padding-block:var(--s-5);
+  border-top:1px solid var(--rule)}
+.orders li:last-child{border-bottom:1px solid var(--rule)}
+.orders h3{font-size:clamp(1.1rem,1.9vw,1.45rem)}
+.orders p{color:var(--ink-secondary); font-size:.93rem; max-width:54ch}
+@media (max-width:760px){ .orders li{grid-template-columns:1fr; gap:10px} }
+
+.rules{display:grid; gap:var(--s-5);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+.rule-col h3{font-size:1.45rem; padding-bottom:16px; border-bottom:2px solid var(--rule-strong)}
+.rule-col.is-yes h3{border-bottom-color:var(--accent)}
+.rule-col.is-no h3{border-bottom-color:var(--neg)}
+.rule-col ol{margin:22px 0 0; padding:0; list-style:none; display:grid; gap:20px; counter-reset:r}
+.rule-col li{counter-increment:r; display:grid; grid-template-columns:26px minmax(0,1fr); gap:14px}
+.rule-col li::before{content:counter(r,decimal-leading-zero); font-size:.78rem; font-weight:700;
+  color:var(--ink-muted); padding-top:.4em; font-variant-numeric:tabular-nums}
+.rule-col li b{display:block; font-size:1rem; letter-spacing:-.02em; line-height:1.3}
+.rule-col li p{margin-top:5px; color:var(--ink-secondary); font-size:.9rem; line-height:1.5}
+
+/* -------------------------------------------------- el momento invertido ---
+   Una vez por documento. Ni dos. */
+.slab{background:var(--inv-ground); color:var(--inv-text); padding-block:var(--s-6)}
+.slab h2{font-size:clamp(1.8rem,3.8vw,3rem); max-width:20ch}
+.slab .lede{color:var(--inv-secondary); margin-top:18px}
+.slab .divider{border-top-color:var(--inv-rule-strong)}
+.slab .note{color:var(--inv-secondary)}
+.calls{display:grid; gap:var(--s-5); margin-top:var(--s-5);
+  grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:1040px){ .calls{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:700px){ .calls{grid-template-columns:1fr} }
+.call{display:grid; gap:12px; align-content:start}
+.call h3{font-size:1.2rem; letter-spacing:-.03em; line-height:1.22}
+.call p{color:var(--inv-secondary); font-size:.93rem; line-height:1.55}
+.call .verdict{display:inline-block; font-size:.8rem; font-weight:700; color:var(--inv-accent);
+  border-top:2px solid var(--inv-accent); padding-top:10px; letter-spacing:-.01em}
+.slab-foot{margin-top:var(--s-5); padding-top:22px; border-top:1px solid var(--inv-rule);
+  color:var(--inv-secondary); font-size:.88rem; max-width:var(--measure)}
+.slab-foot b{color:var(--inv-text)}
+
+/* -------------------------------------------------------------- colofón --- */
+.colophon{padding-block:var(--s-6); border-top:1px solid var(--rule-strong)}
+.colophon dl{display:grid; grid-template-columns:auto minmax(0,1fr);
+  gap:12px var(--s-5); margin:0; max-width:920px}
+.colophon dt{font-size:.78rem; font-weight:700; color:var(--ink-muted); padding-top:.25em;
+  white-space:nowrap}
+.colophon dd{margin:0; color:var(--ink-secondary); font-size:.9rem; line-height:1.5}
+.colophon code{font-family:var(--fuente-mono);
+  font-size:.85em; background:var(--sunken); padding:2px 6px}
+@media (max-width:560px){
+  .colophon dl{grid-template-columns:1fr; gap:2px}
+  .colophon dt{padding-top:16px}
+}
+.footer{padding:26px var(--gutter); border-top:1px solid var(--rule);
+  display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px;
+  color:var(--ink-muted); font-size:.78rem}
+.footer a{color:var(--ink-secondary)}
+
+/* --------------------------------------------------------------- motion ---
+   Un solo momento autorado en todo el sistema: el dato se dibuja cuando su
+   figura entra en pantalla. No hay entrada idéntica en cada sección, ni
+   bucles infinitos. base.js le pone .is-in con un IntersectionObserver. */
+@media (prefers-reduced-motion:no-preference){
+  .grow .bar-track i,
+  .grow .range-fill,
+  .grow .share-bar i{transform:scaleX(0); transition:transform .85s var(--ease)}
+  .grow .range-pin,
+  .grow .bar-head .val{opacity:0; transition:opacity .45s var(--ease) .4s}
+  .grow.is-in .bar-track i,
+  .grow.is-in .range-fill,
+  .grow.is-in .share-bar i{transform:scaleX(1)}
+  .grow.is-in .range-pin,
+  .grow.is-in .bar-head .val{opacity:1}
+}
+
+/* ============================================================================
+   CAPA DE COMPATIBILIDAD
+   ----------------------------------------------------------------------------
+   Los informes viejos traen otros nombres de clase. En vez de reescribir su
+   HTML, se los neutraliza aquí: el lenguaje visual pasa a ser el de arriba
+   (papel, Poppins, un solo acento) y el marcado se queda como está.
+
+   Migrar un documento viejo son dos pasos:
+     1. borrar su <style> embebido
+     2. enlazar este archivo
+   Y después, cuando haya tiempo, cambiar sus clases por las canónicas.
+   ========================================================================= */
+
+/* Las franjas heredadas se respetan: `.section-dark` ES el suelo tinta y
+   `.section-light` ES el suelo papel, declarados arriba junto a los suelos
+   sin duplicar un token. Un informe viejo recupera su ritmo de color con el
+   contraste correcto y sin tocar su HTML.
+
+   Lo único que se corrige es el ritmo: dos franjas seguidas del mismo suelo
+   no duplican el aire, porque son una sola franja. */
+.section-dark,.section-light,.s-dark,.s-light{
+  padding-block:var(--step); padding-inline:var(--gutter)
+}
+.s-dark,.s-light{padding-inline:0}
+/* Una franja pinta de borde a borde, pero su CONTENIDO no. En el marcado nuevo
+   eso lo hace un `.wrap` dentro; los informes viejos no lo tienen, así que se
+   le pone a cada hijo directo de la franja. Sin esto el bloque se estira a
+   todo el viewport: a 1900px la columna de un titular mide 1000px y su
+   complemento aterriza a 1060, con 700px de vacío en medio, y una acción
+   suelta queda pegada al borde izquierdo. */
+.section-dark > *,.section-light > *,.s-dark > *,.s-light > *{
+  max-width:var(--max); margin-inline:auto
+}
+/* Dos franjas seguidas del mismo suelo son UNA franja, así que su aire no se
+   duplica. El colapso va en el ABAJO de la primera, no en el ARRIBA de la
+   segunda: si la primera cierra con una regla, con el colapso al revés el
+   titular de la siguiente aterrizaba pegado a la línea y todo el aire quedaba
+   del lado equivocado.
+
+   Sin `:has()` no se colapsa nada: sobra aire, que es preferible a un titular
+   encima de una regla. */
+.section-light:has(+ .section-light),.section-dark:has(+ .section-dark),
+.s-light:has(+ .s-light),.s-dark:has(+ .s-dark){padding-bottom:0}
+.franja:has(+ .franja[data-suelo="papel"])[data-suelo="papel"],
+.franja:has(+ .franja[data-suelo="tinta"])[data-suelo="tinta"]{padding-bottom:0}
+/* Nota: NO se colapsa el aire entre franjas de suelo distinto. Ahí el cambio
+   de color es el que abre el capítulo, y necesita su respiro completo. */
+.inner,.section-inner{max-width:var(--max); margin-inline:auto}
+
+/* El eyebrow se va. El titular carga su propio peso: si hace falta una
+   etiqueta encima para entenderlo, el titular está mal escrito. */
+.eyebrow,.section-index,.card-index,.scroll-cue{display:none}
+
+/* Portadas heredadas */
+.hero,.library-hero{padding-top:var(--s-6); min-height:0; display:block}
+/* los titulares heredados también suben a la escala de display */
+.hero h1,.library-hero h1,.intro h1,.trends-hero h1{
+  font-size:var(--fs-display);
+  letter-spacing:var(--tk-display);
+  line-height:var(--lh-display);
+  max-width:18ch
+}
+.hero-lead,.library-lead{max-width:var(--measure); margin-top:var(--s-5);
+  color:var(--ink-secondary); font-size:clamp(1.05rem,1.55vw,1.22rem)}
+.hero-lead b,.library-lead b{color:var(--ink)}
+/* NO se ocultan los <br> de los titulares. Ocultar un <br> entre dos palabras
+   borra el salto y también el espacio: `tiene<br>un` renderiza "tieneun".
+   Un salto que el autor puso a mano es menos malo que una palabra pegada.
+   Los <br> arbitrarios se quitan del MARCADO al migrar, no con CSS. */
+.mobile-break{display:none}
+
+/* La fila de cifras deja de ser una rejilla de fichas */
+.hero-stats,.library-count,.document-stats{display:flex; flex-wrap:wrap;
+  gap:22px var(--s-col); margin:var(--s-5) 0 0; padding-top:22px;
+  border:0; border-top:1px solid var(--rule); background:none; overflow:visible;
+  align-items:start}
+.hero-stats div,.document-stats div{padding:0; background:none; border:0; display:grid; gap:3px}
+.hero-stats dt,.document-stats span{font-size:.82rem; color:var(--ink-muted); font-weight:500;
+  letter-spacing:0; text-transform:none; order:2}
+.hero-stats dd,.document-stats strong{margin:0; color:var(--ink); font-size:1.05rem;
+  font-weight:700; letter-spacing:-.03em; font-variant-numeric:tabular-nums; order:1}
+.hero-stats dd small{display:block; margin-top:2px; font-size:.82rem; font-weight:400;
+  color:var(--ink-muted); letter-spacing:0}
+/* el contador "02" con cero de relleno deja de ser un titular */
+.library-count strong{font-size:1.05rem; letter-spacing:-.03em}
+
+/* Titulares de sección heredados */
+.s-head,.section-heading{display:grid; gap:18px; margin:0 auto var(--s-5);
+  max-width:var(--max); align-items:start}
+.s-head h2,.section-heading h2{font-size:clamp(1.9rem,4.2vw,3.4rem); max-width:20ch;
+  line-height:1.03; letter-spacing:-.045em; font-weight:800}
+.s-head > p,.section-heading > p{max-width:46ch; color:var(--fg-secondary);
+  font-size:1.05rem; line-height:1.55; margin:0}
+@media (min-width:900px){
+  /* El texto de la derecha es un COMPLEMENTO del titular, no una segunda
+     columna del mismo peso: va cerca (--s-5, no --s-col) y en la parte
+     estrecha de la rejilla. */
+  .s-head,.section-heading{
+    grid-template-columns:minmax(0,auto) minmax(0,40ch);
+    justify-content:start;
+    gap:var(--s-5); align-items:start}
+  /* la explicación arranca a la altura de la primera línea del titular, no
+     flotando por encima: con align-items:end y una explicación más alta que el
+     titular, el párrafo se leía como una nota suelta en la esquina */
+  .s-head > p,.section-heading > p{padding-top:.45em}
+}
+
+/* Fichas de documento heredadas, a la ficha canónica */
+.document-grid{display:grid; gap:var(--s-4);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr))}
+.document-card{display:grid; align-content:start; gap:14px; padding:var(--s-5);
+  background:var(--raised); border:1px solid var(--rule); border-radius:var(--radius);
+  text-decoration:none; color:inherit; box-shadow:none;
+  transition:border-color .25s var(--ease), transform .25s var(--ease)}
+@media (prefers-reduced-motion:no-preference){
+  a.document-card:hover{transform:translateY(-3px); border-color:var(--ink)}
+}
+.document-card h3{font-size:clamp(1.28rem,2.1vw,1.75rem)}
+.document-card > p{color:var(--ink-secondary); font-size:.92rem}
+.document-card .card-meta,.document-meta{display:flex; flex-wrap:wrap; gap:6px 14px;
+  font-size:.78rem; font-weight:700; color:var(--ink-muted)}
+.document-card .card-meta time,.document-card .card-meta span{font-weight:600}
+/* las píldoras de estado dejan de ser píldoras */
+.document-tag{display:inline; padding:0; border:0; border-radius:0; background:none;
+  font-size:.78rem; font-weight:700; color:var(--ink-muted); text-transform:none;
+  letter-spacing:0}
+.document-tag-accent{color:var(--accent-deep)}
+.document-card > a{display:inline-flex; align-items:center; gap:8px; font-size:.82rem;
+  font-weight:700; text-decoration:none}
+.document-card-footer{display:flex; flex-wrap:wrap; gap:6px 16px; padding-top:14px;
+  border-top:1px solid var(--rule); font-size:.78rem; font-weight:600; color:var(--ink-muted)}
+.document-card-featured,.document-card-half{grid-column:auto}
+
+/* La navegación de categorías heredada de cesde */
+.category-nav{display:flex; flex-wrap:wrap; gap:10px; margin-top:var(--s-5)}
+.category-nav a{display:inline-flex; align-items:baseline; gap:9px; text-decoration:none;
+  padding:9px 15px; border:1px solid var(--rule); border-radius:var(--radius-sm);
+  background:var(--raised);
+  font-size:.86rem; font-weight:600; color:var(--ink-secondary);
+  transition:border-color .2s var(--ease), color .2s var(--ease)}
+.category-nav a:hover{border-color:var(--ink); color:var(--ink)}
+.category-nav a span{font-weight:700; font-size:.78rem; color:var(--ink-muted);
+  font-variant-numeric:tabular-nums}
+.category-nav a[aria-current]{border-color:var(--ink); color:var(--ink);
+  box-shadow:inset 0 -2px 0 var(--accent)}
+.category-nav a[aria-current] span{color:var(--accent-deep)}
+.document-section{padding-block:var(--step)}
+.document-section + .document-section{padding-top:0}
+.document-section.section-alt{background:none}
+.intro{padding-top:var(--s-6); padding-bottom:0}
+.intro > div > p{max-width:var(--measure); margin-top:var(--s-5);
+  color:var(--ink-secondary); font-size:clamp(1.05rem,1.55vw,1.22rem)}
+
+/* Islas heredadas: dejan de tener fondo y sombra propios y siguen el suelo de
+   su franja. Una isla con su propio color dentro de una franja que ya tiene
+   color son dos decisiones de fondo peleando. */
+.iface,.avoid,.card-light,.panel-light,.roadmap-card,.alert-card,.pillar,.step,
+.calc-out,.builder-out,.status,.meter,.kpis div{
+  background:none; color:inherit; box-shadow:none; backdrop-filter:none}
+
+/* Callouts heredados */
+.library-callout{display:grid; gap:18px; padding:var(--s-5) 0 0;
+  border-top:2px solid var(--accent); background:none; color:inherit}
+.library-callout h2{font-size:clamp(1.4rem,3vw,2.2rem); max-width:24ch}
+.library-callout p{max-width:var(--measure); color:var(--ink-secondary); font-size:1rem}
+/* Este <em> no esta en un titular, pero es el mismo enfasis: por token,
+   para que siga al suelo del callout. */
+.library-callout em{
+  font-style:normal;
+  color:var(--em-fg);
+  background:var(--em-bg);
+  padding-inline:var(--em-pad);
+  box-decoration-break:clone; -webkit-box-decoration-break:clone
+}
+
+/* Cabeceras y pies heredados */
+.site-header{position:sticky; top:0; z-index:60; display:flex; align-items:center;
+  justify-content:space-between; gap:24px; height:64px; padding-inline:var(--gutter);
+  background:color-mix(in srgb, var(--ground) 86%, transparent);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--rule); color:var(--fg)}
+.site-header .header-inner{display:flex; align-items:center; justify-content:space-between;
+  gap:24px; width:100%; max-width:var(--max); margin-inline:auto}
+.brand{display:inline-flex; align-items:center; gap:9px; text-decoration:none;
+  font-weight:800; font-size:.92rem; letter-spacing:-.02em; white-space:nowrap; color:var(--fg)}
+.brand-mark{width:9px; height:9px; border-radius:50%; background:var(--accent);
+  flex:0 0 auto; font-size:0; color:transparent; overflow:hidden; text-indent:-99em}
+.brand-logo{height:20px; width:auto}
+.brand-copy small{color:var(--ink-muted); font-weight:500; font-size:.92rem}
+.site-header nav{display:flex; gap:var(--s-4); font-size:.83rem; font-weight:500}
+.site-header nav a{color:var(--ink-secondary); text-decoration:none; white-space:nowrap}
+.site-header nav a:hover{color:var(--ink)}
+.header-context,.repo-link{font-size:.76rem; font-weight:600; color:var(--ink-muted);
+  text-decoration:none; white-space:nowrap}
+@media (max-width:1000px){ .site-header nav{display:none} }
+@media (max-width:520px){ .header-context{display:none} }
+body > footer{padding:26px var(--gutter); border-top:1px solid var(--rule);
+  display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px;
+  background:none; color:var(--ink-muted); font-size:.78rem}
+body > footer a{color:var(--ink-secondary)}
+.hub-back{position:fixed; top:12px; right:12px; z-index:70; padding:9px 14px;
+  background:var(--ink); color:var(--paper); font-size:.78rem; font-weight:700;
+  text-decoration:none}
+
+/* ============================================================================
+   PAPEL Y PDF
+   Va en el mismo archivo para que sincronizar sea copiar UN archivo.
+   Tres decisiones: todo sobre blanco, todo lo plegado se abre, y nada que
+   solo sirva en pantalla se imprime.
+   ========================================================================= */
+@media print{
+  /* En papel todo va sobre blanco: un documento en tinta gastaría una página
+     entera de tinta. En vez de forzar fondo por fondo, se redeclaran los
+     tokens al suelo claro y cada regla del sistema resuelve sola.
+     Va después del bloque de tinta, así que gana por orden. */
+  /* @tokens-print:inicio */
+  :root,[data-suelo],
+  .section-dark,.section-light,.s-dark,.s-light{
+    --ground:#fff;
+    --fg:#000;
+    --fg-secondary:#333;
+    --fg-muted:#555;
+    --raised:#fff;
+    --sunken:#e5e5e5;
+    --rule:rgba(0,0,0,.22);
+    --rule-strong:#000;
+    --accent-fg:#8a7500;
+    --neg:#a81f16;
+    --pos:#125c33;
+    --ramp-1:#ededed;
+    --ramp-2:#cfcfcf;
+    --ramp-3:#9a9a9a;
+    --ramp-4:#3c3c3c;
+    --serie-1:#1b5fae;
+    --serie-2:#b4451c;
+    --serie-3:#0f7c55;
+    /* En impresion las series se oscurecen para que la tinta rinda en papel, y
+       entonces el texto ENCIMA tiene que invertirse: con el #050505 de pantalla
+       daban 3.2, 3.7 y 3.9:1. Con blanco dan 6.4, 5.5 y 5.2:1. */
+    --serie-fg:#fff;
+    --inv-ground:#fff;
+    --inv-fg:#000;
+    --inv-secondary:#333;
+    --inv-rule:rgba(0,0,0,.22);
+    --inv-rule-strong:#000;
+    --inv-accent:#8a7500;
+    color-scheme:light;
+
+    /* Los alias, tambien aqui: si no se redeclaran, lo impreso usa los
+       del suelo de PANTALLA y se pierde el oscurecido para tinta. */
+    --ink:var(--fg);
+    --paper:var(--ground);
+    --ink-secondary:var(--fg-secondary);
+    --ink-muted:var(--fg-muted);
+    --accent-deep:var(--accent-fg);
+    --inv-text:var(--inv-fg);
+
+    /* Suelo blanco: vale el subrayado, no el amarillo como texto (1.4:1).
+       El amarillo de marca se rebaja a un tinte que la impresora rinde sin
+       tapar la letra, y el texto se queda en negro. */
+    --em-fg:#000;
+    --em-bg:linear-gradient(transparent 58%, #f0e6a8 58%);
+    --em-pad:.06em
+  }
+  /* @tokens-print:fin */
+
+  /* las franjas no se imprimen como franjas: en papel todo es papel */
+  .franja,.section-dark,.section-light,.s-dark,.s-light{padding-block:0 14pt}
+
+  /* el riel de navegación no tiene sentido en papel: es para orientarse en
+     una pantalla que hace scroll */
+  .app-sidebar,.app-topbar{display:none !important}
+  body.con-shell{display:block !important}
+  .app-main{display:block !important}
+  .app-content{padding-block:0 !important}
+
+
+  /* Los rellenos amarillos grandes: en papel son un bloque de tinta, y en una
+     impresora en blanco y negro son un gris que tapa el texto. Se convierten
+     en borde, y lo que estaba marcado se dice con palabras. */
+  .button-primary,.metric-card.accent,.rule-card:nth-child(2),.funnel-ftd{
+    background:#fff !important; color:#000 !important;
+    border:2px solid #000 !important
+  }
+  .metric-card.accent .metric-label,.metric-card.accent .metric-foot,
+  .rule-card:nth-child(2) p,.rule-card:nth-child(2) .rule-card-number,
+  .rule-card:nth-child(2) h3{color:#000 !important; opacity:1 !important}
+  .media figcaption{position:static; background:none; color:#000; padding:8pt 0 0}
+  .media-motif{display:none}
+  .marco{border-color:#999 !important}
+  .opcion[aria-pressed="true"],.opcion.is-active{
+    background:#fff !important; border:2px solid #000 !important; color:#000 !important
+  }
+  .opcion[aria-pressed="true"]::after,.opcion.is-active::after{content:" (activo)"; font-size:.7em}
+
+  @page{margin:16mm 14mm}
+  html{scroll-behavior:auto}
+  body{background:#fff; color:#000; font-size:10.5pt; line-height:1.4}
+
+  .masthead,.site-header,.skip-link,.al-indice,.hub-back,.categorias,.category-nav,
+  .nav-toggle,.progress,.scroll-cue,.toc-search,.toc-filtros{display:none !important}
+
+  /* en papel no hay scroll que dispare la animación */
+  .grow .bar-track i,.grow .range-fill,.grow .share-bar i{transform:none !important}
+  .grow .range-pin,.grow .bar-head .val{opacity:1 !important}
+  [data-reveal]{opacity:1 !important; transform:none !important}
+
+  .slab,.card,.document-card,.categorias a,.category-nav a,
+  .section-dark,.section-light,.s-dark,.s-light{
+    background:#fff !important; color:#000 !important;
+    box-shadow:none !important; backdrop-filter:none !important
+  }
+  .slab .lede,.slab .note,.call p,.slab-foot{color:#333 !important}
+  .call .verdict{color:#000 !important; border-top-color:#000 !important}
+
+  .band,.grupo,.document-section,.section-dark,.section-light{padding-block:0 14pt}
+  .card,.document-card{border:1px solid #bbb !important; padding:10pt !important}
+  .bar-track,.share-bar,.range-track{background:#e5e5e5 !important}
+  .bar-track i,.share-bar i{background:#000 !important}
+  .bar-track i.is-best,.share-row.is-accent .share-bar i{background:#8a7500 !important}
+
+  /* que un título no quede solo al final de la página */
+  h1,h2,h3{break-after:avoid-page}
+  .card,.document-card,.panel,.figure,.bar-row,.work,tr{break-inside:avoid}
+  table{min-width:0}
+  thead{display:table-header-group}
+
+  /* el destino de un enlace no se ve en papel */
+  main a[href^="http"]::after{content:" (" attr(href) ")"; font-size:.85em; color:#555}
+}

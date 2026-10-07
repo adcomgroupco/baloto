@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BALOTO — Análisis Campaña Marzo vs Abril 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F5F5;
+    --black: #1A1A1A;
+    --yellow: #FFC000;
+    --white: #FFFFFF;
+    --t1: #1A1A1A;
+    --t2: #333333;
+    --t3: #999999;
+    --t4: #666666;
+    --green: #4CAF50;
+    --red: #EF5350;
+    --gray-bar: #888888;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Poppins', sans-serif; background: #2a2a2a; color: var(--t1); }
+
+  /* SLIDE WRAPPER */
+  .deck { display: flex; flex-direction: column; gap: 0; }
+  .slide {
+    width: 1280px;
+    min-height: 720px;
+    background: var(--bg);
+    margin: 12px auto;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    padding: 0;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+    page-break-after: always;
+  }
+
+  /* HEADER BAR */
+  .header {
+    background: var(--black);
+    border-radius: 10px 10px 0 0;
+    padding: 10px 22px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 60px;
+  }
+  .header-logo {
+    width: 38px; height: 38px;
+    background: var(--yellow);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 14px; color: var(--black);
+    flex-shrink: 0;
+    letter-spacing: -1px;
+  }
+  .header-title { color: #fff; font-size: 17px; font-weight: 400; }
+  .header-title b { font-weight: 700; font-style: italic; }
+  .header-badge {
+    margin-left: auto;
+    background: var(--yellow);
+    color: var(--black);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* SLIDE CONTENT */
+  .slide-content { padding: 18px 24px 16px; }
+  .subtitle {
+    font-size: 11px; color: var(--t4); font-weight: 300;
+    font-style: italic; margin-bottom: 16px;
+  }
+
+  /* KPI CARDS */
+  .kpi-row { display: flex; gap: 12px; margin-bottom: 16px; }
+  .kpi-card {
+    flex: 1;
+    background: var(--white);
+    border-radius: 10px;
+    padding: 14px 10px 18px;
+    border: 1px solid #E0E0E0;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+  .kpi-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 5px;
+    background: var(--yellow);
+  }
+  .kpi-value { font-size: 26px; font-weight: 700; color: var(--t1); line-height: 1; }
+  .kpi-label { font-size: 9.5px; font-weight: 700; color: var(--t2); margin-top: 6px; }
+  .kpi-sub { font-size: 8px; color: var(--t3); font-weight: 300; margin-top: 3px; }
+  .kpi-delta {
+    display: inline-block;
+    font-size: 9px; font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    margin-top: 5px;
+  }
+  .up { background: #E8F5E9; color: var(--green); }
+  .down { background: #FFEBEE; color: var(--red); }
+
+  /* COMPARISON TABLE */
+  .table-wrap { background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid #E0E0E0; }
+  table { width: 100%; border-collapse: collapse; font-size: 9.5px; }
+  thead tr { background: var(--black); color: #fff; }
+  thead th { padding: 9px 12px; text-align: left; font-weight: 700; font-size: 9px; }
+  thead th.col-abril { background: var(--yellow) !important; color: var(--black); }
+  tbody tr:nth-child(odd) { background: #fff; }
+  tbody tr:nth-child(even) { background: #F9F9F9; }
+  tbody tr.highlight { background: var(--yellow); font-weight: 700; }
+  tbody tr.highlight td { color: var(--black); font-weight: 700; }
+  tbody td { padding: 8px 12px; color: var(--t2); border-bottom: 1px solid #EEEEEE; }
+  tbody td.metric { color: var(--t1); font-weight: 600; }
+
+  /* INSIGHT BAR */
+  .insight {
+    background: var(--white);
+    border-radius: 8px;
+    border: 1px solid #E0E0E0;
+    padding: 11px 14px 11px 22px;
+    position: relative;
+    margin-top: 14px;
+    font-size: 9px;
+    color: var(--t4);
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.6;
+  }
+  .insight::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 6px;
+    background: var(--yellow);
+    border-radius: 8px 0 0 8px;
+  }
+  .insight b { color: var(--t2); font-weight: 700; font-style: normal; }
+
+  /* COVER SLIDE */
+  .slide-cover { background: var(--black) !important; }
+  .slide-cover .cover-inner {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    height: 660px;
+    text-align: center;
+  }
+  .cover-logo {
+    width: 72px; height: 72px;
+    background: var(--yellow);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 26px; color: var(--black);
+    margin-bottom: 28px;
+  }
+  .cover-eyebrow { font-size: 11px; color: var(--t3); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 14px; }
+  .cover-title { font-size: 52px; font-weight: 900; color: #fff; line-height: 1; margin-bottom: 10px; }
+  .cover-accent { color: var(--yellow); }
+  .cover-sub { font-size: 16px; color: var(--t3); font-weight: 300; margin-bottom: 36px; }
+  .cover-divider { width: 60px; height: 4px; background: var(--yellow); border-radius: 2px; margin: 0 auto 36px; }
+  .cover-meta { font-size: 11px; color: #666; font-weight: 300; }
+
+  /* TWO COL LAYOUT */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+
+  /* AD TABLE */
+  .ad-table-title {
+    font-size: 10px; font-weight: 700; color: var(--t2);
+    margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+  }
+  .badge-mes {
+    font-size: 9px; font-weight: 700; padding: 2px 10px; border-radius: 12px;
+  }
+  .badge-marzo { background: #1A1A1A; color: #fff; }
+  .badge-abril { background: var(--yellow); color: var(--black); }
+
+  /* SECTION TITLE SLIDE */
+  .section-slide { background: var(--black) !important; }
+  .section-inner {
+    display: flex; align-items: center; justify-content: center;
+    height: 660px; text-align: center; flex-direction: column;
+  }
+  .section-label { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--yellow); margin-bottom: 16px; }
+  .section-title { font-size: 44px; font-weight: 900; color: #fff; }
+  .section-sub { font-size: 14px; font-weight: 300; color: #888; margin-top: 12px; }
+
+  /* DELTA TABLE COLUMN */
+  .delta-pos { color: var(--green); font-weight: 700; }
+  .delta-neg { color: var(--red); font-weight: 700; }
+
+  /* PAGINATION */
+  .slide-num {
+    position: absolute;
+    bottom: 12px; right: 18px;
+    font-size: 9px; color: var(--t3); font-weight: 300;
+  }
+
+  /* AD DETAIL CARD */
+  .ad-card {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 12px 14px 16px;
+    border: 1px solid #E0E0E0;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .ad-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--yellow);
+  }
+  .ad-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .ad-name { font-size: 9px; font-weight: 700; color: var(--t2); }
+  .ad-status { font-size: 8px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+  .status-inactive { background: #EEE; color: #888; }
+  .status-active { background: #E8F5E9; color: #2E7D32; }
+  .ad-metrics { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .ad-metric { text-align: center; }
+  .ad-metric-val { font-size: 13px; font-weight: 700; color: var(--t1); }
+  .ad-metric-lbl { font-size: 7.5px; color: var(--t3); }
+
+  @media print {
+    body { background: white; }
+    .slide { margin: 0; border-radius: 0; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck">
+
+  <!-- ==================== SLIDE 1: COVER ==================== -->
+  <div class="slide slide-cover">
+    <div class="cover-inner">
+      <div class="cover-logo">AD</div>
+      <p class="cover-eyebrow">Campaña Digital · Facebook Ads</p>
+      <h1 class="cover-title"><span class="cover-accent">BALOTO</span></h1>
+      <p class="cover-sub">Retención &amp; Fidelización — Análisis de Rendimiento</p>
+      <div class="cover-divider"></div>
+      <h2 style="font-size:28px;font-weight:700;color:#fff;margin-bottom:8px;">Marzo <span style="color:var(--yellow)">vs</span> Abril 2026</h2>
+      <p class="cover-meta">Activación de nuevas piezas · Comparativo por período y por anuncio</p>
+    </div>
+    <span class="slide-num" style="color:#555">1 / 6</span>
+  </div>
+
+  <!-- ==================== SLIDE 2: RESUMEN EJECUTIVO ==================== -->
+  <div class="slide">
+    <div class="header">
+      <div class="header-logo">AD</div>
+      <span class="header-title">Rendimiento General · <b>Campaña BALOTO Marzo vs Abril 2026</b></span>
+      <span class="header-badge">Retención BBDD</span>
+    </div>
+    <div class="slide-content">
+      <p class="subtitle">Comparativo total de campaña — adcom_miloto_ret_fidelizacion_bbdd_abril · 6 piezas activas por período</p>
+
+      <!-- KPI ROW -->
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-value">$2.36M</div>
+          <div class="kpi-label">Inversión Marzo</div>
+          <div class="kpi-sub">COP</div>
+          <span class="kpi-delta down">vs $1.54M Abril</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value">4,390</div>
+          <div class="kpi-label">Compras Marzo</div>
+          <div class="kpi-sub">Pixel Purchase</div>
+          <span class="kpi-delta down">vs 1,410 Abril</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value">$539</div>
+          <div class="kpi-label">CPR Marzo</div>
+          <div class="kpi-sub">Costo por Resultado</div>
+          <span class="kpi-delta down">vs $1,095 Abril</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value">10.19x</div>
+          <div class="kpi-label">ROAS Marzo</div>
+          <div class="kpi-sub">Promedio piezas</div>
+          <span class="kpi-delta down">vs 6.77x Abril</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value">$8,802</div>
+          <div class="kpi-label">CPM Marzo</div>
+          <div class="kpi-sub">COP por 1K impresiones</div>
+          <span class="kpi-delta up">vs $7,930 Abril ↓</span>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Métrica</th>
+              <th>Marzo (piezas _03-03)</th>
+              <th class="col-abril">Abril (piezas _14-04)</th>
+              <th>Variación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="metric">Inversión Total (COP)</td>
+              <td>$2,364,692</td>
+              <td>$1,543,426</td>
+              <td class="delta-neg">-$821,266 (-34.7%)</td>
+            </tr>
+            <tr>
+              <td class="metric">Impresiones</td>
+              <td>289,281</td>
+              <td>197,923</td>
+              <td class="delta-neg">-91,358 (-31.6%)</td>
+            </tr>
+            <tr>
+              <td class="metric">Alcance (Reach)</td>
+              <td>23,206</td>
+              <td>22,654</td>
+              <td class="delta-neg">-552 (-2.4%)</td>
+            </tr>
+            <tr class="highlight">
+              <td>Compras (Purchases)</td>
+              <td>4,390</td>
+              <td>1,410</td>
+              <td>-2,980 (-67.9%)</td>
+            </tr>
+            <tr>
+              <td class="metric">Costo por Resultado</td>
+              <td>$538.65</td>
+              <td>$1,094.63</td>
+              <td class="delta-neg">+$555.98 (+103.2%)</td>
+            </tr>
+            <tr>
+              <td class="metric">ROAS Promedio</td>
+              <td>10.19x</td>
+              <td>6.77x</td>
+              <td class="delta-neg">-3.42x (-33.6%)</td>
+            </tr>
+            <tr>
+              <td class="metric">CPM Promedio (COP)</td>
+              <td>$8,802</td>
+              <td>$7,930</td>
+              <td class="delta-pos">-$872 (-9.9%) ↓</td>
+            </tr>
+            <tr>
+              <td class="metric">N° de piezas</td>
+              <td>6</td>
+              <td>6</td>
+              <td>—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="insight">
+        <b>Insight clave:</b> Las piezas de Marzo tuvieron un rendimiento significativamente superior en conversión (4,390 vs 1,410 compras). Las piezas de Abril, activadas el 14/04, llevan menos tiempo en vuelo y aún están en fase de aprendizaje — el CPM más bajo en Abril sugiere mejor eficiencia de entrega, pero el ROAS cayó 33.6%. Se recomienda dar más tiempo a las piezas nuevas para optimizar.
+      </div>
+    </div>
+    <span class="slide-num">2 / 6</span>
+  </div>
+
+  <!-- ==================== SLIDE 3: SECCIÓN ANÁLISIS POR ANUNCIO ==================== -->
+  <div class="slide section-slide">
+    <div class="section-inner">
+      <p class="section-label">Análisis Detallado</p>
+      <h2 class="section-title" style="color:#fff">Rendimiento<br><span style="color:var(--yellow)">por Anuncio</span></h2>
+      <p class="section-sub">Comparativo individual · Marzo vs Abril · 6 piezas por período</p>
+    </div>
+    <span class="slide-num" style="color:#555">3 / 6</span>
+  </div>
+
+  <!-- ==================== SLIDE 4: DETALLE PIEZAS MARZO ==================== -->
+  <div class="slide">
+    <div class="header">
+      <div class="header-logo">AD</div>
+      <span class="header-title">Piezas <b>Marzo 2026</b> — Creación 03-03</span>
+      <span class="header-badge" style="background:#1A1A1A;color:#fff">Inactivas</span>
+    </div>
+    <div class="slide-content">
+      <p class="subtitle">6 anuncios activos durante Marzo · Finalizados el 23/04/2026 · Ad Set: adcom_miloto_ret_fidelizacion_bbdd_abril</p>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:32%">Anuncio</th>
+              <th>Inversión (COP)</th>
+              <th>Impresiones</th>
+              <th>Compras</th>
+              <th>CPR (COP)</th>
+              <th>ROAS</th>
+              <th>CPM (COP)</th>
+              <th>Frecuencia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="highlight">
+              <td>naranja_yajugaste</td>
+              <td>$901,401</td>
+              <td>114,138</td>
+              <td>1,748</td>
+              <td>$515.68</td>
+              <td>12.03x</td>
+              <td>$7,897</td>
+              <td>21.24</td>
+            </tr>
+            <tr class="highlight">
+              <td>azul_promoparati</td>
+              <td>$902,930</td>
+              <td>111,781</td>
+              <td>1,737</td>
+              <td>$519.82</td>
+              <td>11.18x</td>
+              <td>$8,078</td>
+              <td>23.68</td>
+            </tr>
+            <tr>
+              <td>naranja_sorteoestasemana</td>
+              <td>$250,305</td>
+              <td>30,826</td>
+              <td>436</td>
+              <td>$574.09</td>
+              <td>10.47x</td>
+              <td>$8,120</td>
+              <td>6.86</td>
+            </tr>
+            <tr>
+              <td>azul_ganauntv</td>
+              <td>$152,415</td>
+              <td>16,156</td>
+              <td>230</td>
+              <td>$662.67</td>
+              <td>9.48x</td>
+              <td>$9,434</td>
+              <td>4.35</td>
+            </tr>
+            <tr>
+              <td>azul_juegamiloto</td>
+              <td>$93,294</td>
+              <td>9,770</td>
+              <td>145</td>
+              <td>$643.41</td>
+              <td>8.81x</td>
+              <td>$9,549</td>
+              <td>3.18</td>
+            </tr>
+            <tr>
+              <td>naranja_ultimaoportunidad</td>
+              <td>$64,347</td>
+              <td>6,610</td>
+              <td>94</td>
+              <td>$684.54</td>
+              <td>9.18x</td>
+              <td>$9,735</td>
+              <td>3.61</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mini KPI row -->
+      <div class="kpi-row" style="margin-top:12px; margin-bottom:0">
+        <div class="kpi-card">
+          <div class="kpi-value" style="font-size:20px">12.03x</div>
+          <div class="kpi-label">Mejor ROAS</div>
+          <div class="kpi-sub">naranja_yajugaste</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" style="font-size:20px">$515.68</div>
+          <div class="kpi-label">Menor CPR</div>
+          <div class="kpi-sub">naranja_yajugaste</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" style="font-size:20px">1,748</div>
+          <div class="kpi-label">Top Compras</div>
+          <div class="kpi-sub">naranja_yajugaste</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" style="font-size:20px">23.68</div>
+          <div class="kpi-label">Mayor Frecuencia</div>
+          <div class="kpi-sub">azul_promoparati</div>
+        </div>
+      </div>
+
+      <div class="insight">
+        <b>Marzo:</b> <b>naranja_yajugaste</b> y <b>azul_promoparati</b> dominaron el presupuesto (76%) y las conversiones (80%). Ambas piezas alcanzaron frecuencias altas (+21x / +23x), señal de saturación de audiencia. El CPR del mejor anuncio fue $515.68 COP.
+      </div>
+    </div>
+    <span class="slide-num">4 / 6</span>
+  </div>
+
+  <!-- ==================== SLIDE 5: DETALLE PIEZAS ABRIL ==================== -->
+  <div class="slide">
+    <div class="header">
+      <div class="header-logo">AD</div>
+      <span class="header-title">Piezas <b>Abril 2026</b> — Activación 14-04</span>
+      <span class="header-badge">Activas</span>
+    </div>
+    <div class="slide-content">
+      <p class="subtitle">6 nuevos anuncios activados el 14 de Abril · En vuelo · Ad Set: adcom_miloto_ret_fidelizacion_bbdd_abril</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:32%">Anuncio</th>
+              <th class="col-abril">Inversión (COP)</th>
+              <th>Impresiones</th>
+              <th>Compras</th>
+              <th>CPR (COP)</th>
+              <th>ROAS</th>
+              <th>CPM (COP)</th>
+              <th>Frecuencia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="highlight">
+              <td>azul_estapromoesparati</td>
+              <td>$576,455</td>
+              <td>76,742</td>
+              <td>503</td>
+              <td>$1,146.03</td>
+              <td>5.30x</td>
+              <td>$7,512</td>
+              <td>14.34</td>
+            </tr>
+            <tr>
+              <td>naranja_yajugaste</td>
+              <td>$445,303</td>
+              <td>56,871</td>
+              <td>382</td>
+              <td>$1,165.71</td>
+              <td>5.68x</td>
+              <td>$7,830</td>
+              <td>11.90</td>
+            </tr>
+            <tr>
+              <td>azul_compraestasemana</td>
+              <td>$264,033</td>
+              <td>34,233</td>
+              <td>313</td>
+              <td>$843.56</td>
+              <td>7.21x</td>
+              <td>$7,713</td>
+              <td>7.50</td>
+            </tr>
+            <tr>
+              <td>naranja_elsorteoesestasemana</td>
+              <td>$183,723</td>
+              <td>20,768</td>
+              <td>113</td>
+              <td>$1,625.87</td>
+              <td>4.27x</td>
+              <td>$8,846</td>
+              <td>5.03</td>
+            </tr>
+            <tr>
+              <td>naranja_ultimaoportunidad</td>
+              <td>$50,379</td>
+              <td>6,185</td>
+              <td>58</td>
+              <td>$868.60</td>
+              <td>8.36x</td>
+              <td>$8,145</td>
+              <td>2.65</td>
+            </tr>
+            <tr>
+              <td>azul_juegayparticipa</td>
+              <td>$23,533</td>
+              <td>3,124</td>
+              <td>41</td>
+              <td>$573.98</td>
+              <td>9.78x</td>
+              <td>$7,533</td>
+              <td>2.09</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="kpi-row" style="margin-top:12px; margin-bottom:0">
+        <div class="kpi-card">
+          <div class="kpi-value" style="font-size:20px">9.78x</div>
+          <div class="kpi-label">Mejor ROAS</div>
+          <div class="kpi-sub">azul_juegayparticipa</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" style="font-size:20px">$573.98</div>
+          <div class="kpi-label">Menor CPR</div>
+          <div class="kpi-sub">azul_juegayparticipa</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" style="font-size:20px">503</div>
+          <div class="kpi-label">Top Compras</div>
+          <div class="kpi-sub">azul_estapromoesparati</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" style="font-size:20px">14.34</div>
+          <div class="kpi-label">Mayor Frecuencia</div>
+          <div class="kpi-sub">azul_estapromoesparati</div>
+        </div>
+      </div>
+
+      <div class="insight">
+        <b>Abril (nuevas piezas):</b> Solo 14 días de vuelo vs 31 días de Marzo. <b>azul_juegayparticipa</b> muestra el mejor ROAS (9.78x) con frecuencia baja (2.09x) — aún tiene alto potencial de escala. <b>naranja_elsorteoesestasemana</b> tiene el mayor CPR ($1,625) y menor ROAS (4.27x), candidata a optimizar o pausar.
+      </div>
+    </div>
+    <span class="slide-num">5 / 6</span>
+  </div>
+
+  <!-- ==================== SLIDE 6: CONCLUSIONES Y RECOMENDACIONES ==================== -->
+  <div class="slide">
+    <div class="header">
+      <div class="header-logo">AD</div>
+      <span class="header-title">Conclusiones y <b>Recomendaciones Estratégicas</b></span>
+      <span class="header-badge">BALOTO · Abr 2026</span>
+    </div>
+    <div class="slide-content">
+      <p class="subtitle">Síntesis del análisis comparativo · Acciones sugeridas para optimizar la campaña</p>
+
+      <div class="two-col">
+        <!-- LEFT: Conclusions -->
+        <div>
+          <div class="ad-table-title"><span class="badge-mes badge-marzo">● MARZO</span> Lo que funcionó</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Hallazgo</th><th>Dato</th></tr></thead>
+              <tbody>
+                <tr><td>ROAS promedio alto</td><td><b>10.19x</b></td></tr>
+                <tr><td>CPR bajo</td><td><b>$538.65 COP</b></td></tr>
+                <tr><td>Top pieza: yajugaste</td><td><b>1,748 compras</b></td></tr>
+                <tr class="highlight"><td>Compras totales</td><td>4,390</td></tr>
+                <tr><td>Frecuencia alta (saturación)</td><td>Hasta 23.68x</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- RIGHT: April analysis -->
+        <div>
+          <div class="ad-table-title"><span class="badge-mes badge-abril">● ABRIL</span> Estado actual</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Hallazgo</th><th class="col-abril">Dato</th></tr></thead>
+              <tbody>
+                <tr><td>ROAS promedio</td><td><b>6.77x</b></td></tr>
+                <tr><td>CPR promedio</td><td><b>$1,094.63 COP</b></td></tr>
+                <tr><td>CPM más bajo</td><td><b>$7,930 COP ↓</b></td></tr>
+                <tr class="highlight"><td>Piezas con potencial</td><td>juegayparticipa</td></tr>
+                <tr><td>Días en vuelo</td><td>~14 días</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommendations -->
+      <div style="background:var(--white);border-radius:10px;padding:14px 16px 18px;border:1px solid #E0E0E0;position:relative;overflow:hidden;">
+        <div style="position:absolute;bottom:0;left:0;right:0;height:5px;background:var(--yellow);"></div>
+        <div style="font-size:10px;font-weight:700;color:var(--t2);margin-bottom:10px;">📋 Recomendaciones</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div style="font-size:8.5px;color:var(--t4);">
+            <b style="color:var(--t2);display:block;margin-bottom:4px;">1. Escalar juegayparticipa</b>
+            Mejor ROAS de Abril (9.78x) con frecuencia baja (2.09x). Aumentar presupuesto para capturar mayor volumen antes de saturar la audiencia.
+          </div>
+          <div style="font-size:8.5px;color:var(--t4);">
+            <b style="color:var(--t2);display:block;margin-bottom:4px;">2. Revisar naranja_elsorteoesestasemana</b>
+            ROAS más bajo (4.27x) y CPR más alto ($1,626). Evaluar pausa o A/B test con creatividad nueva para mejorar conversión.
+          </div>
+          <div style="font-size:8.5px;color:var(--t4);">
+            <b style="color:var(--t2);display:block;margin-bottom:4px;">3. Dar tiempo a las piezas nuevas</b>
+            Con solo 14 días, el algoritmo aún está en aprendizaje. Comparar en igualdad de condiciones cuando Abril complete 30 días de vuelo.
+          </div>
+        </div>
+      </div>
+
+      <div class="insight">
+        <b>Conclusión:</b> La caída en conversiones de Abril (-67.9%) se explica principalmente por el menor tiempo de vuelo (14 vs 31 días). El CPM mejoró (-9.9%), señal positiva de entrega. El ROAS de las mejores piezas nuevas (<b>juegayparticipa: 9.78x</b>, <b>compraestasemana: 7.21x</b>) indica que las creatividades tienen potencial — se recomienda continuar con el vuelo y optimizar con base en los próximos 14 días.
+      </div>
+    </div>
+    <span class="slide-num">6 / 6</span>
+  </div>
+
+</div>
+
+</body>
+</html>

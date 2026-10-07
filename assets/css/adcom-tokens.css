@@ -1,0 +1,609 @@
+/* ============================================================================
+   Sistema de diseno Adcom . SOLO TOKENS
+   ----------------------------------------------------------------------------
+   GENERADO. No lo edites: sync.ps1 lo reescribe extrayendolo de adcom.css,
+   que es la fuente de verdad. Para cambiar un token, cambialo alla.
+
+   Que es esto y por que existe
+   ----------------------------
+   Los documentos de cliente que ya estaban escritos traen su propio CSS
+   completo, con sus tablas, sus titulares y sus tarjetas resueltos a mano.
+   adcom.css declara reglas sobre elementos desnudos (table, img, h1..h4, p,
+   a): enlazarlo en uno de esos documentos le cambiaria cosas que ya estaban
+   bien. Este archivo trae los tokens y NADA mas.
+
+   Como se usa
+   -----------
+   1. En el <head>, ANTES del <style> propio del documento:
+        <link rel="stylesheet" href="assets/css/adcom-tokens.css">
+   2. En el :root del documento, apuntar sus tokens propios a los del sistema:
+        --yellow:var(--accent);  --gray-400:var(--fg-muted);  ...
+      Asi cada regla que ya existia resuelve al color y a la forma de la casa
+      sin reescribir una sola de esas reglas.
+
+   Ademas de los tokens, este archivo trae la familia tipografica (la unica
+   regla de elemento desnudo, sobre `body`, porque la tipografia es justo lo
+   que se quiere estandarizar), la .portada y seis componentes de cuerpo.
+   Es la pieza que fija el caracter del documento y esta acotada por clase
+   (ni un selector de elemento desnudo), asi que es seguro adoptarla en un
+   documento legado. Ver DESIGN.md, 'La portada'.
+
+   Un documento NUEVO no usa este archivo: enlaza adcom.css completo.
+   ========================================================================= */
+:root{
+  /* --- marca Adcom (bloqueada, idéntica en los dos suelos) ---
+     El amarillo viene del framework del área digital, que es la declaración
+     canónica de la marca. Coincide con genius. El #FFC000 que aparece en
+     gana, uan, yajuego y westfield es deriva y se corrige al migrar. */
+  --accent:#ffd400;
+  --accent-hi:#ffdf3d;          /* el amarillo al pasar el cursor */
+  --accent-ink:#3d3300;         /* texto SOBRE el amarillo · 8.8:1 en los dos */
+
+  /* ======================= SUELO PAPEL (por defecto) =======================
+     Contrastes medidos, no estimados. */
+  --ground:#f4f4f1;
+  --fg:#050505;                 /* 18.5:1 */
+  --fg-secondary:#4a4a47;       /* 8.1:1 · prosa secundaria, pasa AAA */
+  --fg-muted:#656560;           /* 5.3:1 sobre el suelo y 4.7:1 sobre --sunken.
+                                   Tiene que pasar en las dos: las etiquetas
+                                   viven también en filas y listas activas. */
+  --raised:#fcfcfa;             /* superficie elevada: la ficha */
+  --sunken:#e7e6e1;             /* superficie hundida: la pista de una barra */
+  --rule:rgba(5,5,5,.13);       /* regla que separa sin llamar la atención */
+  --rule-strong:rgba(5,5,5,.88);/* regla que abre una sección */
+  --scroll-thumb:#c6c5be;
+
+  /* Sobre papel el amarillo de marca da 1.3:1: es inservible como texto o
+     como relleno de barra. Para eso existe --accent-fg. */
+  --accent-fg:#7d6800;          /* el amarillo cuando es dato o texto · 4.9:1 */
+  --neg:#c2261c;                /* 5.3:1 · el dato que está mal */
+  --pos:#16693a;                /* 6.1:1 · el dato que está bien */
+
+  /* el único momento invertido de la página: el otro suelo */
+  --inv-ground:#050505;
+  --inv-fg:#f4f4f1;
+  --inv-secondary:#aaa9a4;
+  --inv-rule:rgba(244,244,241,.18);
+  --inv-rule-strong:rgba(244,244,241,.85);
+  --inv-accent:#ffd400;         /* sobre el slab oscuro el amarillo da 14.2:1 */
+
+  /* --- escala de gráfico (reservada) ---
+     Tres ranuras categóricas para un gráfico de varias series. NO es la
+     marca: el amarillo no entra aquí, porque el lector no sabría cuándo el
+     amarillo significa Adcom y cuándo significa "serie 2".
+     Validada sobre todos los pares: ver DESIGN.md. */
+  --serie-1:#2a78d6;
+  --serie-2:#eb6834;
+  --serie-3:#1baf7a;
+  --serie-fg:#050505;           /* texto encima de una serie · 6.4 / 4.6 / 7.2:1 */
+
+  /* --- rampa secuencial ---
+     Para un ORDEN, no para identidades: un embudo, una escala de intensidad,
+     una serie de etapas. Corre del suelo hacia el primer plano.
+     Regla de texto, idéntica en los dos suelos porque la rampa siempre va en
+     la misma dirección: los pasos 1 a 3 llevan --fg, el paso 4 lleva --ground.
+     Medido en papel: 16.3, 11.5, 7.1 y 8.1:1. */
+  --ramp-1:#e7e6e1;
+  --ramp-2:#c4c3bc;
+  --ramp-3:#9a9992;
+  --ramp-4:#4a4a47;
+
+  /* --- el shell de navegación lateral ---
+     Mueble persistente, no contenido: los documentos de educación con menú
+     lateral (rutas, tableros) llevan un riel de navegación fijo que NO seguía
+     el suelo del documento en el original (sidebar negra con .main blanco), y
+     aquí tampoco lo sigue. No es el mismo concepto que `.slab` — el slab es un
+     momento de contenido, una vez por documento; el shell es la estructura de
+     navegación, siempre presente mientras el documento tiene menú lateral.
+     Contraste medido: 17.6:1, 5.6:1, 13.6:1. */
+  --shell-bg:#0d0d0c;
+  --shell-fg:#f4f4f1;
+  --shell-fg-muted:#8a8a86;
+  --shell-rule:rgba(244,244,241,.12);
+  --shell-active:rgba(244,244,241,.08);
+
+  /* --- forma ---
+     Un sistema de forma con dos roles declarados, no una mezcla al gusto:
+       superficies y medios  ->  --radius
+       controles compactos   ->  --radius-sm
+       marcas de dato        ->  0, siempre (una barra cuadrada mide mejor)
+     Viene del framework del área digital (20/12px), un poco más contenido. */
+  --radius:12px;
+  --radius-sm:8px;
+
+  /* --- piso tipografico ---
+     Nada funcional por debajo de --fs-min, y nada de prosa por debajo de
+     --fs-body-min. No era regla escrita y los informes bajaban a 9.5px en
+     cabeceras de tabla y etiquetas de eje: ilegible en pantalla y peor
+     impreso. El piso se fija en rem para que respete el zoom del navegador. */
+  --fs-min:.75rem;              /* 12px · etiquetas, cabeceras, ejes */
+  --fs-body-min:.8rem;          /* 12.8px · prosa, notas al pie, subtextos.
+                                   Era .82rem. Se baja a .8 porque es lo que
+                                   usa raza en sus notas de ficha, y dos
+                                   decimas de pixel no son una diferencia de
+                                   legibilidad: tener DOS valores para el
+                                   mismo piso si lo es. */         /* 13px · prosa, notas al pie, subtextos */
+
+  /* --- escala de titular ---
+     El techo son 6rem y el tracking no baja de -.04em: por debajo de ahí las
+     letras pierden su forma. Se llega a "fuerte" con TAMAÑO y peso, y con
+     copy corto, no apretando el tracking. */
+  --fs-display:clamp(2.6rem,7vw,6rem);
+  --tk-display:-.04em;
+  --lh-display:.95;
+
+
+  /* --- escala de espacio ---
+     Siete pasos, y cada uno tiene un trabajo. Antes había 67 valores
+     verticales distintos, 40 de ellos clamp(): pares como
+     clamp(18px,2.4vw,26px) y clamp(16px,2vw,26px) hacían lo mismo con 2px de
+     diferencia, invisibles para el lector y caros de mantener.
+
+     Es el mismo arreglo que el framework del área digital hizo con su
+     tipografía, por la misma razón.
+
+     La regla de jerarquía: más espacio ARRIBA de un encabezado que abajo.
+     Una sección abre con --s-7 y separa su encabezado del contenido con
+     --s-5, así que la apertura siempre gana. */
+  --s-1:4px;                     /* dentro de una línea: icono a texto */
+  --s-2:8px;                     /* dentro de un grupo: etiqueta a dato */
+  --s-3:14px;                    /* elemento a elemento dentro de una ficha */
+  --s-4:clamp(18px,2.4vw,26px);  /* ficha a ficha, fila a fila */
+  --s-5:clamp(26px,3.4vw,44px);  /* bloque a bloque, encabezado a contenido */
+  --s-6:clamp(44px,6vw,84px);    /* apertura de una sección o de una portada */
+  --s-7:clamp(72px,8vw,128px);   /* entre franjas */
+  --s-col:clamp(24px,4vw,64px);  /* separación entre columnas anchas */
+
+  /* --- la tipografía ---
+     Va como token para que viaje a la capa adoptable: es la señal más
+     visible de que un documento es de la casa, y era justo la que no
+     llegaba a los documentos que solo pueden recibir tokens. */
+  --fuente:Poppins,ui-sans-serif,-apple-system,"Segoe UI",sans-serif,
+    "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji";
+  --fuente-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+
+  /* --- medida y ritmo (idéntico en los dos suelos) --- */
+  --measure:68ch;               /* medida de lectura */
+  --gutter:clamp(20px,5vw,72px);
+  --max:1240px;
+  --step:var(--s-7);            /* alias heredado del paso de franja */
+  --ease:cubic-bezier(.2,.7,.3,1);
+  color-scheme:light;
+
+  /* --- alias heredados ---
+     El vocabulario se escribió con --ink y --paper. Se quedan como alias de
+     los roles para no reescribir catorce repos, y para que un documento que
+     cambia de suelo funcione sin tocar una línea de su CSS propio. */
+  --ink:var(--fg);
+  --paper:var(--ground);
+  --ink-secondary:var(--fg-secondary);
+  --ink-muted:var(--fg-muted);
+  --accent-deep:var(--accent-fg);
+  --inv-text:var(--inv-fg);
+  /* --- enfasis del titular ---
+     Se declara como token, no como selector de ancestro: el valor que
+     hereda un <em> es el del suelo MAS CERCANO, que es justo lo que
+     hace falta en un documento con franjas de los dos suelos. */
+  --em-fg:var(--fg);
+  --em-bg:linear-gradient(transparent 58%, var(--accent) 58%);
+  --em-pad:.06em
+
+}
+
+/* Suelo papel declarado a mano: hace falta para una franja clara dentro de un
+   documento en tinta. Repite los valores de :root a propósito, porque una
+   franja no puede depender de cuál sea el suelo de la página que la contiene. */
+[data-suelo="papel"],[data-roles="papel"],.section-light,.s-light{
+  --ground:#f4f4f1;
+  --fg:#050505;
+  --fg-secondary:#4a4a47;
+  --fg-muted:#656560;
+  --raised:#fcfcfa;
+  --sunken:#e7e6e1;
+  --rule:rgba(5,5,5,.13);
+  --rule-strong:rgba(5,5,5,.88);
+  --scroll-thumb:#c6c5be;
+  --accent-fg:#7d6800;
+  --neg:#c2261c;
+  --pos:#16693a;
+  --inv-ground:#050505;
+  --inv-fg:#f4f4f1;
+  --inv-secondary:#aaa9a4;
+  --inv-rule:rgba(244,244,241,.18);
+  --inv-rule-strong:rgba(244,244,241,.85);
+  --inv-accent:#ffd400;
+  --serie-1:#2a78d6;
+  --serie-2:#eb6834;
+  --serie-3:#1baf7a;
+  --serie-fg:#050505;
+  --ramp-1:#e7e6e1;
+  --ramp-2:#c4c3bc;
+  --ramp-3:#9a9992;
+  --ramp-4:#4a4a47;
+  color-scheme:light;
+  /* Los alias se REDECLARAN en cada suelo a proposito. Un alias es una
+     sustitucion que se resuelve donde se declara: si solo vive en :root,
+     su valor queda congelado en el suelo de la raiz y una franja del otro
+     suelo lo hereda ya resuelto, con el color contrario. */
+  --ink:var(--fg);
+  --paper:var(--ground);
+  --ink-secondary:var(--fg-secondary);
+  --ink-muted:var(--fg-muted);
+  --accent-deep:var(--accent-fg);
+  --inv-text:var(--inv-fg);
+  /* --- enfasis del titular ---
+     Se declara como token, no como selector de ancestro: el valor que
+     hereda un <em> es el del suelo MAS CERCANO, que es justo lo que
+     hace falta en un documento con franjas de los dos suelos. */
+  --em-fg:var(--fg);
+  --em-bg:linear-gradient(transparent 58%, var(--accent) 58%);
+  --em-pad:.06em
+}
+
+/* ========================== SUELO TINTA ===================================
+   Los mismos roles, resueltos contra un suelo oscuro. Se activa con
+   data-suelo="tinta" en el <html>. Nada más cambia. */
+[data-suelo="tinta"],[data-roles="tinta"],.section-dark,.s-dark{
+  --ground:#050505;
+  --fg:#f4f4f1;                 /* 18.5:1 · nunca #fff puro */
+  --fg-secondary:#aaa9a4;       /* 8.7:1 · el mismo que usa el .slab de genius */
+  --fg-muted:#949289;           /* 6.5:1 sobre el suelo y 4.9:1 sobre --sunken */
+  --raised:#141413;
+  --sunken:#262624;
+  --rule:rgba(244,244,241,.18);
+  --rule-strong:rgba(244,244,241,.85);
+  --scroll-thumb:#3a3a37;
+
+  /* Aquí el amarillo de marca YA es legible: 14.2:1 sobre el suelo. El
+     amarillo de dato y el de marca son el mismo, y por eso este suelo se ve
+     más asertivo que el papel. Es la razón de ser de este suelo. */
+  --accent-fg:var(--accent);
+  --neg:#ff6b6b;                /* 7.3:1 · #c2261c se queda en 3.5:1 aquí */
+  --pos:#2fb574;                /* 7.7:1 · #16693a se queda en 3.0:1 aquí */
+
+  --inv-ground:#f4f4f1;
+  --inv-fg:#050505;
+  --inv-secondary:#4a4a47;
+  --inv-rule:rgba(5,5,5,.16);
+  --inv-rule-strong:rgba(5,5,5,.88);
+  --inv-accent:#7d6800;         /* aquí el slab es CLARO: el amarillo de marca
+                                   daría 1.3:1 encima, así que va el profundo */
+
+  /* los mismos tres hues, escalonados para el suelo oscuro */
+  --serie-1:#3987e5;
+  --serie-2:#d95926;
+  --serie-3:#199e70;
+  --serie-fg:#050505;           /* 5.6 / 5.3 / 6.0:1 */
+
+  /* la misma rampa, del suelo oscuro hacia el primer plano claro.
+     Medido: 13.8, 9.7, 4.9 y 8.7:1 con la misma regla de texto. */
+  --ramp-1:#262624;
+  --ramp-2:#3f3e3b;
+  --ramp-3:#6b6a64;
+  --ramp-4:#aaa9a4;
+
+  color-scheme:dark;
+  /* Los alias se REDECLARAN en cada suelo a proposito. Un alias es una
+     sustitucion que se resuelve donde se declara: si solo vive en :root,
+     su valor queda congelado en el suelo de la raiz y una franja del otro
+     suelo lo hereda ya resuelto, con el color contrario. */
+  --ink:var(--fg);
+  --paper:var(--ground);
+  --ink-secondary:var(--fg-secondary);
+  --ink-muted:var(--fg-muted);
+  --accent-deep:var(--accent-fg);
+  --inv-text:var(--inv-fg);
+  /* Aqui el amarillo si puede ser texto: 14.2:1 sobre el suelo. Es el
+     enfasis que tenia el raza original. */
+  --em-fg:var(--accent);
+  --em-bg:none;
+  --em-pad:0
+}
+
+@media print{
+:root,[data-suelo],
+  .section-dark,.section-light,.s-dark,.s-light{
+    --ground:#fff;
+    --fg:#000;
+    --fg-secondary:#333;
+    --fg-muted:#555;
+    --raised:#fff;
+    --sunken:#e5e5e5;
+    --rule:rgba(0,0,0,.22);
+    --rule-strong:#000;
+    --accent-fg:#8a7500;
+    --neg:#a81f16;
+    --pos:#125c33;
+    --ramp-1:#ededed;
+    --ramp-2:#cfcfcf;
+    --ramp-3:#9a9a9a;
+    --ramp-4:#3c3c3c;
+    --serie-1:#1b5fae;
+    --serie-2:#b4451c;
+    --serie-3:#0f7c55;
+    /* En impresion las series se oscurecen para que la tinta rinda en papel, y
+       entonces el texto ENCIMA tiene que invertirse: con el #050505 de pantalla
+       daban 3.2, 3.7 y 3.9:1. Con blanco dan 6.4, 5.5 y 5.2:1. */
+    --serie-fg:#fff;
+    --inv-ground:#fff;
+    --inv-fg:#000;
+    --inv-secondary:#333;
+    --inv-rule:rgba(0,0,0,.22);
+    --inv-rule-strong:#000;
+    --inv-accent:#8a7500;
+    color-scheme:light;
+
+    /* Los alias, tambien aqui: si no se redeclaran, lo impreso usa los
+       del suelo de PANTALLA y se pierde el oscurecido para tinta. */
+    --ink:var(--fg);
+    --paper:var(--ground);
+    --ink-secondary:var(--fg-secondary);
+    --ink-muted:var(--fg-muted);
+    --accent-deep:var(--accent-fg);
+    --inv-text:var(--inv-fg);
+
+    /* Suelo blanco: vale el subrayado, no el amarillo como texto (1.4:1).
+       El amarillo de marca se rebaja a un tinte que la impresora rinde sin
+       tapar la letra, y el texto se queda en negro. */
+    --em-fg:#000;
+    --em-bg:linear-gradient(transparent 58%, #f0e6a8 58%);
+    --em-pad:.06em
+  }
+}
+
+/* ====================== COMPONENTE: PORTADA ====================== */
+/* Un suelo declarado tiene que PINTARSE. En adcom.css eso lo hace la regla de
+   franja del vocabulario base, que un documento legado no recibe. Sin ella,
+   data-suelo="tinta" cambia los tokens (el texto se vuelve claro) pero nadie
+   pinta el fondo: queda texto claro sobre blanco. Va solo el ATRIBUTO
+   canónico, no los nombres de clase heredados, porque un documento legado
+   recibe data-suelo únicamente donde se lo pongo a mano. */
+[data-suelo]{background:var(--ground); color:var(--fg)}
+
+/* -------------------------------------------------------------- portada ---
+   La portada del documento: la pieza que fija el carácter. Titular grande, el
+   amarillo como marcador sobre UNA PARTE del titular, entradilla, acciones, la
+   tira de cifras y la pieza gráfica al lado.
+
+   Estaba escrita en raza/styles.css, en un repo solo. Por eso ningún otro
+   documento se le parecía. Aquí es vocabulario.
+
+   Son DOS niveles, como cualquier franja del sistema:
+     .portada       sangra de borde a borde y pinta su suelo
+     .portada-wrap  acota el contenido a --max y lo centra
+   Meter la rejilla directamente en .portada deja el contenido pegado a los
+   bordes de la pantalla, y poner el max-width en la columna de texto la
+   centra DENTRO de su columna, que no es lo mismo. */
+.portada{
+  /* El inset horizontal va AQUI, en el elemento que pinta: el contenido no
+     debe tocar nunca el borde de la pintura. Si el canal se pone en el
+     envoltorio, el fondo llega hasta el borde y el detector lo canta.
+     Simetrico: una portada que es solo titular no puede dejar una franja
+     vacia debajo. Cuando hay cifras, son ellas las que agregan su aire. */
+  padding:var(--s-6) var(--gutter);
+  background:var(--ground); color:var(--fg)
+}
+.portada-wrap{
+  max-width:var(--max); margin-inline:auto;
+  display:grid; gap:var(--s-col); align-items:end;
+  grid-template-columns:minmax(0,1fr) minmax(0,.62fr)
+}
+/* Sin pieza gráfica la copia toma todo el ancho, sin dejar una columna vacía
+   ni obligar a buscar una foto de relleno. */
+.portada-wrap:not(:has(.portada-visual)){grid-template-columns:minmax(0,1fr)}
+.portada-copy{min-width:0}
+
+/* El antetítulo: cliente y tipo de documento. Ubica, no compite. */
+/* Corto, siempre: en mayúsculas la lectura se degrada con la longitud. Si no
+   cabe en unas tres palabras, la fecha y el detalle van en la entradilla. */
+.portada-kicker{
+  display:block; margin-bottom:var(--s-4);
+  font-size:.78rem; font-weight:600;
+  color:var(--fg-muted)
+}
+.portada h1{
+  font-size:var(--fs-display);
+  letter-spacing:var(--tk-display);
+  line-height:var(--lh-display);
+  max-width:18ch
+}
+/* El marcador amarillo. Arranca al 58% de la altura para que se lea como
+   trazo y no como fondo, y clona la decoración para cortarse bien al pasar
+   de línea. El <em> NO es énfasis tipográfico: es el marcador. */
+.portada-lede{
+  max-width:var(--measure); margin-top:var(--s-5);
+  color:var(--fg-secondary); font-size:clamp(1.05rem,1.55vw,1.22rem)
+}
+.portada-lede b{color:var(--fg)}
+.portada-acciones{display:flex; flex-wrap:wrap; gap:12px; margin-top:var(--s-5)}
+
+/* La tira de cifras es OPCIONAL, y la excepcion antes que la regla.
+   Va solo cuando el documento tiene dos o tres cifras que son su titular:
+   la inversion, el cumplimiento, el CPL. Si hay que estrujarse para llenarla
+   ("1 vista por pieza"), no va. La portada aloja el titulo; los datos se
+   rinden mas abajo, donde tienen su tabla y su contexto.
+
+   En rejilla y no en flex, para que las columnas midan igual y el aire entre
+   ellas sea real: en flex, dos cifras largas se tocaban. */
+.portada-cifras{
+  display:grid; gap:var(--s-5) var(--s-6);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));
+  margin:var(--s-6) 0 0; padding-top:var(--s-5);
+  border-top:1px solid var(--rule)
+}
+.portada-cifras div{display:grid; gap:3px; min-width:0; padding:0; background:none; border:0}
+.portada-cifras dt{font-size:.82rem; color:var(--fg-muted); font-weight:500; order:2}
+.portada-cifras dd{
+  margin:0; color:var(--fg); font-size:1.35rem; font-weight:800;
+  letter-spacing:-.02em; order:1
+}
+/* La línea de apoyo de una cifra (contra qué se compara). Dentro del dd, para
+   que quede pegada a su número. Los informes la traían en
+   rgba(255,255,255,.35): 3.05:1 sobre el suelo oscuro. */
+.portada-cifras dd small{
+  display:block; margin-top:4px;
+  font-size:.8rem; font-weight:400; letter-spacing:0; color:var(--fg-muted)
+}
+.portada-cifras dd small b{color:var(--fg-secondary); font-weight:700}
+
+.portada-visual{position:relative; min-height:0; display:grid; place-items:center}
+.portada-pieza{width:min(100%,420px); z-index:1}
+/* Los anillos: forma, y quietos. Una rotación infinita no informa nada. */
+.orbita{
+  position:absolute; border:1px dashed var(--rule); border-radius:50%;
+  pointer-events:none
+}
+.orbita-1{width:min(92%,520px); aspect-ratio:1}
+.orbita-2{width:min(112%,640px); aspect-ratio:1}
+@media (max-width:820px){
+  .portada-wrap{grid-template-columns:minmax(0,1fr); align-items:start}
+  .portada-pieza{max-width:420px}
+  .orbita{display:none}
+}
+@media print{
+  .portada-wrap{grid-template-columns:minmax(0,1fr)}
+  .portada-acciones,.orbita{display:none}
+}
+
+/* ================== TIPOGRAFIA ================== */
+body{font-family:var(--fuente)}
+/* En el telefono una tabla ancha se desplaza DENTRO DE SI, no arrastra la
+   pagina. El sistema le pone min-width:620px para que las columnas no se
+   aplasten, y eso, sin contenedor propio, sacaba el cuerpo entero de la
+   ventana: medido, 390px de ventana contra 636 de tabla. Convertida en su
+   propio contenedor de scroll, la regla de los 620 sigue valiendo y el
+   cuerpo deja de moverse.
+
+   Va aqui, en la capa adoptable, porque los documentos que mas tablas tienen
+   son justo los que solo pueden recibir tokens. */
+@media (max-width:560px){
+  table{display:block; overflow-x:auto; -webkit-overflow-scrolling:touch}
+}
+/* El navegador le da a <small> el 80% del tamano heredado, asi que dentro de
+   una etiqueta que ya esta en el piso (12px) cae a 10px. El piso deja de ser
+   un piso. Se fija: <small> es letra pequena, no letra ilegible.
+
+   Es el segundo y ultimo selector de elemento desnudo de esta capa, y va por
+   la misma razon que el primero: corrige algo que el documento no eligio,
+   sino que heredo del navegador. */
+small{font-size:var(--fs-min)}
+
+/* ============== COMPONENTES DE CUERPO ============== */
+/* ------------------------------------------------- titulillo de seccion ---
+   Abre una seccion. Es tipografia, NO una pastilla de color: gana lo tenia
+   como recuadro amarillo en mayusculas y eso compite con el titular de la
+   portada en vez de subordinarse a el. El amarillo va en el <em>, igual que
+   en la portada, y sobre una parte.
+
+     <div class="titulo-seccion">
+       <h2>Donde se puso <em>la plata</em></h2>
+       <p>El complemento del titular, si hace falta.</p>
+     </div>
+
+   El parrafo va al lado en pantalla ancha, no debajo: es complemento del
+   titular y tiene que leerse con el. */
+.titulo-seccion{
+  display:grid; gap:var(--s-4) var(--s-col); align-items:start;
+  grid-template-columns:minmax(0,1fr);
+  margin:0 0 var(--s-5)
+}
+.titulo-seccion:has(> p){grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)}
+.titulo-seccion h2{
+  margin:0; font-size:clamp(1.6rem,3.4vw,2.6rem);
+  letter-spacing:-.035em; line-height:1.05; max-width:22ch; text-wrap:balance
+}
+.titulo-seccion > p{
+  margin:0; max-width:46ch; color:var(--fg-secondary);
+  font-size:clamp(.95rem,1.2vw,1.05rem); align-self:end
+}
+.titulo-seccion > p b{color:var(--fg)}
+
+/* -------------------------------------------------------------- la ficha ---
+   Superficie elevada con una regla fina. Se distingue por eso, NO por una
+   franja de color al borde ni por un fondo hundido: un fondo igual al de la
+   pagina no eleva nada, y la franja sobre esquina redonda se lee como
+   pestana suelta.
+
+     <article class="panel-dato"> … </article>
+     <article class="panel-dato es-acento"> … </article>   una sola por grupo */
+.panel-dato{
+  background:var(--raised); border:1px solid var(--rule);
+  border-radius:var(--radius); padding:var(--s-5)
+}
+/* El acento se aplica al RELLENO, no al borde: una ficha amarilla entera
+   destaca de verdad, y su texto tiene pareja definida (--accent-ink, 8.8:1).
+   Se usa una vez por grupo, si no deja de destacar. */
+.panel-dato.es-acento{
+  background:var(--accent); border-color:var(--accent); color:var(--accent-ink)
+}
+.panel-dato.es-acento :is(h2,h3,h4,strong,b){color:var(--accent-ink)}
+
+/* --------------------------------------------------------- tira de cifras ---
+   Dos o tres cifras en fila, con una regla arriba. Las mismas reglas que la
+   tira de la portada, para que una cifra se lea igual en toda la casa. */
+.tira-cifras{
+  display:grid; gap:var(--s-5) var(--s-6);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));
+  margin:var(--s-5) 0 0; padding-top:var(--s-5);
+  border-top:1px solid var(--rule)
+}
+.tira-cifras div{display:grid; gap:3px; min-width:0}
+.tira-cifras dt{font-size:var(--fs-min); color:var(--fg-muted); font-weight:500; order:2}
+.tira-cifras dd{
+  margin:0; color:var(--fg); font-size:clamp(1.3rem,2.4vw,1.9rem);
+  font-weight:800; letter-spacing:-.02em; order:1
+}
+.tira-cifras dd small{
+  display:block; margin-top:4px; font-size:var(--fs-body-min);
+  font-weight:400; letter-spacing:0; color:var(--fg-muted)
+}
+.tira-cifras dd small b{color:var(--fg-secondary); font-weight:700}
+
+/* ------------------------------------------------------------- el rotulo ---
+   La etiqueta corta: un estado, un canal, un periodo. En minuscula: en
+   versales la lectura se degrada, y estas acaban llevando frases. */
+.rotulo{
+  display:inline-block; padding:4px 10px;
+  border:1px solid var(--rule); border-radius:var(--radius-sm);
+  font-size:var(--fs-min); font-weight:600; color:var(--fg-secondary);
+  background:var(--raised)
+}
+.rotulo.es-acento{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.rotulo.es-bien{color:var(--pos)}
+.rotulo.es-mal{color:var(--neg)}
+
+/* ------------------------------------------------------------- el aviso ---
+   Lo que hay que leer aunque se salte el resto. Enmarcado con el acento
+   COMPLETO, no con una barra lateral gruesa: la barra sobre esquina redonda
+   se lee como pestana, y es un patron fechado. */
+.bloque-aviso{
+  border:1px solid var(--accent); border-radius:var(--radius);
+  padding:var(--s-5); background:var(--raised); color:var(--fg-secondary)
+}
+.bloque-aviso :is(h2,h3,h4){margin:0 0 8px; font-size:1.05rem; color:var(--fg)}
+.bloque-aviso b,.bloque-aviso strong{color:var(--fg)}
+
+/* ------------------------------------------------------------- la tabla ---
+   Abierta. Sin caja, sin esquina redonda, sin cabecera de relleno oscuro:
+   la estructura la da la regla bajo el encabezado. El relleno oscuro con
+   texto en rol es lo que producia cabeceras invisibles al imprimir. */
+.tabla-abierta{overflow-x:auto; margin:var(--s-5) 0}
+.tabla-abierta table{width:100%; border-collapse:collapse}
+.tabla-abierta th{
+  text-align:left; font-size:var(--fs-min); font-weight:700; color:var(--fg-muted);
+  text-transform:none; padding:0 14px 12px 0;
+  border-bottom:1px solid var(--rule-strong); white-space:nowrap
+}
+.tabla-abierta td{
+  padding:12px 14px 12px 0; color:var(--fg-secondary);
+  border-bottom:1px solid var(--rule); vertical-align:top
+}
+.tabla-abierta tr:last-child td{border-bottom:0}
+.tabla-abierta .es-total td{color:var(--fg); font-weight:800; border-top:1px solid var(--rule-strong)}
+/* Las marcas de dato no redondean: una barra cuadrada mide mejor. */
+.tabla-abierta .barra{height:6px; background:var(--sunken); border-radius:0}
+.tabla-abierta .barra i{display:block; height:100%; background:var(--accent-fg)}
+
+@media (max-width:820px){
+  .titulo-seccion:has(> p){grid-template-columns:minmax(0,1fr)}
+}

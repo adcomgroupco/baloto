@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Benchmark Anuncios Propios — Baloto 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #F5F5F5;
+    --black: #1A1A1A;
+    --yellow: #FFC000;
+    --white: #FFFFFF;
+    --t1: #1A1A1A;
+    --t2: #333333;
+    --t3: #999999;
+    --t4: #666666;
+    --green: #4CAF50;
+    --red: #EF5350;
+    --border: #E0E0E0;
+  }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: #2A2A2A;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px;
+    gap: 20px;
+  }
+
+  /* SLIDE */
+  .slide {
+    width: 960px;
+    min-height: 540px;
+    background: var(--bg);
+    border-radius: 12px;
+    overflow: hidden;
+    padding: 14px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--black);
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+  }
+  .header-logo {
+    width: 34px; height: 34px;
+    background: var(--yellow);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; color: var(--black);
+    flex-shrink: 0;
+  }
+  .header-title { color: #fff; font-size: 15px; font-weight: 400; }
+  .header-title strong { font-weight: 700; font-style: italic; }
+  .header-badge {
+    margin-left: auto;
+    background: var(--yellow);
+    color: var(--black);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* SUBTITLE */
+  .subtitle {
+    font-size: 9px;
+    color: var(--t4);
+    font-style: italic;
+    margin-bottom: 12px;
+    padding-left: 2px;
+  }
+
+  /* INSIGHT BAR */
+  .insight-bar {
+    background: var(--white);
+    border: 0.5px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    padding: 8px 14px;
+    margin-top: auto;
+    gap: 12px;
+  }
+  .insight-bar-accent {
+    width: 5px; min-height: 36px;
+    background: var(--yellow);
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .insight-bar p { font-size: 8.5px; color: var(--t4); line-height: 1.5; }
+  .insight-bar strong { color: var(--t2); }
+
+  /* CARD */
+  .card {
+    background: var(--white);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 5px;
+    background: var(--yellow);
+  }
+
+  /* KPI CARD */
+  .kpi-card { text-align: center; }
+  .kpi-card .kpi-val {
+    font-size: 22px; font-weight: 700; color: var(--t1);
+    line-height: 1.1;
+  }
+  .kpi-card .kpi-val.green { color: var(--green); }
+  .kpi-card .kpi-val.yellow { color: var(--yellow); }
+  .kpi-card .kpi-label {
+    font-size: 8.5px; font-weight: 700; color: var(--t2);
+    margin-top: 3px;
+  }
+  .kpi-card .kpi-sub {
+    font-size: 7px; color: var(--t3);
+    margin-top: 2px; line-height: 1.3;
+  }
+
+  /* TABLE */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 9px; }
+  .data-table th {
+    background: var(--black); color: #fff;
+    padding: 6px 8px; text-align: left;
+    font-size: 8px; font-weight: 700;
+  }
+  .data-table th.yellow { background: var(--yellow); color: var(--black); }
+  .data-table td { padding: 5px 8px; border-bottom: 0.5px solid #EEEEEE; color: var(--t2); }
+  .data-table tr:nth-child(even) td { background: #F9F9F9; }
+  .data-table tr.highlight td { background: #FFF8E1; font-weight: 700; color: var(--t1); }
+  .data-table tr.highlight-green td { background: #E8F5E9; }
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-size: 7.5px;
+    font-weight: 700;
+  }
+  .badge-yellow { background: var(--yellow); color: var(--black); }
+  .badge-green { background: #E8F5E9; color: #2E7D32; }
+  .badge-red { background: #FFEBEE; color: #C62828; }
+  .badge-gray { background: #EEEEEE; color: #555; }
+  .badge-blue { background: #E3F2FD; color: #1565C0; }
+
+  /* GRID HELPERS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+
+  /* SLIDE NUMBER */
+  .slide-number {
+    position: absolute;
+    bottom: 14px; right: 18px;
+    font-size: 8px; color: var(--t3);
+  }
+
+  /* DARK SLIDE */
+  .slide.dark { background: var(--black); }
+  .slide.dark .section-title { color: #fff; }
+  .slide.dark .section-sub { color: var(--yellow); }
+
+  /* SECTION TITLE SLIDE */
+  .section-title {
+    font-size: 36px; font-weight: 700; color: var(--white);
+    line-height: 1.15; margin-top: auto; margin-bottom: 8px;
+  }
+  .section-sub {
+    font-size: 14px; color: var(--yellow);
+    font-style: italic; font-weight: 300;
+    margin-bottom: auto;
+  }
+
+  /* HIGHLIGHT LIST */
+  .hl-list { display: flex; flex-direction: column; gap: 7px; }
+  .hl-item {
+    background: var(--white);
+    border: 0.5px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 8px;
+    color: var(--t2);
+    line-height: 1.5;
+    border-left: 3px solid var(--yellow);
+  }
+  .hl-item strong { color: var(--t1); display: block; margin-bottom: 1px; font-size: 8.5px; }
+
+  /* PILAR CARD */
+  .pilar-card {
+    background: var(--white);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .pilar-top {
+    display: flex; align-items: center; gap: 6px;
+    border-bottom: 0.5px solid #F0F0F0;
+    padding-bottom: 6px; margin-bottom: 4px;
+  }
+  .pilar-icon {
+    width: 28px; height: 28px;
+    background: var(--yellow);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; flex-shrink: 0;
+  }
+  .pilar-name { font-size: 9.5px; font-weight: 700; color: var(--t1); }
+  .pilar-tipo { font-size: 7.5px; color: var(--t3); }
+  .pilar-metric { display: flex; justify-content: space-between; align-items: center; }
+  .pilar-metric span { font-size: 7.5px; color: var(--t3); }
+  .pilar-metric strong { font-size: 10px; color: var(--t1); font-weight: 700; }
+  .pilar-metric strong.ctr { color: #1565C0; }
+  .pilar-reco {
+    background: #FFF8E1;
+    border-radius: 4px;
+    padding: 5px 7px;
+    font-size: 7.5px;
+    color: var(--t4);
+    line-height: 1.4;
+    margin-top: 3px;
+  }
+  .pilar-reco strong { color: var(--black); }
+
+  /* EMOTIONAL BANNER */
+  .emotional-banner {
+    background: var(--black);
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+  .emotional-banner .eb-icon {
+    font-size: 22px; flex-shrink: 0;
+  }
+  .emotional-banner .eb-text { }
+  .emotional-banner .eb-title {
+    color: var(--yellow);
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .emotional-banner .eb-body {
+    color: #ccc;
+    font-size: 8.5px;
+    line-height: 1.5;
+  }
+  .eb-tags { display: flex; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
+  .eb-tag {
+    background: rgba(255,192,0,0.15);
+    color: var(--yellow);
+    border: 0.5px solid rgba(255,192,0,0.3);
+    border-radius: 20px;
+    padding: 2px 9px;
+    font-size: 7.5px;
+    font-weight: 600;
+  }
+
+  /* VAR BADGES */
+  .var-up { color: var(--green); font-weight: 700; }
+  .var-down { color: var(--red); font-weight: 700; }
+
+  /* TREND BARS */
+  .trend-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .trend-bar-bg { flex: 1; background: #EEE; border-radius: 3px; height: 8px; overflow: hidden; }
+  .trend-bar-fill { height: 100%; border-radius: 3px; background: var(--yellow); }
+  .trend-bar-fill.green { background: var(--green); }
+
+  /* SLIDE NAV */
+  .nav-bar {
+    display: flex; gap: 8px; align-items: center;
+    background: #1A1A1A;
+    padding: 10px 16px;
+    border-radius: 30px;
+    position: sticky;
+    top: 16px;
+    z-index: 100;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 960px;
+  }
+  .nav-btn {
+    background: transparent;
+    border: 0.5px solid #555;
+    color: #aaa;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 9px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover, .nav-btn.active { background: var(--yellow); color: var(--black); border-color: var(--yellow); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav-bar">
+  <button class="nav-btn" onclick="scrollToSlide('s1')">Portada</button>
+  <button class="nav-btn" onclick="scrollToSlide('s2')">Overview</button>
+  <button class="nav-btn" onclick="scrollToSlide('s3')">Formato</button>
+  <button class="nav-btn" onclick="scrollToSlide('s4')">Objetivo</button>
+  <button class="nav-btn" onclick="scrollToSlide('s5a')">Top Objetivo</button>
+  <button class="nav-btn" onclick="scrollToSlide('s5b')">Top Formato</button>
+  <button class="nav-btn" onclick="scrollToSlide('s5c')">Top CTR</button>
+  <button class="nav-btn" onclick="scrollToSlide('s6')">Mensajes</button>
+  <button class="nav-btn" onclick="scrollToSlide('s7')">Tendencia</button>
+  <button class="nav-btn" onclick="scrollToSlide('s8')">Marzo</button>
+  <button class="nav-btn" onclick="scrollToSlide('sp')">Top Previews</button>
+  <button class="nav-btn" onclick="scrollToSlide('s9')">Conclusiones</button>
+</div>
+
+<!-- SLIDE 1 — PORTADA -->
+<div class="slide dark" id="s1" style="justify-content:center; min-height:540px;">
+  <div style="position:absolute;top:14px;left:18px;right:18px;">
+    <div class="header">
+      <div class="header-logo">A</div>
+      <span class="header-title">ADCOM · <strong>Benchmark Digital Baloto</strong></span>
+      <span class="header-badge">Febrero – Abril 2026</span>
+    </div>
+  </div>
+  <div style="padding: 60px 0 20px; display:flex; flex-direction:column; justify-content:center; flex:1;">
+    <p style="color:var(--yellow); font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; margin-bottom:16px;">Análisis de Pauta Propia</p>
+    <div class="section-title" style="font-size:42px; margin:0 0 12px;">Benchmark de<br>Anuncios Propios</div>
+    <div class="section-sub" style="font-size:16px;">Meta Ads · Enero – Mayo 2026</div>
+    <div style="margin-top:32px; display:flex; gap:24px;">
+      <div style="text-align:center;">
+        <div style="font-size:28px; font-weight:700; color:var(--yellow);">390</div>
+        <div style="font-size:9px; color:#aaa; margin-top:2px;">Anuncios analizados</div>
+      </div>
+      <div style="width:1px; background:#333;"></div>
+      <div style="text-align:center;">
+        <div style="font-size:28px; font-weight:700; color:var(--yellow);">$372M</div>
+        <div style="font-size:9px; color:#aaa; margin-top:2px;">Inversión en pauta</div>
+      </div>
+      <div style="width:1px; background:#333;"></div>
+      <div style="text-align:center;">
+        <div style="font-size:28px; font-weight:700; color:var(--yellow);">5</div>
+        <div style="font-size:9px; color:#aaa; margin-top:2px;">Formatos evaluados</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number" style="color:#555;">01 / 11</div>
+</div>
+
+<!-- SLIDE 2 — OVERVIEW -->
+<div class="slide" id="s2">
+  <div class="header">
+    <div class="header-logo">A</div>
+    <span class="header-title">Resumen Ejecutivo · <strong>Overview Feb–Abr 2026</strong></span>
+    <span class="header-badge">Indicadores Clave</span>
+  </div>
+  <p class="subtitle">Indicadores Clave de Adquisición y Rendimiento Digital · Febrero – Abril 2026</p>
+
+  <!-- Macro KPIs -->
+  <div class="grid-2" style="margin-bottom:10px;">
+    <div class="card kpi-card" style="padding:12px 16px;">
+      <div class="kpi-val" style="font-size:28px;">$372.658.210</div>
+      <div class="kpi-label">Inversión total en pauta</div>
+    </div>
+    <div class="card kpi-card" style="padding:12px 16px;">
+      <div class="kpi-val" style="font-size:28px;">132</div>
+      <div class="kpi-label">Anuncios implementados</div>
+    </div>
+  </div>
+
+  <!-- Fila 1: visibilidad -->
+  <div class="grid-3" style="margin-bottom:10px;">
+    <div class="card kpi-card">
+      <div class="kpi-val">170 M</div>
+      <div class="kpi-label">Impresiones</div>
+      <div class="kpi-sub">Veces que se mostró el anuncio</div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-val">72 M</div>
+      <div class="kpi-label">Alcance</div>
+      <div class="kpi-sub">Usuarios únicos impactados</div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-val">25 M</div>
+      <div class="kpi-label">Thruplays</div>
+      <div class="kpi-sub">Reproducciones +15 seg en Meta</div>
+    </div>
+  </div>
+
+  <!-- Fila 2: tráfico -->
+  <div class="grid-2" style="margin-bottom:10px;">
+    <div class="card kpi-card">
+      <div class="kpi-val">1.7 M</div>
+      <div class="kpi-label">Clics en el enlace</div>
+      <div class="kpi-sub">Veces que los usuarios hicieron clic en el anuncio</div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-val">3.6 M</div>
+      <div class="kpi-label">Usuarios</div>
+      <div class="kpi-sub">Personas únicas que visitaron el sitio web</div>
+    </div>
+  </div>
+
+  <!-- Fila 3: conversión -->
+  <div class="grid-4" style="margin-bottom:10px;">
+    <div class="card kpi-card">
+      <div class="kpi-val green">100.747</div>
+      <div class="kpi-label">Registros</div>
+      <div class="kpi-sub">Formularios completados</div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-val green">711.408</div>
+      <div class="kpi-label">Compras</div>
+      <div class="kpi-sub">Transacciones con pago exitoso</div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-val green">$4.2 M</div>
+      <div class="kpi-label">Ingresos</div>
+      <div class="kpi-sub">Atribuibles a campañas digitales</div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-val yellow">11,48</div>
+      <div class="kpi-label">ROAS</div>
+      <div class="kpi-sub">Ingreso por cada $1 invertido</div>
+    </div>
+  </div>
+
+  <div class="insight-bar">
+    <div class="insight-bar-accent"></div>
+    <p>Por cada <strong>$1 invertido</strong> en pauta digital, Baloto generó <strong>$11,48 en ingresos</strong> — con 711K transacciones completadas. El beneficio emocional detrás de cada compra (el sueño, la aspiración) es el motor real de este ROAS.</p>
+  </div>
+  <div class="slide-number">02 / 11</div>
+</div>
+
+<!-- SLIDE 3 — FORMATO -->
+<div class="slide" id="s3">
+  <div class="header">
+    <div class="header-logo">A</div>
+    <span class="header-title">Rendimiento por <strong>Formato de Anuncio</strong></span>
+    <span class="header-badge">5 Formatos</span>
+  </div>
+  <p class="subtitle">Análisis comparativo de los 5 formatos implementados · Ene – May 2026</p>
+
+  <div class="grid-2" style="flex:1; gap:12px;">
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Formato</th>
+            <th>Ads</th>
+            <th>Impresiones</th>
+            <th class="yellow">CTR</th>
+            <th>CPM</th>
+            <th>CPC</th>
+            <th>Conversiones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight">
+            <td><span class="badge badge-yellow">Estático</span></td>
+            <td>222</td><td>29.5 M</td><td><strong>1.29%</strong></td>
+            <td>$5.731</td><td>$446</td><td>379.269</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-gray">Video</span></td>
+            <td>76</td><td>11.4 M</td><td>1.70%</td>
+            <td>$5.392</td><td>$317</td><td>64.408</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue">Reel</span></td>
+            <td>69</td><td>4.3 M</td><td><strong>2.66%</strong></td>
+            <td>$4.874</td><td>$183</td><td>44.544</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-red">Carrusel</span></td>
+            <td>10</td><td>225 K</td><td>0.62%</td>
+            <td>$9.633</td><td>$1.557</td><td>3.998</td>
+          </tr>
+          <tr class="highlight-green">
+            <td><span class="badge badge-green">Orgánico</span></td>
+            <td>13</td><td>882 K</td><td><strong>4.28%</strong></td>
+            <td>$5.416</td><td>$127</td><td>17.501</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="hl-list" style="justify-content:center;">
+      <div class="hl-item">
+        <strong>🏆 Orgánico lidera en eficiencia</strong>
+        CTR 4.28% y CPC $127 — el más bajo de todos los formatos. Máximo rendimiento por peso invertido.
+      </div>
+      <div class="hl-item">
+        <strong>📦 Estático domina en volumen</strong>
+        57% de los anuncios y 63% de las conversiones totales. El caballo de batalla de la cuenta.
+      </div>
+      <div class="hl-item">
+        <strong>🎬 Reel supera al Video en CTR</strong>
+        2.66% vs 1.70% con menor inversión. Formato en ascenso con alto potencial emocional.
+      </div>
+      <div class="hl-item">
+        <strong>⚠️ Carrusel, el menos eficiente</strong>
+        CPM 2x más caro ($9.633) y CTR más bajo (0.62%). Revisar si justifica inversión.
+      </div>
+      <div class="hl-item" style="border-left-color: #1565C0; background:#E3F2FD;">
+        <strong style="color:#1565C0;">💡 Insight emocional</strong>
+        Los formatos con mayor CTR (Orgánico, Reel) son los que más espacio dan al beneficio emocional — narrativa, aspiración, humor. El estático transaccional convierte en volumen pero a mayor costo.
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-bar">
+    <div class="insight-bar-accent"></div>
+    <p>El formato estático concentra el mayor volumen de conversiones, pero el <strong>reel y el orgánico muestran mayor eficiencia por clic</strong> — oportunidad de redistribuir inversión hacia formatos que permiten <strong>conectar emocionalmente</strong> con el usuario.</p>
+  </div>
+  <div class="slide-number">03 / 11</div>
+</div>
+
+<!-- SLIDE 4 — OBJETIVO -->
+<div class="slide" id="s4">
+  <div class="header">
+    <div class="header-logo">A</div>
+    <span class="header-title">Rendimiento por <strong>Objetivo de Campaña</strong></span>
+    <span class="header-badge">3 Objetivos</span>
+  </div>
+  <p class="subtitle">Comparativo de eficiencia según objetivo configurado en Meta · Ene – May 2026</p>
+
+  <div class="grid-2" style="margin-bottom:10px;">
+    <div class="card kpi-card">
+      <div class="kpi-val">3</div>
+      <div class="kpi-label">Objetivos activos</div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-val">291</div>
+      <div class="kpi-label">Anuncios con resultado medible</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="flex:1; gap:12px;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Objetivo</th>
+          <th>Ads</th>
+          <th>Impresiones</th>
+          <th class="yellow">CTR</th>
+          <th>CPM</th>
+          <th>CPC</th>
+          <th>Resultados</th>
+          <th>Costo/Res.</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight">
+          <td><span class="badge badge-yellow">Compra</span></td>
+          <td>216</td><td>24.1 M</td><td>1.40%</td>
+          <td>$6.091</td><td>$436</td><td>391.757</td><td><strong>$375</strong></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-gray">Registro</span></td>
+          <td>51</td><td>19.6 M</td><td>1.46%</td>
+          <td>$5.346</td><td>$365</td><td>49.265</td><td>$2.130</td>
+        </tr>
+        <tr class="highlight-green">
+          <td><span class="badge badge-green">Vista pág.</span></td>
+          <td>24</td><td>2.5 M</td><td><strong>4.03%</strong></td>
+          <td>$2.561</td><td><strong>$64</strong></td><td>68.698</td><td><strong>$95</strong></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="hl-list">
+      <div class="hl-item">
+        <strong>🏆 Vista de Página: el objetivo más eficiente</strong>
+        CTR 4x más alto y CPC 7x más barato que Compra. Ideal para atraer tráfico frío con creatividades emocionales.
+      </div>
+      <div class="hl-item">
+        <strong>💰 Compra concentra el volumen</strong>
+        57% de la inversión y 89% de los resultados. El motor transaccional de la cuenta.
+      </div>
+      <div class="hl-item">
+        <strong>📋 Registro: el costo más alto</strong>
+        $2.130 por lead — 6x más caro que una vista de página. Revisar el funnel post-registro.
+      </div>
+      <div class="hl-item" style="border-left-color: #1565C0; background:#E3F2FD;">
+        <strong style="color:#1565C0;">💡 Insight emocional</strong>
+        Vista de Página funciona mejor con creatividades aspiracionales. El usuario que llega por emoción navega más y convierte mejor en pasos siguientes.
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-bar">
+    <div class="insight-bar-accent"></div>
+    <p><strong>Vista de Página</strong> entrega el tráfico más barato ($64 CPC), pero <strong>Compra</strong> genera el volumen de transacciones. La clave está en usar <strong>mensajes emocionales en TOFU</strong> (Vista pág.) y transaccionales en BOFU (Compra).</p>
+  </div>
+  <div class="slide-number">04 / 11</div>
+</div>
+
+<!-- SLIDE 5A — TOP POR OBJETIVO -->
+<div class="slide" id="s5a">
+  <div class="header">
+    <div class="header-logo">A</div>
+    <span class="header-title">Top Anuncios por <strong>Objetivo</strong></span>
+    <span class="header-badge">Mayor Volumen de Resultados</span>
+  </div>
+  <p class="subtitle">Los anuncios con mayor volumen de resultados según objetivo configurado</p>
+
+  <div class="grid-3" style="flex:1; gap:10px;">
+    <!-- Compra -->
+    <div style="display:flex; flex-direction:column; gap:0;">
+      <div style="background:var(--black); color:#fff; padding:6px 10px; border-radius:6px 6px 0 0; font-size:9px; font-weight:700;">🛒 Compra — Top por Resultados</div>
+      <table class="data-table" style="border-radius:0 0 6px 6px; overflow:hidden;">
+        <thead><tr><th>#</th><th>Anuncio</th><th>Resultados</th><th class="yellow">CTR</th></tr></thead>
+        <tbody>
+          <tr class="highlight"><td>1</td><td>acercateunpasomas</td><td><strong>17.413</strong></td><td>0.60%</td></tr>
+          <tr><td>2</td><td>nuevahistoria_jugar</td><td>16.128</td><td>0.53%</td></tr>
+          <tr><td>3</td><td>sabado_28500M</td><td>11.728</td><td>1.09%</td></tr>
+          <tr><td>4</td><td>sabado_32000M</td><td>10.773</td><td>1.30%</td></tr>
+          <tr><td>5</td><td>haztujugada</td><td>10.229</td><td>2.18%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Registro -->
+    <div style="display:flex; flex-direction:column;">
+      <div style="background:var(--black); color:#fff; padding:6px 10px; border-radius:6px 6px 0 0; font-size:9px; font-weight:700;">📋 Registro — Top por Resultados</div>
+      <table class="data-table" style="border-radius:0 0 6px 6px; overflow:hidden;">
+        <thead><tr><th>#</th><th>Anuncio</th><th>Resultados</th><th class="yellow">CTR</th></tr></thead>
+        <tbody>
+          <tr class="highlight"><td>1</td><td>yerlicampo_off10-04</td><td><strong>12.370</strong></td><td>1.18%</td></tr>
+          <tr><td>2</td><td>unticketededistancia</td><td>8.320</td><td>1.22%</td></tr>
+          <tr><td>3</td><td>porquejugar</td><td>6.262</td><td>1.65%</td></tr>
+          <tr><td>4</td><td>mariopara</td><td>3.614</td><td>2.02%</td></tr>
+          <tr><td>5</td><td>registrarseenminutos</td><td>3.258</td><td>1.32%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Vista -->
+    <div style="display:flex; flex-direction:column;">
+      <div style="background:var(--black); color:#fff; padding:6px 10px; border-radius:6px 6px 0 0; font-size:9px; font-weight:700;">👁️ Vista de Página — Top por Resultados</div>
+      <table class="data-table" style="border-radius:0 0 6px 6px; overflow:hidden;">
+        <thead><tr><th>#</th><th>Anuncio</th><th>Resultados</th><th class="yellow">CTR</th></tr></thead>
+        <tbody>
+          <tr class="highlight"><td>1</td><td>algoestapasando_reg.</td><td><strong>22.601</strong></td><td style="color:#1565C0; font-weight:700;">8.45%</td></tr>
+          <tr><td>2</td><td>algoestapasando_14-11</td><td>10.569</td><td>6.30%</td></tr>
+          <tr><td>3</td><td>ysiestaveztetocaati2</td><td>9.041</td><td>3.22%</td></tr>
+          <tr><td>4</td><td>hazloporloquesueñas</td><td>7.483</td><td>2.16%</td></tr>
+          <tr><td>5</td><td>nolopiensestanto</td><td>7.032</td><td>2.60%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="insight-bar">
+    <div class="insight-bar-accent"></div>
+    <p>El reel <strong>'algo está pasando'</strong> domina Vista de Página con un CTR de <strong>8.45%</strong>. En Compra, los estáticos de acumulado siguen siendo el volumen. El <strong>beneficio emocional</strong> (narrativa + presentadora) es el diferencial del top 1.</p>
+  </div>
+  <div class="slide-number">05 / 11</div>
+</div>
+
+<!-- SLIDE 5B — TOP POR FORMATO -->
+<div class="slide" id="s5b">
+  <div class="header">
+    <div class="header-logo">A</div>
+    <span class="header-title">Top Anuncios por <strong>Formato</strong></span>
+    <span class="header-badge">Mejor CTR por Formato</span>
+  </div>
+  <p class="subtitle">Mejor CTR por formato con mínimo 50K impresiones</p>
+
+  <div class="grid-5" style="margin-bottom:10px;">
+    <div class="card kpi-card">
+      <div class="kpi-val" style="font-size:14px; color:#1565C0;">14.01%</div>
+      <div class="kpi-label">🎬 Video</div>
+      <div class="kpi-sub">whatsapp_vermas<br>Objetivo: Compra</div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-val" style="font-size:14px; color:#1565C0;">8.45%</div>
+      <div class="kpi-label">📱 Reel</div>
+      <div class="kpi-sub">algoestapasando<br>Objetivo: Vista pág.</div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-val" style="font-size:14px; color:#1565C0;">7.12%</div>
+      <div class="kpi-label">🖼️ Estático</div>
+      <div class="kpi-sub">modomultiacti<br>Objetivo: Compra</div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-val" style="font-size:14px; color:#1565C0;">5.64%</div>
+      <div class="kpi-label">🌿 Orgánico</div>
+      <div class="kpi-sub">telomereces_rest.<br>Objetivo: Compra</div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-val" style="font-size:14px; color:var(--red);">0.66%</div>
+      <div class="kpi-label">🎠 Carrusel</div>
+      <div class="kpi-sub">triloto_lunes<br>Objetivo: Compra</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="flex:1; gap:10px;">
+    <table class="data-table">
+      <thead><tr><th>Formato</th><th class="yellow">CTR líder</th><th>Impresiones</th><th>Inversión</th><th>Resultados</th></tr></thead>
+      <tbody>
+        <tr><td>🎬 Video</td><td style="color:#1565C0; font-weight:700;">14.01%</td><td>88 K</td><td>$589 K</td><td>5.830</td></tr>
+        <tr class="highlight"><td>📱 Reel</td><td style="color:#1565C0; font-weight:700;">8.45%</td><td>407 K</td><td>$638 K</td><td>22.601</td></tr>
+        <tr><td>🖼️ Estático</td><td>7.12%</td><td>66 K</td><td>$408 K</td><td>1.330</td></tr>
+        <tr><td>🌿 Orgánico</td><td>5.64%</td><td>297 K</td><td>$1.7 M</td><td>6.015</td></tr>
+        <tr><td>🎠 Carrusel</td><td style="color:var(--red);">0.66%</td><td>54 K</td><td>$490 K</td><td>1.043</td></tr>
+      </tbody>
+    </table>
+    <div class="hl-list">
+      <div class="hl-item">
+        <strong>Reel es el formato con mejor balance</strong>
+        8.45% CTR con 407K impresiones y solo $638K de inversión. Alto alcance, alta eficiencia.
+      </div>
+      <div class="hl-item">
+        <strong>Carrusel: revisar su rol en la estrategia</strong>
+        CTR 0.66% vs 8.45% del reel líder. 12x menos eficiente en clics con inversión similar.
+      </div>
+      <div class="hl-item" style="border-left-color: #1565C0; background:#E3F2FD;">
+        <strong style="color:#1565C0;">💡 Insight emocional</strong>
+        Los formatos con narrativa (Reel, Orgánico) superan a los formatos estáticos en CTR. El movimiento y la historia activan la respuesta emocional.
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-bar">
+    <div class="insight-bar-accent"></div>
+    <p>El <strong>carrusel tiene el CTR más bajo</strong> en todos los formatos (0.66%) vs el video líder (14%). Revisar si el formato carrusel justifica inversión o si el presupuesto se redistribuye a <strong>reels con narrativa emocional</strong>.</p>
+  </div>
+  <div class="slide-number">06 / 11</div>
+</div>
+
+<!-- SLIDE 5C — TOP CTR GLOBAL -->
+<div class="slide" id="s5c">
+  <div class="header">
+    <div class="header-logo">A</div>
+    <span class="header-title">Top 10 Anuncios por <strong>CTR Global</strong></span>
+    <span class="header-badge">Mín. 50K Impresiones</span>
+  </div>
+  <p class="subtitle">Ranking global de eficiencia de clic — sin campaña de acumulado programado</p>
+
+  <table class="data-table" style="flex:1;">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Anuncio</th>
+        <th>Formato</th>
+        <th>Objetivo</th>
+        <th class="yellow">CTR</th>
+        <th>Impresiones</th>
+        <th>Inversión</th>
+        <th>Resultados</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="highlight">
+        <td>🥇</td>
+        <td>algoestapasando_registrate</td>
+        <td><span class="badge badge-blue">Reel</span></td>
+        <td><span class="badge badge-gray">Vista pág.</span></td>
+        <td style="color:#1565C0; font-weight:700;">8.45%</td>
+        <td>407 K</td><td>$638 K</td><td>22.601</td>
+      </tr>
+      <tr>
+        <td>🥈</td><td>modomultiacti</td>
+        <td><span class="badge badge-gray">Estático</span></td>
+        <td><span class="badge badge-yellow">Compra</span></td>
+        <td style="font-weight:700;">7.12%</td>
+        <td>66 K</td><td>$408 K</td><td>1.330</td>
+      </tr>
+      <tr>
+        <td>🥉</td><td>algoestapasando_14-11</td>
+        <td><span class="badge badge-blue">Reel</span></td>
+        <td><span class="badge badge-gray">Vista pág.</span></td>
+        <td style="font-weight:700;">6.30%</td>
+        <td>263 K</td><td>$522 K</td><td>10.569</td>
+      </tr>
+      <tr><td>4</td><td>telomereces_restaurante</td><td><span class="badge badge-green">Orgánico</span></td><td><span class="badge badge-yellow">Compra</span></td><td>5.64%</td><td>297 K</td><td>$1.7 M</td><td>6.015</td></tr>
+      <tr><td>5</td><td>millonesenjuego_jugar</td><td><span class="badge badge-gray">Estático</span></td><td><span class="badge badge-yellow">Compra</span></td><td>5.11%</td><td>130 K</td><td>$786 K</td><td>2.104</td></tr>
+      <tr><td>6</td><td>sigueparticipando</td><td><span class="badge badge-gray">Estático</span></td><td><span class="badge badge-yellow">Compra</span></td><td>4.84%</td><td>387 K</td><td>$1.7 M</td><td>4.501</td></tr>
+      <tr><td>7</td><td>telomereces_carros_14-04</td><td><span class="badge badge-gray">Video</span></td><td><span class="badge badge-yellow">Compra</span></td><td>4.53%</td><td>108 K</td><td>$578 K</td><td>1.609</td></tr>
+      <tr><td>8</td><td>telomereces_carros_lunes</td><td><span class="badge badge-green">Orgánico</span></td><td><span class="badge badge-yellow">Compra</span></td><td>4.31%</td><td>263 K</td><td>$1.2 M</td><td>4.177</td></tr>
+      <tr><td>9</td><td>telomereces_entrenar</td><td><span class="badge badge-gray">Video</span></td><td><span class="badge badge-yellow">Compra</span></td><td>3.61%</td><td>86 K</td><td>$425 K</td><td>1.784</td></tr>
+    </tbody>
+  </table>
+
+  <div class="insight-bar">
+    <div class="insight-bar-accent"></div>
+    <p><strong>7 de los 9 anuncios</strong> con mejor CTR tienen objetivo Compra. Los reels 'algo está pasando' son la excepción — alto CTR con presupuesto mínimo, señal clara de que la <strong>narrativa emocional</strong> conecta sin necesitar gran inversión.</p>
+  </div>
+  <div class="slide-number">07 / 11</div>
+</div>
+
+<!-- SLIDE 6 — MENSAJES / PILARES -->
+<div class="slide" id="s6">
+  <div class="header">
+    <div class="header-logo">A</div>
+    <span class="header-title">Análisis de <strong>Mensaje y Pilar Creativo</strong></span>
+    <span class="header-badge">7 Creativos Agrupados</span>
+  </div>
+  <p class="subtitle">Top creativos clasificados por pilar de comunicación · performance consolidado</p>
+
+  <!-- Emotional banner -->
+  <div class="emotional-banner">
+    <div class="eb-icon">💡</div>
+    <div class="eb-text">
+      <div class="eb-title">Insight transversal: incorporar beneficios emocionales a futuras piezas</div>
+      <div class="eb-body">Los anuncios con mayor CTR tienen en común un <strong style="color:var(--yellow)">beneficio emocional claro</strong>: aspiración, humor, pertenencia o urgencia afectiva. Las futuras piezas deben conectar primero emocionalmente antes de comunicar el producto o la oferta.</div>
+      <div class="eb-tags">
+        <span class="eb-tag">Aspiración</span>
+        <span class="eb-tag">Humor / Entretenimiento</span>
+        <span class="eb-tag">Pertenencia</span>
+        <span class="eb-tag">Urgencia afectiva</span>
+        <span class="eb-tag">Recompensa personal</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; flex:1;">
+    <!-- Entretenimiento -->
+    <div class="pilar-card">
+      <div class="pilar-top">
+        <div class="pilar-icon">🎭</div>
+        <div>
+          <div class="pilar-name">Entretenimiento</div>
+          <div class="pilar-tipo">Presentadora · Narrativa</div>
+        </div>
+      </div>
+      <div class="pilar-metric"><span>CTR consolidado</span><strong class="ctr">7.60%</strong></div>
+      <div class="pilar-metric"><span>Resultados</span><strong>33.170</strong></div>
+      <div class="pilar-metric"><span>CPR</span><strong>$35</strong></div>
+      <div class="pilar-metric"><span>Variantes</span><strong>2</strong></div>
+      <div class="pilar-reco"><strong>Top del benchmark.</strong> Narrativa + presentadora + acumulado = máxima conexión emocional. Escalar con nuevos temas.</div>
+    </div>
+    <!-- Te lo mereces carros -->
+    <div class="pilar-card">
+      <div class="pilar-top">
+        <div class="pilar-icon">🚗</div>
+        <div>
+          <div class="pilar-name">Te lo mereces</div>
+          <div class="pilar-tipo">Aspiracional · Carros</div>
+        </div>
+      </div>
+      <div class="pilar-metric"><span>CTR consolidado</span><strong class="ctr">4.37%</strong></div>
+      <div class="pilar-metric"><span>Resultados</span><strong>5.786</strong></div>
+      <div class="pilar-metric"><span>CPR</span><strong>$312</strong></div>
+      <div class="pilar-metric"><span>Variantes</span><strong>2</strong></div>
+      <div class="pilar-reco"><strong>Línea aspiracional sólida.</strong> El sueño del carro conecta. Explorar más sueños concretos y tangibles.</div>
+    </div>
+    <!-- Te lo mereces restaurante -->
+    <div class="pilar-card">
+      <div class="pilar-top">
+        <div class="pilar-icon">🍽️</div>
+        <div>
+          <div class="pilar-name">Te lo mereces</div>
+          <div class="pilar-tipo">Aspiracional · Restaurante</div>
+        </div>
+      </div>
+      <div class="pilar-metric"><span>CTR consolidado</span><strong class="ctr">5.64%</strong></div>
+      <div class="pilar-metric"><span>Resultados</span><strong>6.015</strong></div>
+      <div class="pilar-metric"><span>CPR</span><strong>$290</strong></div>
+      <div class="pilar-metric"><span>Variantes</span><strong>1</strong></div>
+      <div class="pilar-reco"><strong>Mejor CPR de la línea.</strong> Experiencia + recompensa = combinación ganadora. Ampliar a más experiencias cotidianas.</div>
+    </div>
+    <!-- Te lo mereces entrenar -->
+    <div class="pilar-card">
+      <div class="pilar-top">
+        <div class="pilar-icon">💪</div>
+        <div>
+          <div class="pilar-name">Te lo mereces</div>
+          <div class="pilar-tipo">Aspiracional · Entrenar</div>
+        </div>
+      </div>
+      <div class="pilar-metric"><span>CTR consolidado</span><strong class="ctr">3.61%</strong></div>
+      <div class="pilar-metric"><span>Resultados</span><strong>1.784</strong></div>
+      <div class="pilar-metric"><span>CPR</span><strong>$238</strong></div>
+      <div class="pilar-metric"><span>Variantes</span><strong>1</strong></div>
+      <div class="pilar-reco"><strong>CPR más bajo del grupo.</strong> El bienestar como recompensa resuena. Probar con más ángulos de salud/deporte.</div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-top:8px;">
+    <!-- Más oportunidades -->
+    <div class="pilar-card">
+      <div class="pilar-top">
+        <div class="pilar-icon">🔄</div>
+        <div>
+          <div class="pilar-name">Más Oportunidades</div>
+          <div class="pilar-tipo">Transaccional</div>
+        </div>
+      </div>
+      <div class="pilar-metric"><span>CTR</span><strong class="ctr">5.44%</strong></div>
+      <div class="pilar-metric"><span>CPR</span><strong>$340</strong></div>
+      <div class="pilar-reco"><strong>Buen CTR, alto CPR.</strong> Añadir beneficio emocional al mensaje transaccional para bajar el costo de conversión.</div>
+    </div>
+    <!-- Urgencia acumulado -->
+    <div class="pilar-card">
+      <div class="pilar-top">
+        <div class="pilar-icon">⚡</div>
+        <div>
+          <div class="pilar-name">Urgencia Acumulado</div>
+          <div class="pilar-tipo">Urgencia</div>
+        </div>
+      </div>
+      <div class="pilar-metric"><span>CTR</span><strong class="ctr">5.11%</strong></div>
+      <div class="pilar-metric"><span>CPR</span><strong>$374</strong></div>
+      <div class="pilar-reco"><strong>Genera clic pero cuesta convertir.</strong> Combinar urgencia + beneficio emocional concreto (¿qué harías con ese dinero?).</div>
+    </div>
+    <!-- Seguir intentando -->
+    <div class="pilar-card">
+      <div class="pilar-top">
+        <div class="pilar-icon">🔁</div>
+        <div>
+          <div class="pilar-name">Seguir Intentando</div>
+          <div class="pilar-tipo">Urgencia · Retención</div>
+        </div>
+      </div>
+      <div class="pilar-metric"><span>CTR</span><strong class="ctr">4.84%</strong></div>
+      <div class="pilar-metric"><span>CPR</span><strong>$378</strong></div>
+      <div class="pilar-reco"><strong>Útil para retención.</strong> Sumar el beneficio emocional de la perseverancia + recompensa para bajar CPR.</div>
+    </div>
+  </div>
+
+  <div class="slide-number">08 / 11</div>
+</div>
+
+<!-- SLIDE 7 — TENDENCIA -->
+<div class="slide" id="s7">
+  <div class="header">
+    <div class="header-logo">A</div>
+    <span class="header-title">Tendencia Mensual · <strong>Inversión vs. Resultados</strong></span>
+    <span class="header-badge">Enero – Abril 2026</span>
+  </div>
+  <p class="subtitle">Evolución mensual de inversión y resultados por objetivo</p>
+
+  <div class="grid-4" style="margin-bottom:10px;">
+    <div class="card kpi-card">
+      <div class="kpi-val" style="font-size:16px;">$12.7 M</div>
+      <div class="kpi-label">Enero</div>
+      <div class="kpi-sub">58.397 resultados</div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-val" style="font-size:16px;">$46.3 M</div>
+      <div class="kpi-label">Febrero</div>
+      <div class="kpi-sub">110.185 resultados <span class="var-up">+89%</span></div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-val" style="font-size:16px;">$83.6 M</div>
+      <div class="kpi-label">Marzo</div>
+      <div class="kpi-sub">138.275 resultados <span class="var-up">+25%</span></div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-val" style="font-size:16px;">$56.3 M</div>
+      <div class="kpi-label">Abril</div>
+      <div class="kpi-sub">113.471 resultados <span class="var-down">-18%</span></div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="flex:1; gap:12px;">
+    <div>
+      <div style="position:relative; width:100%; height:220px;">
+        <canvas id="trendChart" role="img" aria-label="Gráfico de inversión y resultados mensuales Ene-Abr 2026">Inversión: Enero $12.7M, Febrero $46.3M, Marzo $83.6M, Abril $56.3M.</canvas>
+      </div>
+    </div>
+    <div class="hl-list" style="justify-content:center;">
+      <div class="hl-item">
+        <strong>Feb vs Ene: inversión +266%, resultados +89% ⚠️</strong>
+        La inversión creció 3x más rápido que los resultados. Inicio de campaña con alto costo de aprendizaje.
+      </div>
+      <div class="hl-item">
+        <strong>Mar vs Feb: inversión +81%, resultados +25% ⚠️</strong>
+        Escala sin eficiencia proporcional. Mes de mayor volumen absoluto.
+      </div>
+      <div class="hl-item">
+        <strong style="color:var(--green);">Abr vs Mar: inversión -33%, resultados -18% ✅</strong>
+        La caída de resultados fue menor que la caída de inversión. Señal de optimización real.
+      </div>
+      <div class="hl-item" style="border-left-color: #1565C0; background:#E3F2FD;">
+        <strong style="color:#1565C0;">💡 Insight emocional</strong>
+        Abril mantuvo eficiencia porque las piezas con mayor beneficio emocional (Te lo mereces, Entretenimiento) siguieron activas y maduras.
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-bar">
+    <div class="insight-bar-accent"></div>
+    <p><strong>Marzo</strong> fue el mes de mayor inversión ($83.6M) y resultados (138K), pero la eficiencia se diluyó. <strong>Abril</strong> redujo pauta 33% y solo cayó 18% en resultados — las <strong>creatividades emocionales</strong> sostienen el rendimiento cuando baja el presupuesto.</p>
+  </div>
+  <div class="slide-number">09 / 11</div>
+</div>
+
+<!-- SLIDE 8 — MARZO COMPARATIVA -->
+<div class="slide" id="s8">
+  <div class="header">
+    <div class="header-logo">A</div>
+    <span class="header-title">Comparativa Interna · <strong>Tanda Marzo 2026</strong></span>
+    <span class="header-badge">Sin Campaña de Acumulado</span>
+  </div>
+  <p class="subtitle">47 anuncios lanzados en Marzo · Excluye campaña de acumulado programado</p>
+
+  <div class="grid-3" style="gap:10px; flex:1;">
+    <!-- Top CTR -->
+    <div>
+      <div style="background:var(--black); color:#fff; padding:6px 10px; border-radius:6px 6px 0 0; font-size:9px; font-weight:700; display:flex; align-items:center; gap:6px;"><span style="background:var(--yellow); color:var(--black); border-radius:4px; padding:1px 6px;">CTR</span> Top 5 por CTR</div>
+      <table class="data-table">
+        <thead><tr><th>#</th><th>Anuncio</th><th>Formato</th><th class="yellow">CTR</th><th>CPR</th></tr></thead>
+        <tbody>
+          <tr class="highlight"><td>1</td><td>dostiposdepersonas_reg.</td><td><span class="badge badge-blue">Reel</span></td><td style="color:#1565C0; font-weight:700;">11.01%</td><td>$39</td></tr>
+          <tr><td>2</td><td>dostiposdepersonas_14-11</td><td><span class="badge badge-blue">Reel</span></td><td>6.65%</td><td>$67</td></tr>
+          <tr><td>3</td><td>modomultiacti</td><td><span class="badge badge-gray">Estático</span></td><td>6.32%</td><td>$233</td></tr>
+          <tr><td>4</td><td>activaelmodoexc</td><td><span class="badge badge-gray">Estático</span></td><td>4.09%</td><td>$38</td></tr>
+          <tr><td>5</td><td>activatumodomillonario</td><td><span class="badge badge-gray">Estático</span></td><td>3.61%</td><td>$2.884</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Top Resultados -->
+    <div>
+      <div style="background:var(--black); color:#fff; padding:6px 10px; border-radius:6px 6px 0 0; font-size:9px; font-weight:700; display:flex; align-items:center; gap:6px;"><span style="background:var(--yellow); color:var(--black); border-radius:4px; padding:1px 6px;">Vol.</span> Top 5 por Resultados</div>
+      <table class="data-table">
+        <thead><tr><th>#</th><th>Anuncio</th><th>Formato</th><th class="yellow">Resultados</th><th>CTR</th></tr></thead>
+        <tbody>
+          <tr class="highlight"><td>1</td><td>nuevahistoria_jugar</td><td><span class="badge badge-gray">Estático</span></td><td><strong>6.931</strong></td><td>0.44%</td></tr>
+          <tr><td>2</td><td>yerlicampo_off10-04</td><td><span class="badge badge-gray">Video</span></td><td>5.086</td><td>1.28%</td></tr>
+          <tr><td>3</td><td>telomereces_selfie</td><td><span class="badge badge-green">Orgánico</span></td><td>3.671</td><td>3.06%</td></tr>
+          <tr><td>4</td><td>unticketededistancia</td><td><span class="badge badge-gray">Estático</span></td><td>3.151</td><td>1.09%</td></tr>
+          <tr><td>5</td><td>tuportunidadtambien</td><td><span class="badge badge-gray">Estático</span></td><td>2.284</td><td>1.49%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Top CPR -->
+    <div>
+      <div style="background:var(--black); color:#fff; padding:6px 10px; border-radius:6px 6px 0 0; font-size:9px; font-weight:700; display:flex; align-items:center; gap:6px;"><span style="background:var(--green); color:#fff; border-radius:4px; padding:1px 6px;">$</span> Top 5 más Eficientes (CPR)</div>
+      <table class="data-table">
+        <thead><tr><th>#</th><th>Anuncio</th><th>Formato</th><th class="yellow">CPR</th><th>CTR</th></tr></thead>
+        <tbody>
+          <tr class="highlight-green"><td>1</td><td>dostiposdepersonas_reg.</td><td><span class="badge badge-blue">Reel</span></td><td style="color:var(--green); font-weight:700;"><strong>$39</strong></td><td>11.01%</td></tr>
+          <tr class="highlight-green"><td>2</td><td>activaelmodoexc</td><td><span class="badge badge-gray">Estático</span></td><td style="color:var(--green); font-weight:700;"><strong>$38</strong></td><td>4.09%</td></tr>
+          <tr><td>3</td><td>ysiestaveztetocaati2</td><td><span class="badge badge-gray">Estático</span></td><td>$120</td><td>3.09%</td></tr>
+          <tr><td>4</td><td>telomereces_selfie</td><td><span class="badge badge-green">Orgánico</span></td><td>$247</td><td>3.06%</td></tr>
+          <tr><td>5</td><td>telomereces_entrenar</td><td><span class="badge badge-gray">Video</span></td><td>$238</td><td>3.61%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="insight-bar">
+    <div class="insight-bar-accent"></div>
+    <p>Los reels y orgánicos dominan en eficiencia (CTR alto, CPR bajo), pero el volumen lo mueven los estáticos con mayor inversión. El orgánico <strong>'telomereces selfie'</strong> es el punto dulce: alto CTR, alto volumen y CPR razonable — el <strong>beneficio emocional + contexto cotidiano</strong> es la fórmula.</p>
+  </div>
+  <div class="slide-number">10 / 12</div>
+</div>
+
+<!-- SLIDE PREVIEWS — TOP ANUNCIOS -->
+<div class="slide" id="sp" style="min-height:600px;">
+  <div class="header">
+    <div class="header-logo">A</div>
+    <span class="header-title">Vista Previa · <strong>Top Anuncios por CTR</strong></span>
+    <span class="header-badge">7 Creativos · Meta Ads</span>
+  </div>
+  <p class="subtitle">Los anuncios con mayor eficiencia del período — haz clic en cada pieza para ver el preview en Meta</p>
+
+  <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; flex:1;">
+
+    <!-- 1 algo esta pasando -->
+    <a href="https://fb.me/adspreview/facebook/24XcT0SElbjCljt" target="_blank" style="text-decoration:none;">
+      <div class="card" style="cursor:pointer; transition: transform 0.15s; height:100%;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
+        <div style="background:var(--black); border-radius:6px; height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; margin-bottom:10px; position:relative; overflow:hidden;">
+          <div style="position:absolute; top:6px; left:6px; background:var(--yellow); color:var(--black); font-size:7px; font-weight:700; padding:2px 7px; border-radius:10px;">🥇 CTR 8.45%</div>
+          <div style="font-size:28px;">🎭</div>
+          <div style="color:#fff; font-size:8px; font-weight:600;">Ver en Meta →</div>
+        </div>
+        <div style="font-size:9px; font-weight:700; color:var(--t1); margin-bottom:3px;">algo_esta_pasando</div>
+        <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:6px;">
+          <span class="badge badge-blue">Reel</span>
+          <span class="badge badge-gray">Vista pág.</span>
+        </div>
+        <div style="font-size:7.5px; color:var(--t3); margin-bottom:4px;"><strong style="color:var(--t2);">Pilar:</strong> Entretenimiento</div>
+        <div style="font-size:7.5px; color:var(--t3); margin-bottom:4px;"><strong style="color:var(--t2);">Mensaje:</strong> Acumulado más grande de Colombia</div>
+        <div style="display:flex; justify-content:space-between; margin-top:6px; padding-top:6px; border-top:0.5px solid var(--border);">
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:#1565C0;">8.45%</div><div style="font-size:7px; color:var(--t3);">CTR</div></div>
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:var(--t1);">33.170</div><div style="font-size:7px; color:var(--t3);">Resultados</div></div>
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:var(--green);">$35</div><div style="font-size:7px; color:var(--t3);">CPR</div></div>
+        </div>
+      </div>
+    </a>
+
+    <!-- 2 telomereces restaurante -->
+    <a href="https://fb.me/adspreview/facebook/256G4ySUs138wSR" target="_blank" style="text-decoration:none;">
+      <div class="card" style="cursor:pointer; transition: transform 0.15s; height:100%;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
+        <div style="background:var(--black); border-radius:6px; height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; margin-bottom:10px; position:relative; overflow:hidden;">
+          <div style="position:absolute; top:6px; left:6px; background:var(--yellow); color:var(--black); font-size:7px; font-weight:700; padding:2px 7px; border-radius:10px;">CTR 5.64%</div>
+          <div style="font-size:28px;">🍽️</div>
+          <div style="color:#fff; font-size:8px; font-weight:600;">Ver en Meta →</div>
+        </div>
+        <div style="font-size:9px; font-weight:700; color:var(--t1); margin-bottom:3px;">telomereces_restaurante</div>
+        <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:6px;">
+          <span class="badge badge-green">Orgánico</span>
+          <span class="badge badge-yellow">Compra</span>
+        </div>
+        <div style="font-size:7.5px; color:var(--t3); margin-bottom:4px;"><strong style="color:var(--t2);">Pilar:</strong> Te lo mereces</div>
+        <div style="font-size:7.5px; color:var(--t3); margin-bottom:4px;"><strong style="color:var(--t2);">Mensaje:</strong> Aspiracional · Restaurante</div>
+        <div style="display:flex; justify-content:space-between; margin-top:6px; padding-top:6px; border-top:0.5px solid var(--border);">
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:#1565C0;">5.64%</div><div style="font-size:7px; color:var(--t3);">CTR</div></div>
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:var(--t1);">6.015</div><div style="font-size:7px; color:var(--t3);">Resultados</div></div>
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:var(--green);">$290</div><div style="font-size:7px; color:var(--t3);">CPR</div></div>
+        </div>
+      </div>
+    </a>
+
+    <!-- 3 modomultiacti -->
+    <a href="https://fb.me/adspreview/facebook/253rIZx52m6TuSk" target="_blank" style="text-decoration:none;">
+      <div class="card" style="cursor:pointer; transition: transform 0.15s; height:100%;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
+        <div style="background:var(--black); border-radius:6px; height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; margin-bottom:10px; position:relative; overflow:hidden;">
+          <div style="position:absolute; top:6px; left:6px; background:var(--yellow); color:var(--black); font-size:7px; font-weight:700; padding:2px 7px; border-radius:10px;">CTR 5.44%</div>
+          <div style="font-size:28px;">🔄</div>
+          <div style="color:#fff; font-size:8px; font-weight:600;">Ver en Meta →</div>
+        </div>
+        <div style="font-size:9px; font-weight:700; color:var(--t1); margin-bottom:3px;">modomultiacti</div>
+        <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:6px;">
+          <span class="badge badge-gray">Estático</span>
+          <span class="badge badge-yellow">Compra</span>
+        </div>
+        <div style="font-size:7.5px; color:var(--t3); margin-bottom:4px;"><strong style="color:var(--t2);">Pilar:</strong> Más oportunidades</div>
+        <div style="font-size:7.5px; color:var(--t3); margin-bottom:4px;"><strong style="color:var(--t2);">Mensaje:</strong> Transaccional</div>
+        <div style="display:flex; justify-content:space-between; margin-top:6px; padding-top:6px; border-top:0.5px solid var(--border);">
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:#1565C0;">5.44%</div><div style="font-size:7px; color:var(--t3);">CTR</div></div>
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:var(--t1);">2.547</div><div style="font-size:7px; color:var(--t3);">Resultados</div></div>
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:var(--t1);">$340</div><div style="font-size:7px; color:var(--t3);">CPR</div></div>
+        </div>
+      </div>
+    </a>
+
+    <!-- 4 millonesenjuego -->
+    <a href="https://fb.me/adspreview/facebook/1U8WvgJjDNNSKeQ" target="_blank" style="text-decoration:none;">
+      <div class="card" style="cursor:pointer; transition: transform 0.15s; height:100%;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
+        <div style="background:var(--black); border-radius:6px; height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; margin-bottom:10px; position:relative; overflow:hidden;">
+          <div style="position:absolute; top:6px; left:6px; background:var(--yellow); color:var(--black); font-size:7px; font-weight:700; padding:2px 7px; border-radius:10px;">CTR 5.11%</div>
+          <div style="font-size:28px;">⚡</div>
+          <div style="color:#fff; font-size:8px; font-weight:600;">Ver en Meta →</div>
+        </div>
+        <div style="font-size:9px; font-weight:700; color:var(--t1); margin-bottom:3px;">millonesenjuego_jugar</div>
+        <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:6px;">
+          <span class="badge badge-gray">Estático</span>
+          <span class="badge badge-yellow">Compra</span>
+        </div>
+        <div style="font-size:7.5px; color:var(--t3); margin-bottom:4px;"><strong style="color:var(--t2);">Pilar:</strong> Urgencia acumulado</div>
+        <div style="font-size:7.5px; color:var(--t3); margin-bottom:4px;"><strong style="color:var(--t2);">Mensaje:</strong> Millones en juego</div>
+        <div style="display:flex; justify-content:space-between; margin-top:6px; padding-top:6px; border-top:0.5px solid var(--border);">
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:#1565C0;">5.11%</div><div style="font-size:7px; color:var(--t3);">CTR</div></div>
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:var(--t1);">2.104</div><div style="font-size:7px; color:var(--t3);">Resultados</div></div>
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:var(--t1);">$374</div><div style="font-size:7px; color:var(--t3);">CPR</div></div>
+        </div>
+      </div>
+    </a>
+
+    <!-- 5 sigueparticipando -->
+    <a href="https://fb.me/adspreview/facebook/225knipZmKyHtWP" target="_blank" style="text-decoration:none;">
+      <div class="card" style="cursor:pointer; transition: transform 0.15s; height:100%;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
+        <div style="background:var(--black); border-radius:6px; height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; margin-bottom:10px; position:relative; overflow:hidden;">
+          <div style="position:absolute; top:6px; left:6px; background:var(--yellow); color:var(--black); font-size:7px; font-weight:700; padding:2px 7px; border-radius:10px;">CTR 4.84%</div>
+          <div style="font-size:28px;">🔁</div>
+          <div style="color:#fff; font-size:8px; font-weight:600;">Ver en Meta →</div>
+        </div>
+        <div style="font-size:9px; font-weight:700; color:var(--t1); margin-bottom:3px;">sigueparticipando</div>
+        <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:6px;">
+          <span class="badge badge-gray">Estático</span>
+          <span class="badge badge-yellow">Compra</span>
+        </div>
+        <div style="font-size:7.5px; color:var(--t3); margin-bottom:4px;"><strong style="color:var(--t2);">Pilar:</strong> Seguir intentando</div>
+        <div style="font-size:7.5px; color:var(--t3); margin-bottom:4px;"><strong style="color:var(--t2);">Mensaje:</strong> Urgencia · Retención</div>
+        <div style="display:flex; justify-content:space-between; margin-top:6px; padding-top:6px; border-top:0.5px solid var(--border);">
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:#1565C0;">4.84%</div><div style="font-size:7px; color:var(--t3);">CTR</div></div>
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:var(--t1);">4.501</div><div style="font-size:7px; color:var(--t3);">Resultados</div></div>
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:var(--t1);">$378</div><div style="font-size:7px; color:var(--t3);">CPR</div></div>
+        </div>
+      </div>
+    </a>
+
+    <!-- 6 telomereces carros -->
+    <a href="https://fb.me/adspreview/facebook/1QEXI2cTWwdxN6s" target="_blank" style="text-decoration:none;">
+      <div class="card" style="cursor:pointer; transition: transform 0.15s; height:100%;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
+        <div style="background:var(--black); border-radius:6px; height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; margin-bottom:10px; position:relative; overflow:hidden;">
+          <div style="position:absolute; top:6px; left:6px; background:var(--yellow); color:var(--black); font-size:7px; font-weight:700; padding:2px 7px; border-radius:10px;">CTR 4.53%</div>
+          <div style="font-size:28px;">🚗</div>
+          <div style="color:#fff; font-size:8px; font-weight:600;">Ver en Meta →</div>
+        </div>
+        <div style="font-size:9px; font-weight:700; color:var(--t1); margin-bottom:3px;">telomereces_carros</div>
+        <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:6px;">
+          <span class="badge badge-gray">Video</span>
+          <span class="badge badge-yellow">Compra</span>
+        </div>
+        <div style="font-size:7.5px; color:var(--t3); margin-bottom:4px;"><strong style="color:var(--t2);">Pilar:</strong> Te lo mereces</div>
+        <div style="font-size:7.5px; color:var(--t3); margin-bottom:4px;"><strong style="color:var(--t2);">Mensaje:</strong> Aspiracional · Carros</div>
+        <div style="display:flex; justify-content:space-between; margin-top:6px; padding-top:6px; border-top:0.5px solid var(--border);">
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:#1565C0;">4.53%</div><div style="font-size:7px; color:var(--t3);">CTR</div></div>
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:var(--t1);">1.609</div><div style="font-size:7px; color:var(--t3);">Resultados</div></div>
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:var(--t1);">$359</div><div style="font-size:7px; color:var(--t3);">CPR</div></div>
+        </div>
+      </div>
+    </a>
+
+    <!-- 7 telomereces entrenar -->
+    <a href="https://fb.me/adspreview/facebook/2ds39Q5ETB7TDJd" target="_blank" style="text-decoration:none;">
+      <div class="card" style="cursor:pointer; transition: transform 0.15s; height:100%;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
+        <div style="background:var(--black); border-radius:6px; height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; margin-bottom:10px; position:relative; overflow:hidden;">
+          <div style="position:absolute; top:6px; left:6px; background:var(--yellow); color:var(--black); font-size:7px; font-weight:700; padding:2px 7px; border-radius:10px;">CTR 3.61%</div>
+          <div style="font-size:28px;">💪</div>
+          <div style="color:#fff; font-size:8px; font-weight:600;">Ver en Meta →</div>
+        </div>
+        <div style="font-size:9px; font-weight:700; color:var(--t1); margin-bottom:3px;">telomereces_entrenar</div>
+        <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:6px;">
+          <span class="badge badge-gray">Video</span>
+          <span class="badge badge-yellow">Compra</span>
+        </div>
+        <div style="font-size:7.5px; color:var(--t3); margin-bottom:4px;"><strong style="color:var(--t2);">Pilar:</strong> Te lo mereces</div>
+        <div style="font-size:7.5px; color:var(--t3); margin-bottom:4px;"><strong style="color:var(--t2);">Mensaje:</strong> Aspiracional · Entrenar</div>
+        <div style="display:flex; justify-content:space-between; margin-top:6px; padding-top:6px; border-top:0.5px solid var(--border);">
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:#1565C0;">3.61%</div><div style="font-size:7px; color:var(--t3);">CTR</div></div>
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:var(--t1);">1.784</div><div style="font-size:7px; color:var(--t3);">Resultados</div></div>
+          <div style="text-align:center;"><div style="font-size:11px; font-weight:700; color:var(--green);">$238</div><div style="font-size:7px; color:var(--t3);">CPR</div></div>
+        </div>
+      </div>
+    </a>
+
+    <!-- Insight card -->
+    <div style="background:var(--black); border-radius:8px; padding:14px; display:flex; flex-direction:column; gap:10px; justify-content:center;">
+      <div style="color:var(--yellow); font-size:11px; font-weight:700;">💡 Patrón de los top anuncios</div>
+      <div style="color:#ccc; font-size:8px; line-height:1.6;">Los 7 creativos con mejor CTR comparten estas características:</div>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <div style="background:rgba(255,192,0,0.1); border:0.5px solid rgba(255,192,0,0.3); border-radius:6px; padding:6px 9px; font-size:8px; color:#FFC000; font-weight:600;">✓ Beneficio emocional explícito</div>
+        <div style="background:rgba(255,192,0,0.1); border:0.5px solid rgba(255,192,0,0.3); border-radius:6px; padding:6px 9px; font-size:8px; color:#FFC000; font-weight:600;">✓ Narrativa o contexto aspiracional</div>
+        <div style="background:rgba(255,192,0,0.1); border:0.5px solid rgba(255,192,0,0.3); border-radius:6px; padding:6px 9px; font-size:8px; color:#FFC000; font-weight:600;">✓ Formato Reel u Orgánico</div>
+        <div style="background:rgba(255,192,0,0.1); border:0.5px solid rgba(255,192,0,0.3); border-radius:6px; padding:6px 9px; font-size:8px; color:#FFC000; font-weight:600;">✓ CTA natural dentro del contexto</div>
+        <div style="background:rgba(255,192,0,0.1); border:0.5px solid rgba(255,192,0,0.3); border-radius:6px; padding:6px 9px; font-size:8px; color:#FFC000; font-weight:600;">✓ Sueño concreto y tangible</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="insight-bar">
+    <div class="insight-bar-accent"></div>
+    <p>Haz clic en cualquier pieza para ver el preview en Meta Ads. El <strong>patrón ganador</strong> es consistente: emoción primero, producto después. Las futuras piezas deben replicar estas características desde la conceptualización.</p>
+  </div>
+  <div class="slide-number">11 / 12</div>
+</div>
+
+<!-- SLIDE 9 — CONCLUSIONES -->
+<div class="slide" id="s9">
+  <div class="header">
+    <div class="header-logo">A</div>
+    <span class="header-title">Conclusiones y <strong>Recomendaciones</strong></span>
+    <span class="header-badge">Próximos Pasos</span>
+  </div>
+  <p class="subtitle">Hallazgos clave del benchmark y lineamientos creativos para futuras tandas</p>
+
+  <!-- Insight emocional destacado -->
+  <div class="emotional-banner" style="margin-bottom:12px;">
+    <div class="eb-icon">🎯</div>
+    <div class="eb-text">
+      <div class="eb-title">Lineamiento estratégico: el beneficio emocional debe ser el punto de partida creativo</div>
+      <div class="eb-body">El análisis demuestra que los anuncios con <strong style="color:var(--yellow)">mayor CTR y menor CPR son consistentemente los que conectan primero emocionalmente</strong> antes de comunicar el producto. Las futuras piezas deben incorporar un beneficio emocional explícito: ¿qué siente el usuario al ganar? ¿Qué sueño concreto se cumple?</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="flex:1; gap:12px;">
+    <div class="hl-list">
+      <div class="hl-item">
+        <strong>1. Escalar el formato Reel con narrativa emocional</strong>
+        Los reels con historia (algo está pasando, dos tipos de personas) logran CTR 4–8x por encima del promedio. Producir más creatividades en este formato con beneficio emocional claro.
+      </div>
+      <div class="hl-item">
+        <strong>2. Línea "Te lo mereces" como pilar permanente</strong>
+        3 creativos distintos, todos con CTR consistente (3.6%–5.6%) y CPR razonable. Ampliar a nuevos contextos emocionales: familia, viajes, experiencias cotidianas.
+      </div>
+      <div class="hl-item">
+        <strong>3. Revisar o pausar el carrusel</strong>
+        CTR 0.66% — el más bajo de todos los formatos. Si se mantiene, reformular con narrativa emocional o redirigir presupuesto a Reel/Orgánico.
+      </div>
+      <div class="hl-item">
+        <strong>4. Optimizar el funnel de Registro</strong>
+        CPR de $2.130 vs $375 de Compra. Revisar la experiencia post-clic: ¿el landing page mantiene el tono emocional del anuncio?
+      </div>
+    </div>
+    <div class="hl-list">
+      <div class="hl-item">
+        <strong>5. Usar Vista de Página para tráfico frío con creatividades emocionales</strong>
+        CTR 4.03% y CPC $64. Ideal para TOFU: entrar con emoción, convertir después con retargeting.
+      </div>
+      <div class="hl-item">
+        <strong>6. En urgencia/acumulado: añadir el sueño concreto</strong>
+        Los anuncios de urgencia tienen buen CTR (4.8–5.1%) pero alto CPR. Combinar urgencia + "¿qué harías con ese dinero?" para bajar el costo de conversión.
+      </div>
+      <div class="hl-item">
+        <strong>7. Mantener el estático como base, potenciar con emoción</strong>
+        El estático convierte en volumen pero a mayor costo. Probar versiones A/B añadiendo un beneficio emocional al mensaje transaccional.
+      </div>
+      <div class="hl-item" style="border-left-color: var(--yellow); background:#FFF8E1;">
+        <strong>🏆 La fórmula ganadora del período</strong>
+        Reel + narrativa/presentadora + beneficio emocional concreto + objetivo Vista de Página = mayor CTR, menor CPR y mejor eficiencia global. Replicar en cada tanda.
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">12 / 12</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+function scrollToSlide(id) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+const ctx = document.getElementById('trendChart').getContext('2d');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: ['Enero', 'Febrero', 'Marzo', 'Abril'],
+    datasets: [
+      {
+        label: 'Compras',
+        data: [58209, 88774, 118539, 92329],
+        backgroundColor: '#FFC000',
+        stack: 'res'
+      },
+      {
+        label: 'Registros',
+        data: [139, 5907, 14961, 8314],
+        backgroundColor: '#1A1A1A',
+        stack: 'res'
+      },
+      {
+        label: 'Vistas pág.',
+        data: [49, 15504, 4775, 12828],
+        backgroundColor: '#CCCCCC',
+        stack: 'res'
+      },
+      {
+        label: 'Inversión (M COP)',
+        data: [12.7, 46.3, 83.6, 56.3],
+        type: 'line',
+        borderColor: '#FF6B35',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        pointBackgroundColor: '#FF6B35',
+        pointRadius: 4,
+        yAxisID: 'y2',
+        tension: 0.3
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false }
+    },
+    scales: {
+      x: { stacked: true, ticks: { font: { family: 'Poppins', size: 9 } }, grid: { display: false } },
+      y: { stacked: true, ticks: { font: { family: 'Poppins', size: 8 } }, grid: { color: '#EEEEEE' } },
+      y2: {
+        position: 'right',
+        ticks: {
+          font: { family: 'Poppins', size: 8 },
+          callback: v => '$' + v + 'M'
+        },
+        grid: { display: false }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>

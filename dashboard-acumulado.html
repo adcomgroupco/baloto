@@ -1,0 +1,770 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap');
+
+  .slide-root {
+    font-family: 'Poppins', sans-serif;
+    background: #F5F5F5;
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    padding-bottom: 20px;
+  }
+
+  .header-bar {
+    background: #1A1A1A;
+    padding: 10px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: 10px 10px 0 0;
+  }
+
+  .logo-circle {
+    width: 40px;
+    height: 40px;
+    background: #FFC000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .header-title {
+    font-size: 17px;
+    color: #fff;
+    font-weight: 400;
+  }
+
+  .header-title strong {
+    font-weight: 700;
+    font-style: italic;
+  }
+
+  .subtitle-row {
+    padding: 6px 20px 4px;
+    font-size: 10px;
+    color: #888;
+    font-style: italic;
+  }
+
+  .body {
+    padding: 0 16px;
+  }
+
+  .section-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: #999;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 10px 0 6px;
+  }
+
+  .brand-cols {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .brand-block {
+    background: #fff;
+    border-radius: 10px;
+    border: 0.5px solid #E0E0E0;
+    overflow: hidden;
+  }
+
+  .brand-header {
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.04em;
+  }
+
+  .brand-header.baloto { background: #D0021B; }
+  .brand-header.colorloto { background: #0077C8; }
+  .brand-header.miloto { background: #5DA832; }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: #F0F0F0;
+  }
+
+  .kpi-cell {
+    background: #fff;
+    padding: 8px 10px;
+    position: relative;
+  }
+
+  .kpi-cell::after {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: #FFC000;
+    opacity: 0;
+  }
+
+  .kpi-cell.accent::after { opacity: 1; }
+
+  .kpi-val {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1A1A1A;
+    line-height: 1.1;
+    margin-bottom: 2px;
+  }
+
+  .kpi-label {
+    font-size: 8px;
+    font-weight: 700;
+    color: #444;
+    line-height: 1.2;
+  }
+
+  .kpi-sub {
+    font-size: 7px;
+    color: #AAA;
+    margin-top: 1px;
+  }
+
+  .bottom-strip {
+    background: #1A1A1A;
+    margin: 10px 0 6px;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 8px;
+    color: #fff;
+    font-weight: 700;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bottom-strip span { color: #FFC000; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .table-block {
+    background: #fff;
+    border-radius: 10px;
+    border: 0.5px solid #E0E0E0;
+    overflow: hidden;
+  }
+
+  .table-title {
+    background: #1A1A1A;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 6px 12px;
+    letter-spacing: 0.06em;
+  }
+
+  table.daily {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.5px;
+  }
+
+  table.daily th {
+    background: #2C2C2C;
+    color: #fff;
+    padding: 5px 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 7.5px;
+  }
+
+  table.daily td {
+    padding: 5px 8px;
+    text-align: center;
+    color: #333;
+    border-bottom: 0.5px solid #F0F0F0;
+  }
+
+  table.daily tr.domingo td {
+    background: #FFF8E1;
+    color: #8B6914;
+    font-weight: 600;
+  }
+
+  table.daily td.brand-col {
+    font-weight: 700;
+    text-align: left;
+    font-size: 8px;
+  }
+
+  table.daily td.best { color: #2E7D32; font-weight: 700; }
+  table.daily td.worst { color: #C62828; font-weight: 700; }
+
+  .insights-block {
+    background: #fff;
+    border-radius: 10px;
+    border: 0.5px solid #E0E0E0;
+    overflow: hidden;
+  }
+
+  .insights-title {
+    background: #FFC000;
+    color: #1A1A1A;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 6px 12px;
+    letter-spacing: 0.06em;
+  }
+
+  .insight-item {
+    display: flex;
+    gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 0.5px solid #F5F5F5;
+    align-items: flex-start;
+  }
+
+  .insight-item:last-child { border-bottom: none; }
+
+  .ins-num {
+    width: 18px;
+    height: 18px;
+    background: #1A1A1A;
+    border-radius: 50%;
+    font-size: 8px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .ins-text strong {
+    font-size: 8.5px;
+    font-weight: 700;
+    color: #1A1A1A;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .ins-text p {
+    font-size: 7.5px;
+    color: #666;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .insight-bar {
+    background: #fff;
+    border-radius: 8px;
+    border: 0.5px solid #E0E0E0;
+    border-left: 4px solid #FFC000;
+    border-radius: 0 8px 8px 0;
+    padding: 8px 12px;
+    font-size: 8px;
+    color: #666;
+    line-height: 1.6;
+    margin-top: 8px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 7px;
+    font-weight: 700;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  .badge.green { background: #E8F5E9; color: #2E7D32; }
+  .badge.red   { background: #FFEBEE; color: #C62828; }
+  .badge.blue  { background: #E3F2FD; color: #1565C0; }
+
+  .chart-wrap {
+    background: #fff;
+    border-radius: 10px;
+    border: 0.5px solid #E0E0E0;
+    overflow: hidden;
+  }
+
+  .chart-title {
+    background: #1A1A1A;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 6px 12px;
+    letter-spacing: 0.06em;
+  }
+
+  .chart-inner { padding: 10px 12px 8px; }
+
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .bar-label {
+    font-size: 7.5px;
+    color: #555;
+    width: 64px;
+    flex-shrink: 0;
+    text-align: right;
+    line-height: 1.2;
+  }
+
+  .bar-track {
+    flex: 1;
+    background: #F5F5F5;
+    border-radius: 3px;
+    height: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    padding-right: 5px;
+    justify-content: flex-end;
+  }
+
+  .bar-fill span {
+    font-size: 7px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  .bar-val {
+    font-size: 7.5px;
+    color: #333;
+    font-weight: 700;
+    width: 44px;
+    flex-shrink: 0;
+  }
+
+  .legend-row {
+    display: flex;
+    gap: 14px;
+    padding: 4px 12px 8px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 7.5px;
+    color: #666;
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+</style>
+
+<div class="slide-root">
+
+  <div class="header-bar">
+    <div class="logo-circle">
+      <svg width="22" height="22" viewBox="0 0 40 40" fill="none">
+        <circle cx="12" cy="20" r="6" fill="#1A1A1A"/>
+        <circle cx="28" cy="20" r="6" fill="#1A1A1A"/>
+        <circle cx="20" cy="12" r="6" fill="#1A1A1A"/>
+      </svg>
+    </div>
+    <div class="header-title">Campañas Acumulado &nbsp;<strong>Baloto · Colorloto · Miloto</strong></div>
+    <div style="margin-left:auto; font-size:9px; color:#888; white-space:nowrap;">Meta Ads · Jun 13–15, 2026</div>
+  </div>
+
+  <div class="subtitle-row">Push de inversión ~$3MM COP / marca · Sábado, Domingo y Lunes · Retargeting Conversión · Acumulado</div>
+
+  <div class="body">
+
+    <div class="section-label">Resumen por marca — 3 días acumulado</div>
+
+    <div class="brand-cols">
+
+      <!-- BALOTO -->
+      <div class="brand-block">
+        <div class="brand-header baloto">BALOTO</div>
+        <div class="kpi-grid">
+          <div class="kpi-cell accent">
+            <div class="kpi-val">$ 3.882.332</div>
+            <div class="kpi-label">Inversión</div>
+            <div class="kpi-sub">COP · 3 días</div>
+          </div>
+          <div class="kpi-cell accent">
+            <div class="kpi-val">5.910</div>
+            <div class="kpi-label">Compras</div>
+            <div class="kpi-sub">Mayor volumen</div>
+          </div>
+          <div class="kpi-cell">
+            <div class="kpi-val">$ 657</div>
+            <div class="kpi-label">CPR Prom.</div>
+            <div class="kpi-sub">COP</div>
+          </div>
+          <div class="kpi-cell">
+            <div class="kpi-val">784.461</div>
+            <div class="kpi-label">Impresiones</div>
+            <div class="kpi-sub">Totales</div>
+          </div>
+          <div class="kpi-cell">
+            <div class="kpi-val">0.51%</div>
+            <div class="kpi-label">CTR Prom.</div>
+            <div class="kpi-sub">Link clicks</div>
+          </div>
+          <div class="kpi-cell">
+            <div class="kpi-val">356.466</div>
+            <div class="kpi-label">Alcance</div>
+            <div class="kpi-sub">Usuarios únicos</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLORLOTO -->
+      <div class="brand-block">
+        <div class="brand-header colorloto">COLORLOTO</div>
+        <div class="kpi-grid">
+          <div class="kpi-cell accent">
+            <div class="kpi-val">$ 3.014.938</div>
+            <div class="kpi-label">Inversión</div>
+            <div class="kpi-sub">COP · 3 días</div>
+          </div>
+          <div class="kpi-cell accent">
+            <div class="kpi-val">5.797</div>
+            <div class="kpi-label">Compras</div>
+            <div class="kpi-sub">Conversiones</div>
+          </div>
+          <div class="kpi-cell">
+            <div class="kpi-val" style="color:#2E7D32;">$ 520 ✓</div>
+            <div class="kpi-label">CPR Prom.</div>
+            <div class="kpi-sub">Mejor del grupo</div>
+          </div>
+          <div class="kpi-cell">
+            <div class="kpi-val">856.883</div>
+            <div class="kpi-label">Impresiones</div>
+            <div class="kpi-sub">Mayor alcance</div>
+          </div>
+          <div class="kpi-cell">
+            <div class="kpi-val" style="color:#2E7D32;">1.66% ✓</div>
+            <div class="kpi-label">CTR Prom.</div>
+            <div class="kpi-sub">Más alto grupo</div>
+          </div>
+          <div class="kpi-cell">
+            <div class="kpi-val">375.239</div>
+            <div class="kpi-label">Alcance</div>
+            <div class="kpi-sub">Usuarios únicos</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MILOTO -->
+      <div class="brand-block">
+        <div class="brand-header miloto">MILOTO</div>
+        <div class="kpi-grid">
+          <div class="kpi-cell accent">
+            <div class="kpi-val">$ 3.380.046</div>
+            <div class="kpi-label">Inversión</div>
+            <div class="kpi-sub">COP · 3 días</div>
+          </div>
+          <div class="kpi-cell accent">
+            <div class="kpi-val">4.300</div>
+            <div class="kpi-label">Compras</div>
+            <div class="kpi-sub">Menor volumen</div>
+          </div>
+          <div class="kpi-cell">
+            <div class="kpi-val" style="color:#C62828;">$ 786 ↑</div>
+            <div class="kpi-label">CPR Prom.</div>
+            <div class="kpi-sub">Más alto grupo</div>
+          </div>
+          <div class="kpi-cell">
+            <div class="kpi-val">521.953</div>
+            <div class="kpi-label">Impresiones</div>
+            <div class="kpi-sub">Totales</div>
+          </div>
+          <div class="kpi-cell">
+            <div class="kpi-val">1.53%</div>
+            <div class="kpi-label">CTR Prom.</div>
+            <div class="kpi-sub">Link clicks</div>
+          </div>
+          <div class="kpi-cell">
+            <div class="kpi-val" style="color:#C62828;">214.757 ↓</div>
+            <div class="kpi-label">Alcance</div>
+            <div class="kpi-sub">Menor del grupo</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="bottom-strip">
+      TOTAL 3 MARCAS:
+      Inversión <span>$10.277.316 COP</span> &nbsp;·&nbsp;
+      Compras <span>16.007</span> &nbsp;·&nbsp;
+      CPR Promedio <span>$642 COP</span> &nbsp;·&nbsp;
+      Impresiones <span>2.163.297</span> &nbsp;·&nbsp;
+      Alcance Total <span>946.462</span>
+    </div>
+
+    <div class="two-col">
+
+      <!-- Tabla evolución diaria -->
+      <div class="table-block">
+        <div class="table-title">EVOLUCIÓN DIARIA — CPR Y COMPRAS</div>
+        <table class="daily">
+          <thead>
+            <tr>
+              <th style="text-align:left;">Marca</th>
+              <th>Día</th>
+              <th>Compras</th>
+              <th>CPR (COP)</th>
+              <th>CTR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="brand-col" style="color:#D0021B;">Baloto</td>
+              <td>Sáb 13/6 <span class="badge green">mejor</span></td>
+              <td class="best">3.223</td>
+              <td class="best">$428</td>
+              <td>0.85%</td>
+            </tr>
+            <tr class="domingo">
+              <td class="brand-col" style="color:#8B6914;">Baloto</td>
+              <td>Dom 14/6</td>
+              <td class="worst">288</td>
+              <td class="worst">$3.998</td>
+              <td>0.32%</td>
+            </tr>
+            <tr>
+              <td class="brand-col" style="color:#D0021B;">Baloto</td>
+              <td>Lun 15/6 <span class="badge blue">recup.</span></td>
+              <td>2.399</td>
+              <td>$563</td>
+              <td>0.43%</td>
+            </tr>
+            <tr>
+              <td class="brand-col" style="color:#0077C8;">Colorloto</td>
+              <td>Sáb 13/6 <span class="badge green">mejor</span></td>
+              <td class="best">2.703</td>
+              <td class="best">$310</td>
+              <td>0.86%</td>
+            </tr>
+            <tr class="domingo">
+              <td class="brand-col" style="color:#8B6914;">Colorloto</td>
+              <td>Dom 14/6</td>
+              <td class="worst">495</td>
+              <td class="worst">$2.444</td>
+              <td>1.58%</td>
+            </tr>
+            <tr>
+              <td class="brand-col" style="color:#0077C8;">Colorloto</td>
+              <td>Lun 15/6 <span class="badge blue">2.48% CTR</span></td>
+              <td>2.599</td>
+              <td>$372</td>
+              <td class="best">2.48%</td>
+            </tr>
+            <tr>
+              <td class="brand-col" style="color:#5DA832;">Miloto</td>
+              <td>Sáb 13/6 <span class="badge green">mejor</span></td>
+              <td class="best">1.792</td>
+              <td class="best">$483</td>
+              <td>0.69%</td>
+            </tr>
+            <tr class="domingo">
+              <td class="brand-col" style="color:#8B6914;">Miloto</td>
+              <td>Dom 14/6</td>
+              <td class="worst">467</td>
+              <td class="worst">$3.138</td>
+              <td>0.85%</td>
+            </tr>
+            <tr>
+              <td class="brand-col" style="color:#5DA832;">Miloto</td>
+              <td>Lun 15/6 <span class="badge blue">3.28% CTR</span></td>
+              <td>2.041</td>
+              <td>$514</td>
+              <td class="best">3.28%</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="padding:5px 10px 7px; font-size:7px; color:#AAA;">
+          <span style="display:inline-block; width:8px; height:8px; background:#FFF8E1; border:0.5px solid #DDD; margin-right:4px; vertical-align:middle;"></span>Domingo = peor rendimiento en las 3 marcas
+        </div>
+      </div>
+
+      <!-- Insights + recomendaciones -->
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div class="insights-block">
+          <div class="insights-title">HALLAZGOS CLAVE</div>
+          <div class="insight-item">
+            <div class="ins-num">1</div>
+            <div class="ins-text">
+              <strong>El domingo fue el peor día en las 3 marcas</strong>
+              <p>CPR de $3.998 (Baloto), $2.444 (Colorloto) y $3.138 (Miloto) — entre 6x y 9x más caro que el sábado. Baja intención de compra de lotería ese día.</p>
+            </div>
+          </div>
+          <div class="insight-item">
+            <div class="ins-num">2</div>
+            <div class="ins-text">
+              <strong>Colorloto = mejor eficiencia del grupo</strong>
+              <p>CPR más bajo ($520 prom., $310 el sábado) y mayor CTR (1.66%). Con menos inversión generó resultados comparables a Baloto. Es el benchmark del grupo.</p>
+            </div>
+          </div>
+          <div class="insight-item">
+            <div class="ins-num">3</div>
+            <div class="ins-text">
+              <strong>El lunes tuvo CTR explosivo</strong>
+              <p>Miloto 3.28% y Colorloto 2.48% el lunes. Audiencia retargeteada muy receptiva tras el sorteo del sábado — oportunidad de escalar ese día.</p>
+            </div>
+          </div>
+          <div class="insight-item">
+            <div class="ins-num">4</div>
+            <div class="ins-text">
+              <strong>Miloto: riesgo de saturación</strong>
+              <p>Frecuencia 2.97 el lunes con solo 51.884 de alcance. Audiencia pequeña y sobre-expuesta. Ampliar Lookalikes 2–5% antes del próximo ciclo.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="insights-block">
+          <div class="insights-title" style="background:#1A1A1A; color:#FFC000;">RECOMENDACIONES</div>
+          <div class="insight-item">
+            <div class="ins-num" style="background:#FFC000; color:#1A1A1A;">01</div>
+            <div class="ins-text">
+              <strong>Concentrar inversión en Sáb y Lun</strong>
+              <p>Redistribuir presupuesto del domingo (+33% al sábado). Mantener domingo en budget mínimo de mantenimiento.</p>
+            </div>
+          </div>
+          <div class="insight-item">
+            <div class="ins-num" style="background:#FFC000; color:#1A1A1A;">02</div>
+            <div class="ins-text">
+              <strong>Escalar Colorloto 20–30%</strong>
+              <p>Tiene margen de eficiencia claro. Revisar cap de audiencia antes de escalar presupuesto.</p>
+            </div>
+          </div>
+          <div class="insight-item">
+            <div class="ins-num" style="background:#FFC000; color:#1A1A1A;">03</div>
+            <div class="ins-text">
+              <strong>Ampliar audiencia Miloto + creativos por día</strong>
+              <p>Sábado: urgencia de acumulado. Lunes: recuerdo del sorteo. Domingo: testear "¿Jugaste?" vs "¿Ganaste?"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CPR Bar chart -->
+    <div class="chart-wrap" style="margin-bottom:10px;">
+      <div class="chart-title">CPR POR DÍA Y MARCA (COP) — menor es mejor</div>
+      <div class="chart-inner">
+
+        <div class="bar-row">
+          <div class="bar-label">Baloto<br>Sáb 13/6</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:10.7%; background:#D0021B;"><span>$428</span></div>
+          </div>
+          <div class="bar-val" style="color:#2E7D32;">$428</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Baloto<br>Dom 14/6</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:100%; background:#FFCDD2;"><span style="color:#C62828;">$3.998</span></div>
+          </div>
+          <div class="bar-val" style="color:#C62828;">$3.998</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Baloto<br>Lun 15/6</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:14.1%; background:#D0021B;"><span>$563</span></div>
+          </div>
+          <div class="bar-val">$563</div>
+        </div>
+
+        <div style="height:6px;"></div>
+
+        <div class="bar-row">
+          <div class="bar-label">Colorloto<br>Sáb 13/6</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:7.8%; background:#0077C8;"><span>$310</span></div>
+          </div>
+          <div class="bar-val" style="color:#2E7D32;">$310</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Colorloto<br>Dom 14/6</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:61.1%; background:#90CAF9;"><span style="color:#1565C0;">$2.444</span></div>
+          </div>
+          <div class="bar-val" style="color:#C62828;">$2.444</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Colorloto<br>Lun 15/6</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:9.3%; background:#0077C8;"><span>$372</span></div>
+          </div>
+          <div class="bar-val">$372</div>
+        </div>
+
+        <div style="height:6px;"></div>
+
+        <div class="bar-row">
+          <div class="bar-label">Miloto<br>Sáb 13/6</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:12.1%; background:#5DA832;"><span>$483</span></div>
+          </div>
+          <div class="bar-val" style="color:#2E7D32;">$483</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Miloto<br>Dom 14/6</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:78.5%; background:#C5E1A5;"><span style="color:#33691E;">$3.138</span></div>
+          </div>
+          <div class="bar-val" style="color:#C62828;">$3.138</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Miloto<br>Lun 15/6</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:12.9%; background:#5DA832;"><span>$514</span></div>
+          </div>
+          <div class="bar-val">$514</div>
+        </div>
+
+      </div>
+      <div class="legend-row">
+        <div class="legend-item"><div class="legend-dot" style="background:#D0021B;"></div>Baloto</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#0077C8;"></div>Colorloto</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#5DA832;"></div>Miloto</div>
+        <div class="legend-item" style="margin-left:auto;"><div class="legend-dot" style="background:#FFCDD2; border:0.5px solid #EF9A9A;"></div>Domingo (menor rendimiento)</div>
+      </div>
+    </div>
+
+    <div class="insight-bar">
+      <strong style="color:#1A1A1A;">Conclusión:</strong> El push de inversión funcionó de manera heterogénea. El sábado fue consistentemente el mejor día en CPR para las 3 marcas. El domingo generó el mayor desperdicio presupuestal. El lunes mostró recuperación con CTR alto, especialmente en Colorloto (2.48%) y Miloto (3.28%), lo que sugiere que la audiencia retargeteada sigue activa 48h después del sorteo. Para el próximo ciclo: concentrar en sábado y lunes, reducir domingo, escalar Colorloto y renovar audiencias de Miloto.
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informe Telomereces · Baloto · ADCOM</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --yellow: #FFC000;
+    --black: #1A1A1A;
+    --white: #FFFFFF;
+    --bg: #F5F5F5;
+    --t1: #1A1A1A;
+    --t2: #333333;
+    --t3: #999999;
+    --t4: #666666;
+    --card-border: #E0E0E0;
+    --green: #4CAF50;
+    --red: #EF5350;
+  }
+  body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--t1); }
+
+  /* COVER */
+  .cover {
+    background: var(--black);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: flex-start;
+    padding: 80px;
+    position: relative; overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute; top: -120px; right: -120px;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    border: 80px solid rgba(255,192,0,0.08);
+  }
+  .cover::after {
+    content: '';
+    position: absolute; bottom: -80px; right: 200px;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    border: 40px solid rgba(255,192,0,0.05);
+  }
+  .cover-badge {
+    background: var(--yellow); color: var(--black);
+    font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    padding: 6px 16px; border-radius: 20px; margin-bottom: 32px; display: inline-block;
+  }
+  .cover h1 {
+    font-size: 56px; font-weight: 700; color: var(--white);
+    line-height: 1.1; margin-bottom: 16px; max-width: 700px;
+  }
+  .cover h1 span { color: var(--yellow); }
+  .cover .cover-sub {
+    font-size: 18px; font-weight: 300; color: rgba(255,255,255,0.5);
+    margin-bottom: 60px;
+  }
+  .cover-meta {
+    display: flex; gap: 40px; margin-top: 40px;
+  }
+  .cover-meta-item { }
+  .cover-meta-item .label { font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
+  .cover-meta-item .value { font-size: 15px; font-weight: 600; color: var(--white); }
+  .cover-line { width: 60px; height: 4px; background: var(--yellow); border-radius: 2px; margin-bottom: 40px; }
+
+  /* PAGE */
+  .page { padding: 60px 80px; max-width: 1200px; margin: 0 auto; }
+  .page-break { border: none; border-top: 2px solid var(--black); margin: 60px 0; }
+
+  /* SECTION HEADER */
+  .section-header { margin-bottom: 40px; }
+  .section-tag {
+    font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--black); background: var(--yellow);
+    padding: 4px 14px; border-radius: 20px; display: inline-block; margin-bottom: 12px;
+  }
+  .section-header h2 { font-size: 32px; font-weight: 700; color: var(--t1); line-height: 1.2; }
+  .section-header p { font-size: 14px; color: var(--t4); font-weight: 300; margin-top: 8px; line-height: 1.6; }
+
+  /* KPI GRID */
+  .kpi-grid { display: grid; gap: 16px; margin-bottom: 40px; }
+  .kpi-grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .kpi-grid-5 { grid-template-columns: repeat(5, 1fr); }
+  .kpi-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .kpi-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .kpi-card {
+    background: var(--white); border-radius: 12px;
+    border: 1px solid var(--card-border);
+    padding: 20px 18px 14px;
+    position: relative; overflow: hidden;
+  }
+  .kpi-card::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 5px; background: var(--yellow);
+  }
+  .kpi-card .kpi-val { font-size: 28px; font-weight: 700; color: var(--t1); line-height: 1; margin-bottom: 8px; }
+  .kpi-card .kpi-label { font-size: 11px; font-weight: 600; color: var(--t2); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 3px; }
+  .kpi-card .kpi-sub { font-size: 11px; color: var(--t3); font-weight: 300; }
+  .kpi-card.dark { background: var(--black); border-color: var(--black); }
+  .kpi-card.dark .kpi-val { color: var(--yellow); }
+  .kpi-card.dark .kpi-label { color: rgba(255,255,255,0.6); }
+  .kpi-card.dark .kpi-sub { color: rgba(255,255,255,0.35); }
+  .kpi-card.dark::after { background: var(--yellow); }
+
+  /* CHART AREA */
+  .chart-card {
+    background: var(--white); border-radius: 12px;
+    border: 1px solid var(--card-border);
+    padding: 28px; margin-bottom: 24px;
+  }
+  .chart-card h3 { font-size: 14px; font-weight: 600; color: var(--t2); margin-bottom: 6px; }
+  .chart-card .chart-desc { font-size: 12px; color: var(--t3); font-weight: 300; margin-bottom: 20px; }
+  .chart-wrap { position: relative; width: 100%; }
+  .chart-legend { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 16px; }
+  .chart-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--t4); }
+  .chart-legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* CHART GRID */
+  .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+
+  /* TABLE */
+  .table-card {
+    background: var(--white); border-radius: 12px;
+    border: 1px solid var(--card-border);
+    overflow: hidden; margin-bottom: 24px;
+  }
+  .table-card-header { padding: 20px 24px 12px; }
+  .table-card-header h3 { font-size: 14px; font-weight: 600; color: var(--t2); }
+  .table-card-header p { font-size: 12px; color: var(--t3); font-weight: 300; margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: var(--black); }
+  thead th { padding: 12px 16px; font-size: 11px; font-weight: 600; color: var(--white); text-align: left; letter-spacing: .04em; text-transform: uppercase; }
+  thead th.nr { text-align: right; }
+  tbody tr { border-bottom: 1px solid #F0F0F0; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:nth-child(even) { background: #FAFAFA; }
+  tbody tr.highlight { background: var(--yellow); }
+  tbody tr.highlight td { color: var(--black); font-weight: 600; }
+  tbody td { padding: 11px 16px; font-size: 13px; color: var(--t2); }
+  tbody td.nr { text-align: right; }
+  .badge { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; display: inline-block; }
+  .badge-green { background: #E8F5E9; color: #2E7D32; }
+  .badge-yellow { background: #FFF8E1; color: #E65100; }
+  .badge-red { background: #FFEBEE; color: #C62828; }
+  .badge-black { background: var(--black); color: var(--white); }
+  .badge-above { background: var(--yellow); color: var(--black); }
+
+  /* INSIGHT BAR */
+  .insight-bar {
+    background: var(--white); border-radius: 10px;
+    border: 1px solid var(--card-border);
+    padding: 16px 20px 16px 28px;
+    position: relative; overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .insight-bar::before {
+    content: ''; position: absolute;
+    left: 0; top: 0; bottom: 0; width: 6px;
+    background: var(--yellow);
+  }
+  .insight-bar p { font-size: 13px; color: var(--t4); font-weight: 300; line-height: 1.6; }
+  .insight-bar strong { color: var(--t1); font-weight: 600; }
+
+  /* VS BLOCK */
+  .vs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 32px; }
+  .vs-card {
+    background: var(--white); border-radius: 12px;
+    border: 1px solid var(--card-border); padding: 24px;
+    position: relative; overflow: hidden;
+  }
+  .vs-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 5px; background: var(--yellow); }
+  .vs-card .vs-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--t3); margin-bottom: 14px; display: block; }
+  .vs-card h3 { font-size: 18px; font-weight: 700; color: var(--t1); margin-bottom: 20px; }
+  .vs-stat { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px solid #F0F0F0; }
+  .vs-stat:last-child { border-bottom: none; }
+  .vs-stat .stat-label { font-size: 12px; color: var(--t4); font-weight: 300; }
+  .vs-stat .stat-val { font-size: 15px; font-weight: 700; color: var(--t1); }
+  .vs-card.dark-card { background: var(--black); border-color: var(--black); }
+  .vs-card.dark-card .vs-tag { color: rgba(255,255,255,0.4); }
+  .vs-card.dark-card h3 { color: var(--white); }
+  .vs-card.dark-card .vs-stat { border-color: rgba(255,255,255,0.08); }
+  .vs-card.dark-card .stat-label { color: rgba(255,255,255,0.5); }
+  .vs-card.dark-card .stat-val { color: var(--yellow); }
+  .vs-card.dark-card::after { background: var(--yellow); }
+
+  /* UPLIFT TAG */
+  .uplift { color: var(--green); font-size: 12px; font-weight: 700; }
+  .downlift { color: var(--red); font-size: 12px; font-weight: 700; }
+
+  /* RETENTION FUNNEL */
+  .funnel-row { display: grid; grid-template-columns: 140px 1fr 60px; gap: 12px; align-items: center; margin-bottom: 12px; }
+  .funnel-label { font-size: 12px; color: var(--t2); font-weight: 600; text-align: right; }
+  .funnel-track { height: 10px; background: #F0F0F0; border-radius: 5px; overflow: hidden; }
+  .funnel-fill { height: 100%; border-radius: 5px; }
+  .funnel-pct { font-size: 12px; font-weight: 700; color: var(--t1); text-align: right; }
+
+  /* SECTION DIVIDER */
+  .section-divider {
+    background: var(--black); margin: 0 -80px; padding: 50px 80px;
+  }
+  .section-divider .div-tag { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--yellow); margin-bottom: 10px; }
+  .section-divider h2 { font-size: 36px; font-weight: 700; color: var(--white); }
+  .section-divider p { font-size: 14px; color: rgba(255,255,255,0.5); font-weight: 300; margin-top: 8px; }
+
+  /* FOOTER */
+  .footer { background: var(--black); padding: 40px 80px; display: flex; justify-content: space-between; align-items: center; }
+  .footer .footer-brand { font-size: 20px; font-weight: 700; color: var(--white); }
+  .footer .footer-brand span { color: var(--yellow); }
+  .footer .footer-meta { font-size: 12px; color: rgba(255,255,255,0.4); text-align: right; font-weight: 300; }
+
+  /* RECOMMENDATIONS */
+  .rec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .rec-card {
+    background: var(--white); border-radius: 12px;
+    border: 1px solid var(--card-border);
+    padding: 22px; display: flex; gap: 16px;
+  }
+  .rec-num {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--yellow); color: var(--black);
+    font-size: 16px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .rec-body h4 { font-size: 13px; font-weight: 700; color: var(--t1); margin-bottom: 6px; }
+  .rec-body p { font-size: 12px; color: var(--t4); font-weight: 300; line-height: 1.6; }
+  .rec-body .rec-video { font-size: 11px; font-weight: 700; color: var(--black); background: var(--yellow); padding: 2px 8px; border-radius: 20px; display: inline-block; margin-top: 8px; }
+
+  @media print {
+    .section-divider { margin: 0; }
+    .cover { min-height: auto; padding: 60px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== COVER ===================== -->
+<div class="cover">
+  <div class="cover-badge">ADCOM · Análisis de Creativos</div>
+  <div class="cover-line"></div>
+  <h1>Videos<br><span>Telomereces</span></h1>
+  <p class="cover-sub">Baloto · Meta Ads · Análisis de rendimiento</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="label">Período</div>
+      <div class="value">Mar 12 – Abr 14, 2026</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Plataforma</div>
+      <div class="value">Meta (Facebook + Instagram)</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Audiencia</div>
+      <div class="value">Desconocidos + Acumulado</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Videos analizados</div>
+      <div class="value">5 pilares creativos</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SECCIÓN 1: REGISTROS ===================== -->
+<div class="page" style="padding-top:70px">
+  <div class="section-header">
+    <div class="section-tag">01 · Campaña de Registros</div>
+    <h2>Rendimiento en audiencia fría</h2>
+    <p>Videos con pauta propia, objetivo de registro, audiencia de desconocidos. Periodo: Mar 12 – Abr 14, 2026.</p>
+  </div>
+
+  <div class="kpi-grid kpi-grid-4" style="margin-bottom:32px">
+    <div class="kpi-card dark">
+      <div class="kpi-label">Total registros</div>
+      <div class="kpi-val">461</div>
+      <div class="kpi-sub">5 videos activos</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Inversión total</div>
+      <div class="kpi-val">$894K</div>
+      <div class="kpi-sub">COP</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Mejor CPR</div>
+      <div class="kpi-val">$780</div>
+      <div class="kpi-sub">Ropa · COP</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Mejor CTR</div>
+      <div class="kpi-val">1.77%</div>
+      <div class="kpi-sub">Ropa · link CTR</div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-card">
+      <h3>Registros por pilar</h3>
+      <p class="chart-desc">Total de conversiones (registros) acumuladas por video en el período.</p>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="c1" role="img" aria-label="Registros por pilar">Carros 313, Selfie 124, Restaurante 14, Ropa 9, Viaje 1.</canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>CTR link click-through rate</h3>
+      <p class="chart-desc">Porcentaje de impresiones que generan un clic al enlace de destino.</p>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="c2" role="img" aria-label="CTR por pilar">Ropa 1.77%, Carros 1.43%, Selfie 1.24%, Restaurante 0.94%, Viaje 0.83%.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-card-header">
+      <h3>Detalle completo por pilar — Campaña Registros</h3>
+      <p>Métricas de CTR, conversiones y costo por resultado. Fila destacada = mejor CPR.</p>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Pilar</th>
+          <th class="nr">Registros</th>
+          <th class="nr">CTR link</th>
+          <th class="nr">CTR all</th>
+          <th class="nr">Clics link</th>
+          <th class="nr">CPR (COP)</th>
+          <th class="nr">Inversión (COP)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Carros</td><td class="nr">313</td><td class="nr">1.43%</td><td class="nr">2.11%</td><td class="nr">1,079</td><td class="nr">$2,036</td><td class="nr">$637,156</td></tr>
+        <tr><td>Selfie</td><td class="nr">124</td><td class="nr">1.24%</td><td class="nr">2.11%</td><td class="nr">383</td><td class="nr">$1,748</td><td class="nr">$216,717</td></tr>
+        <tr><td>Restaurante</td><td class="nr">14</td><td class="nr">0.94%</td><td class="nr">1.93%</td><td class="nr">37</td><td class="nr">$1,985</td><td class="nr">$27,785</td></tr>
+        <tr class="highlight"><td>Ropa ⭐ mejor CPR</td><td class="nr">9</td><td class="nr">1.77%</td><td class="nr">3.43%</td><td class="nr">17</td><td class="nr">$780</td><td class="nr">$7,024</td></tr>
+        <tr><td>Viaje</td><td class="nr">1</td><td class="nr">0.83%</td><td class="nr">1.24%</td><td class="nr">8</td><td class="nr">$5,572</td><td class="nr">$5,572</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight-bar">
+    <p><strong>Hallazgo clave:</strong> Carros y Selfie concentran el 95% del volumen de registros. Sin embargo, Ropa tiene el CPR más eficiente ($780 COP) y el CTR más alto (1.77%), con inversión mínima — lo que revela potencial sin explorar. Viaje es el único pilar que no justifica continuidad con solo 1 registro y CPR de $5,572.</p>
+  </div>
+</div>
+
+<!-- ===================== SECCIÓN 2: VS INFLUENCERS ===================== -->
+<div class="section-divider">
+  <div class="div-tag">02 · Comparativo</div>
+  <h2>Telomereces vs Influencers</h2>
+  <p>¿Cómo compiten los videos de marca propia contra el contenido de influencers en la misma campaña?</p>
+</div>
+
+<div class="page" style="padding-top:60px">
+  <div class="vs-grid">
+    <div class="vs-card">
+      <span class="vs-tag">Telomereces · 5 videos</span>
+      <h3>Videos de marca propia</h3>
+      <div class="vs-stat"><span class="stat-label">Total registros</span><span class="stat-val">461</span></div>
+      <div class="vs-stat"><span class="stat-label">Inversión total (COP)</span><span class="stat-val">$894,000</span></div>
+      <div class="vs-stat"><span class="stat-label">CPR ponderado (COP)</span><span class="stat-val">$1,938</span></div>
+      <div class="vs-stat"><span class="stat-label">CTR link promedio</span><span class="stat-val">1.24%</span></div>
+    </div>
+    <div class="vs-card dark-card">
+      <span class="vs-tag">Influencers · 10 videos activos</span>
+      <h3 style="color:#fff">Contenido de influencers</h3>
+      <div class="vs-stat"><span class="stat-label">Total registros</span><span class="stat-val">12,091</span></div>
+      <div class="vs-stat"><span class="stat-label">Inversión total (COP)</span><span class="stat-val">$23,681,161</span></div>
+      <div class="vs-stat"><span class="stat-label">CPR ponderado (COP)</span><span class="stat-val">$1,958</span></div>
+      <div class="vs-stat"><span class="stat-label">CTR link promedio</span><span class="stat-val">2.42%</span></div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-card">
+      <h3>CPR comparado — todos los videos</h3>
+      <p class="chart-desc">Costo por resultado (registro) en COP. Menor es mejor.</p>
+      <div class="chart-legend">
+        <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#FFC000"></div>Telomereces</div>
+        <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#1A1A1A"></div>Influencers</div>
+      </div>
+      <div class="chart-wrap" style="height:280px">
+        <canvas id="c3" role="img" aria-label="CPR por video">Ropa $780, Selfie $1748, Restaurante $1985, Carros $2036, Viaje $5572. Influencers: sinmoverte $248, davidtriana $1329, juaneste1 $1667, chance $1783, yerlicampo $1929, juegaenlinea $2136, jaime $2297, yennifer $2734, felipe $2387, juaneste2 $1353.</canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>CTR link — todos los videos</h3>
+      <p class="chart-desc">Porcentaje de clic al enlace. Mayor es mejor.</p>
+      <div class="chart-legend">
+        <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#FFC000"></div>Telomereces</div>
+        <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#1A1A1A"></div>Influencers</div>
+      </div>
+      <div class="chart-wrap" style="height:280px">
+        <canvas id="c4" role="img" aria-label="CTR por video">felipe 4.92%, yennifer 4.17%, sinmoverte 3.03%, ropa 1.77%, chance 1.77%, carros 1.43%, juaneste1 1.48%, selfie 1.24%, juaneste2 1.63%, restaurante 0.94%, juegaenlinea 1.06%, viaje 0.83%, yerlicampo 1.19%, davidtriana 2.56%, jaime 2.43%.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-bar">
+    <p><strong>Conclusión estratégica:</strong> El CPR de Telomereces ($1,938) es prácticamente idéntico al de influencers ($1,958), con una inversión <strong>26 veces menor</strong>. Los influencers superan en CTR (2.42% vs 1.24%), pero en eficiencia de costo los Telomereces compiten de igual a igual. Los videos de marca demuestran ser un activo de alto valor para la campaña.</p>
+  </div>
+
+  <div class="table-card">
+    <div class="table-card-header">
+      <h3>Ranking completo — Telomereces e Influencers por CPR</h3>
+      <p>Todos los videos ordenados de menor a mayor costo por registro.</p>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Video</th>
+          <th>Grupo</th>
+          <th class="nr">Registros</th>
+          <th class="nr">CTR link</th>
+          <th class="nr">CPR (COP)</th>
+          <th class="nr">Inversión (COP)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>sinmovertedecasa</td><td><span class="badge badge-black">influencer</span></td><td class="nr">16</td><td class="nr">3.03%</td><td class="nr"><strong>$248</strong> <span class="badge badge-above">mejor CPR</span></td><td class="nr">$3,960</td></tr>
+        <tr class="highlight"><td>ropa</td><td><span class="badge badge-black">telomereces</span></td><td class="nr">9</td><td class="nr">1.77%</td><td class="nr"><strong>$780</strong></td><td class="nr">$7,024</td></tr>
+        <tr><td>davidtriana</td><td><span class="badge badge-black">influencer</span></td><td class="nr">3</td><td class="nr">2.56%</td><td class="nr">$1,329</td><td class="nr">$3,986</td></tr>
+        <tr><td>juaneste2</td><td><span class="badge badge-black">influencer</span></td><td class="nr">1</td><td class="nr">1.63%</td><td class="nr">$1,353</td><td class="nr">$1,353</td></tr>
+        <tr><td>juaneste1</td><td><span class="badge badge-black">influencer</span></td><td class="nr">1,002</td><td class="nr">1.48%</td><td class="nr">$1,667</td><td class="nr">$1,669,966</td></tr>
+        <tr><td>selfie</td><td><span class="badge badge-above">telomereces</span></td><td class="nr">124</td><td class="nr">1.24%</td><td class="nr">$1,748</td><td class="nr">$216,717</td></tr>
+        <tr><td>chance</td><td><span class="badge badge-black">influencer</span></td><td class="nr">57</td><td class="nr">1.77%</td><td class="nr">$1,783</td><td class="nr">$101,657</td></tr>
+        <tr><td>restaurante</td><td><span class="badge badge-above">telomereces</span></td><td class="nr">14</td><td class="nr">0.94%</td><td class="nr">$1,985</td><td class="nr">$27,785</td></tr>
+        <tr><td>carros</td><td><span class="badge badge-above">telomereces</span></td><td class="nr">313</td><td class="nr">1.43%</td><td class="nr">$2,036</td><td class="nr">$637,156</td></tr>
+        <tr><td>jaime</td><td><span class="badge badge-black">influencer</span></td><td class="nr">1,516</td><td class="nr">2.43%</td><td class="nr">$2,297</td><td class="nr">$3,482,231</td></tr>
+        <tr><td>yerlicampo</td><td><span class="badge badge-black">influencer</span></td><td class="nr">9,048</td><td class="nr">1.19%</td><td class="nr">$1,929</td><td class="nr">$17,455,784</td></tr>
+        <tr><td>juegaenlinea</td><td><span class="badge badge-black">influencer</span></td><td class="nr">433</td><td class="nr">1.06%</td><td class="nr">$2,136</td><td class="nr">$924,688</td></tr>
+        <tr><td>felipe</td><td><span class="badge badge-black">influencer</span></td><td class="nr">10</td><td class="nr">4.92%</td><td class="nr">$2,387</td><td class="nr">$23,865</td></tr>
+        <tr><td>yennifer</td><td><span class="badge badge-black">influencer</span></td><td class="nr">5</td><td class="nr">4.17%</td><td class="nr">$2,734</td><td class="nr">$13,671</td></tr>
+        <tr><td>viaje</td><td><span class="badge badge-above">telomereces</span></td><td class="nr">1</td><td class="nr">0.83%</td><td class="nr"><span class="badge badge-red">$5,572</span></td><td class="nr">$5,572</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== SECCIÓN 3: RETENCIÓN ===================== -->
+<div class="section-divider">
+  <div class="div-tag">03 · Video Engagement</div>
+  <h2>Retención y ThruPlays</h2>
+  <p>¿Qué tanto retienen los videos a la audiencia? Análisis de curvas de visualización completa.</p>
+</div>
+
+<div class="page" style="padding-top:60px">
+  <div class="kpi-grid kpi-grid-4" style="margin-bottom:32px">
+    <div class="kpi-card dark">
+      <div class="kpi-label">Mejor retención 100%</div>
+      <div class="kpi-val">4.7%</div>
+      <div class="kpi-sub">Ropa · mejor Telomerce</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ret. 100% promedio Telo</div>
+      <div class="kpi-val">3.64%</div>
+      <div class="kpi-sub">vs 2.88% influencers activos</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">ThruPlay más barato</div>
+      <div class="kpi-val">$159</div>
+      <div class="kpi-sub">Ropa · COP por ThruPlay</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Rango CPThruPlay Telo</div>
+      <div class="kpi-val">$159–$235</div>
+      <div class="kpi-sub">COP por ThruPlay</div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <h3>Curva de retención — Telomereces vs top influencers</h3>
+    <p class="chart-desc">Porcentaje de reproducciones que llegan a cada hito del video (25%, 50%, 75%, 95%, 100%). Una curva plana indica mayor retención de audiencia.</p>
+    <div class="chart-legend">
+      <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#FFC000"></div>Telomereces (promedio)</div>
+      <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#1A1A1A"></div>Jaime (top influencer)</div>
+      <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#999"></div>Yerlicampo (mayor volumen)</div>
+    </div>
+    <div class="chart-wrap" style="height:300px">
+      <canvas id="c5" role="img" aria-label="Curva de retención comparativa">Jaime mantiene curva muy plana hasta 8% al 100%. Telomereces promedio decae de 11.9% al 25% hasta 3.64% al 100%.</canvas>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-card">
+      <h3>Retención al 100% — ranking Telomereces</h3>
+      <p class="chart-desc">% de reproducciones que vieron el video completo.</p>
+      <div class="chart-wrap" style="height:240px">
+        <canvas id="c6" role="img" aria-label="Retención 100% Telomereces">Ropa 4.7%, Selfie 4.0%, Carros 3.5%, Restaurante 3.2%, Viaje 2.9%.</canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>Costo por ThruPlay (COP)</h3>
+      <p class="chart-desc">Menor costo = más eficiente para retención total del video.</p>
+      <div class="chart-wrap" style="height:240px">
+        <canvas id="c7" role="img" aria-label="Costo por ThruPlay Telomereces">Ropa $159, Selfie $181, Carros $201, Viaje $206, Restaurante $235.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-card-header">
+      <h3>Métricas de retención — todos los videos Telomereces</h3>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Pilar</th>
+          <th class="nr">ThruPlays</th>
+          <th class="nr">Tasa ThruPlay</th>
+          <th class="nr">Ret. 25%</th>
+          <th class="nr">Ret. 50%</th>
+          <th class="nr">Ret. 75%</th>
+          <th class="nr">Ret. 95%</th>
+          <th class="nr">Ret. 100%</th>
+          <th class="nr">CPThruPlay (COP)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight"><td>Ropa ⭐</td><td class="nr">44</td><td class="nr">4.6%</td><td class="nr">13.4%</td><td class="nr">8.4%</td><td class="nr">6.1%</td><td class="nr">5.0%</td><td class="nr">4.7%</td><td class="nr">$159</td></tr>
+        <tr><td>Selfie</td><td class="nr">1,196</td><td class="nr">4.0%</td><td class="nr">13.0%</td><td class="nr">7.9%</td><td class="nr">5.9%</td><td class="nr">4.7%</td><td class="nr">4.0%</td><td class="nr">$181</td></tr>
+        <tr><td>Carros</td><td class="nr">3,167</td><td class="nr">4.3%</td><td class="nr">10.7%</td><td class="nr">6.5%</td><td class="nr">4.8%</td><td class="nr">3.9%</td><td class="nr">3.5%</td><td class="nr">$201</td></tr>
+        <tr><td>Restaurante</td><td class="nr">118</td><td class="nr">3.1%</td><td class="nr">10.6%</td><td class="nr">5.9%</td><td class="nr">4.1%</td><td class="nr">3.4%</td><td class="nr">3.2%</td><td class="nr">$235</td></tr>
+        <tr><td>Viaje</td><td class="nr">27</td><td class="nr">2.9%</td><td class="nr">10.8%</td><td class="nr">6.2%</td><td class="nr">3.6%</td><td class="nr">3.0%</td><td class="nr">2.9%</td><td class="nr">$206</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight-bar">
+    <p><strong>Hallazgo:</strong> Ropa lidera en retención (4.7% al 100%) y tiene el ThruPlay más barato ($159 COP). El mayor problema de los Telomereces no es la calidad del contenido sino el contexto: en audiencia fría el costo por ThruPlay ($159–$235) es 3–8x más caro que los influencers con mayor escala (jaime $30, juaneste1 $57). Esto se explica por el diferencial de inversión y audience fit, no por la calidad creativa.</p>
+  </div>
+</div>
+
+<!-- ===================== SECCIÓN 4: ACUMULADO ===================== -->
+<div class="section-divider">
+  <div class="div-tag">04 · Campaña Acumulado</div>
+  <h2>Telomereces en audiencia caliente</h2>
+  <p>Los mismos videos añadidos orgánicamente a la campaña de acumulado con objetivo de compra generan resultados radicalmente distintos.</p>
+</div>
+
+<div class="page" style="padding-top:60px">
+  <div class="kpi-grid kpi-grid-4" style="margin-bottom:32px">
+    <div class="kpi-card dark">
+      <div class="kpi-label">Total compras</div>
+      <div class="kpi-val">16,039</div>
+      <div class="kpi-sub">5 videos orgánicos</div>
+    </div>
+    <div class="kpi-card dark">
+      <div class="kpi-label">CPR promedio compras</div>
+      <div class="kpi-val">$286</div>
+      <div class="kpi-sub">COP · vs $1,938 en registros</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">CTR link promedio</div>
+      <div class="kpi-val">3.78%</div>
+      <div class="kpi-sub">vs 1.24% en registros</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Conversion ranking</div>
+      <div class="kpi-val" style="font-size:18px">Above avg</div>
+      <div class="kpi-sub">100% de los videos</div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-card">
+      <h3>CTR — Registros vs Acumulado por pilar</h3>
+      <p class="chart-desc">El CTR se multiplica entre 2x y 6x en audiencia caliente.</p>
+      <div class="chart-legend">
+        <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#FFC000"></div>Registros (pagado)</div>
+        <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#1A1A1A"></div>Acumulado orgánico</div>
+      </div>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="c8" role="img" aria-label="CTR registros vs acumulado">Restaurante sube de 0.94% a 5.64%. Carros de 1.43% a 4.31%. Selfie de 1.24% a 3.06%. Viaje de 0.83% a 2.95%. Ropa de 1.77% a 2.95%.</canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>CPR — Registros vs Acumulado por pilar</h3>
+      <p class="chart-desc">El costo por resultado cae entre 67% y 96% en audiencia caliente.</p>
+      <div class="chart-legend">
+        <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#FFC000"></div>Registros (pagado)</div>
+        <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#1A1A1A"></div>Acumulado orgánico</div>
+      </div>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="c9" role="img" aria-label="CPR registros vs acumulado">Viaje baja de $5572 a $246. Ropa de $780 a $255. Restaurante de $1985 a $290. Selfie de $1748 a $246. Carros de $2036 a $394.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-card-header">
+      <h3>Telomereces — Registros vs Acumulado orgánico</h3>
+      <p>Comparación directa del mismo creativo en dos contextos de campaña.</p>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Pilar</th>
+          <th class="nr">Reg. (reg.)</th>
+          <th class="nr">CTR reg.</th>
+          <th class="nr">CPR reg.</th>
+          <th class="nr">Compras (acum.)</th>
+          <th class="nr">CTR acum.</th>
+          <th class="nr">CPR acum.</th>
+          <th class="nr">Conv. ranking</th>
+          <th class="nr">Mejora CPR</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight"><td>Restaurante ⭐</td><td class="nr">14</td><td class="nr">0.94%</td><td class="nr">$1,985</td><td class="nr">6,015</td><td class="nr">5.64%</td><td class="nr">$290</td><td class="nr"><span class="badge badge-black">above avg</span></td><td class="nr">-85%</td></tr>
+        <tr><td>Selfie</td><td class="nr">124</td><td class="nr">1.24%</td><td class="nr">$1,748</td><td class="nr">3,691</td><td class="nr">3.06%</td><td class="nr">$246</td><td class="nr"><span class="badge badge-above">above avg</span></td><td class="nr"><span class="uplift">-86%</span></td></tr>
+        <tr><td>Carros</td><td class="nr">313</td><td class="nr">1.43%</td><td class="nr">$2,036</td><td class="nr">3,120</td><td class="nr">4.31%</td><td class="nr">$394</td><td class="nr"><span class="badge badge-above">above avg</span></td><td class="nr"><span class="uplift">-81%</span></td></tr>
+        <tr><td>Viaje</td><td class="nr">1</td><td class="nr">0.83%</td><td class="nr">$5,572</td><td class="nr">2,377</td><td class="nr">2.95%</td><td class="nr">$246</td><td class="nr"><span class="badge badge-above">above avg</span></td><td class="nr"><span class="uplift">-96%</span></td></tr>
+        <tr><td>Ropa</td><td class="nr">9</td><td class="nr">1.77%</td><td class="nr">$780</td><td class="nr">1,236</td><td class="nr">2.95%</td><td class="nr">$255</td><td class="nr"><span class="badge badge-above">above avg</span></td><td class="nr"><span class="uplift">-67%</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight-bar">
+    <p><strong>Dato revelador — Viaje:</strong> En audiencia fría generó apenas 1 registro con CPR de $5,572. En acumulado orgánico generó 2,377 compras a $246 COP. Esto confirma que el creativo no tiene problema de calidad — el problema era el fit con la audiencia. <strong>Restaurante</strong> es la gran sorpresa: pasa de 0.94% CTR en frío a 5.64% en caliente y lidera en volumen de compras con 6,015.</p>
+  </div>
+
+  <div class="chart-card">
+    <h3>Telomereces vs estáticos en campaña acumulado — CPR compra (COP)</h3>
+    <p class="chart-desc">Los Telomereces compiten directamente con los mejores estáticos en costo por compra, con CTR muy superior (2.9–5.6% vs 0.7–2.6%).</p>
+    <div class="chart-legend">
+      <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#FFC000"></div>Telomereces (orgánico)</div>
+      <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#CCCCCC"></div>Estáticos</div>
+    </div>
+    <div class="chart-wrap" style="height:260px">
+      <canvas id="c10" role="img" aria-label="Telomereces vs estáticos CPR acumulado">Selfie y Viaje $246, Ropa $255, Restaurante $290, Carros $394. Estáticos entre $181 y $472.</canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SECCIÓN 5: VISUALIZACIONES ===================== -->
+<div class="section-divider">
+  <div class="div-tag">05 · Visualizaciones</div>
+  <h2>Reproducciones totales de video</h2>
+  <p>Total de views acumulados por pilar en el período Mar 12 – Abr 14, 2026 (ambas campañas combinadas).</p>
+</div>
+
+<div class="page" style="padding-top:60px">
+  <div class="kpi-grid kpi-grid-4" style="margin-bottom:32px">
+    <div class="kpi-card dark">
+      <div class="kpi-label">Reproducciones totales</div>
+      <div class="kpi-val">110,115</div>
+      <div class="kpi-sub">5 pilares · ambas campañas</div>
+    </div>
+    <div class="kpi-card dark">
+      <div class="kpi-label">Impresiones totales</div>
+      <div class="kpi-val">112,258</div>
+      <div class="kpi-sub">Mar 12 – Abr 14, 2026</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Mayor volumen</div>
+      <div class="kpi-val">74,133</div>
+      <div class="kpi-sub">Carros · reproducciones</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Tasa reproducción prom.</div>
+      <div class="kpi-val">98.1%</div>
+      <div class="kpi-sub">views / impresiones</div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-card">
+      <h3>Reproducciones por pilar</h3>
+      <p class="chart-desc">Total de veces que el video fue reproducido en el período completo.</p>
+      <div class="chart-wrap" style="height:280px">
+        <canvas id="cv1" role="img" aria-label="Reproducciones por pilar">Carros 74133, Selfie 30255, Restaurante 3833, Ropa 949, Viaje 945.</canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>Reproducciones vs Impresiones</h3>
+      <p class="chart-desc">Comparación entre impresiones totales y reproducciones efectivas del video.</p>
+      <div class="chart-wrap" style="height:280px">
+        <canvas id="cv2" role="img" aria-label="Reproducciones vs impresiones">Todos los pilares tienen tasa de reproducción superior al 97%.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-card-header">
+      <h3>Detalle de reproducciones y retención por pilar</h3>
+      <p>Reproducciones totales, impresiones y tasa de visualización completa (100%). Período combinado ambas campañas.</p>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Pilar</th>
+          <th class="nr">Impresiones</th>
+          <th class="nr">Reproducciones</th>
+          <th class="nr">Tasa rep.</th>
+          <th class="nr">Views 25%</th>
+          <th class="nr">Views 50%</th>
+          <th class="nr">Views 75%</th>
+          <th class="nr">Views 100%</th>
+          <th class="nr">Ret. 100%</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight"><td>Carros ⭐ mayor volumen</td><td class="nr">75,513</td><td class="nr">74,133</td><td class="nr">98.2%</td><td class="nr">7,929</td><td class="nr">4,826</td><td class="nr">3,566</td><td class="nr">2,568</td><td class="nr">3.5%</td></tr>
+        <tr><td>Selfie</td><td class="nr">30,884</td><td class="nr">30,255</td><td class="nr">97.9%</td><td class="nr">3,934</td><td class="nr">2,378</td><td class="nr">1,790</td><td class="nr">1,224</td><td class="nr">4.0%</td></tr>
+        <tr><td>Restaurante</td><td class="nr">3,933</td><td class="nr">3,833</td><td class="nr">97.5%</td><td class="nr">406</td><td class="nr">228</td><td class="nr">157</td><td class="nr">124</td><td class="nr">3.2%</td></tr>
+        <tr><td>Ropa</td><td class="nr">962</td><td class="nr">949</td><td class="nr">98.6%</td><td class="nr">127</td><td class="nr">80</td><td class="nr">58</td><td class="nr">45</td><td class="nr">4.7%</td></tr>
+        <tr><td>Viaje</td><td class="nr">966</td><td class="nr">945</td><td class="nr">97.8%</td><td class="nr">102</td><td class="nr">59</td><td class="nr">34</td><td class="nr">27</td><td class="nr">2.9%</td></tr>
+        <tr style="background:#F5F5F5;font-weight:600"><td>Total</td><td class="nr">112,258</td><td class="nr">110,115</td><td class="nr">98.1%</td><td class="nr">12,498</td><td class="nr">7,571</td><td class="nr">5,605</td><td class="nr">3,988</td><td class="nr">3.6%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight-bar">
+    <p><strong>Nota metodológica:</strong> Las reproducciones corresponden al archivo de engagement del período completo y consolidan ambas campañas (registros + acumulado). <strong>Carros concentra el 67% de todas las reproducciones</strong> (74,133) por ser el video con mayor inversión y alcance. Ropa, a pesar de tener el menor volumen de views, tiene la mejor tasa de visualización completa (4.7%) — lo que confirma su superioridad en calidad creativa.</p>
+  </div>
+</div>
+
+<!-- ===================== SECCIÓN 6: RECOMENDACIONES ===================== -->
+<div class="section-divider">
+  <div class="div-tag">06 · Conclusiones</div>
+  <h2>Recomendaciones estratégicas</h2>
+  <p>Acciones concretas basadas en el análisis completo de registros, engagement y acumulado.</p>
+</div>
+
+<div class="page" style="padding-top:60px; padding-bottom:80px">
+  <div class="rec-grid">
+    <div class="rec-card">
+      <div class="rec-num">1</div>
+      <div class="rec-body">
+        <h4>Escalar Ropa en audiencia fría</h4>
+        <p>Es el video más eficiente en registros (CPR $780, CTR 1.77%) y el de mejor retención (4.7% al 100%). Solo recibió $7K COP de inversión. Aumentar presupuesto para ver hasta dónde escala la eficiencia.</p>
+        <span class="rec-video">video_telomereces_ropa</span>
+      </div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-num">2</div>
+      <div class="rec-body">
+        <h4>Mantener Carros y Selfie como motores de volumen</h4>
+        <p>Concentran el 95% de los registros. Carros ($637K) y Selfie ($216K) son los caballos de trabajo en frío. Su CPR ($1,748–$2,036) está dentro del promedio de la campaña y escalan con consistencia.</p>
+        <span class="rec-video">video_telomereces_carros</span>
+        <span class="rec-video" style="margin-left:6px">video_telomereces_selfie</span>
+      </div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-num">3</div>
+      <div class="rec-body">
+        <h4>Continuar todos los Telomereces en acumulado orgánico</h4>
+        <p>Los 5 videos tienen ranking "Above average" en conversión de compra. No requieren inversión adicional y generan 16,039 compras a $286 COP promedio. Son un activo de retargeting de alto valor que no debe pausarse.</p>
+        <span class="rec-video">todos los pilares · orgánico</span>
+      </div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-num">4</div>
+      <div class="rec-body">
+        <h4>Evaluar Restaurante con más inversión en frío</h4>
+        <p>En acumulado genera el mayor volumen de compras (6,015) y el CTR más alto (5.64%). En frío tiene mal CTR (0.94%) pero el creativo claramente convierte en etapas bajas del funnel. Probar con segmentación de interés más calificada.</p>
+        <span class="rec-video">video_telomereces_restaurante</span>
+      </div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-num">5</div>
+      <div class="rec-body">
+        <h4>Pausar Viaje en audiencia fría</h4>
+        <p>Con 1 registro y CPR de $5,572 no justifica inversión en frío. Sin embargo, mantenerlo en acumulado orgánico donde genera 2,377 compras a $246. El creativo tiene valor, solo necesita contexto correcto.</p>
+        <span class="rec-video">video_telomereces_viaje · solo orgánico</span>
+      </div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-num">6</div>
+      <div class="rec-body">
+        <h4>Usar Telomereces como benchmark de marca propia</h4>
+        <p>CPR idéntico al de influencers ($1,938 vs $1,958) con inversión 26x menor. Los Telomereces demuestran que el contenido de marca puede competir con influencers en eficiencia, liberando presupuesto para otras palancas.</p>
+        <span class="rec-video">todos · campaña de registros</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== FOOTER ===================== -->
+<div class="footer">
+  <div class="footer-brand">AD<span>COM</span></div>
+  <div class="footer-meta">
+    Baloto · Telomereces Performance Report<br>
+    Meta Ads · Mar 12 – Abr 14, 2026<br>
+    Generado por ADCOM Analytics
+  </div>
+</div>
+
+<script>
+const Y = '#FFC000';
+const BK = '#1A1A1A';
+const GR = '#AAAAAA';
+
+const opts = (extra={}) => ({
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { display: false } },
+  scales: {
+    x: { ticks: { color:'#999', font:{size:11,family:'Poppins'} }, grid: { display:false }, border:{display:false} },
+    y: { ticks: { color:'#999', font:{size:11,family:'Poppins'} }, grid: { color:'rgba(0,0,0,0.06)' }, border:{display:false} }
+  },
+  ...extra
+});
+
+// C1 — Registros por pilar
+new Chart(document.getElementById('c1'), {
+  type:'bar',
+  data:{ labels:['Carros','Selfie','Restaurante','Ropa','Viaje'],
+    datasets:[{data:[313,124,14,9,1], backgroundColor:[Y,Y,Y,BK,GR], borderRadius:6, borderSkipped:false}]},
+  options: opts()
+});
+
+// C2 — CTR registros
+new Chart(document.getElementById('c2'), {
+  type:'bar',
+  data:{ labels:['Ropa','Carros','Selfie','Restaurante','Viaje'],
+    datasets:[{data:[1.77,1.43,1.24,0.94,0.83], backgroundColor:[BK,Y,Y,Y,GR], borderRadius:6, borderSkipped:false}]},
+  options: opts({scales:{x:{ticks:{color:'#999',font:{size:11}},grid:{display:false},border:{display:false}},y:{ticks:{color:'#999',font:{size:11},callback:v=>v+'%'},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}}}})
+});
+
+// C3 — CPR todos ordenado
+const allCPR = [
+  {n:'sinmoverte',g:'inf',v:248},{n:'ropa',g:'tel',v:780},{n:'davidtriana',g:'inf',v:1329},
+  {n:'juaneste2',g:'inf',v:1353},{n:'juaneste1',g:'inf',v:1667},{n:'selfie',g:'tel',v:1748},
+  {n:'chance',g:'inf',v:1783},{n:'restaurante',g:'tel',v:1985},{n:'carros',g:'tel',v:2036},
+  {n:'yerlicampo',g:'inf',v:1929},{n:'juegaenlinea',g:'inf',v:2136},{n:'jaime',g:'inf',v:2297},
+  {n:'felipe',g:'inf',v:2387},{n:'yennifer',g:'inf',v:2734},{n:'viaje',g:'tel',v:5572}
+];
+new Chart(document.getElementById('c3'), {
+  type:'bar',
+  data:{ labels:allCPR.map(v=>v.n),
+    datasets:[{data:allCPR.map(v=>v.v), backgroundColor:allCPR.map(v=>v.g==='tel'?Y:BK), borderRadius:5, borderSkipped:false}]},
+  options: opts({scales:{x:{ticks:{color:'#999',font:{size:10},maxRotation:45,autoSkip:false},grid:{display:false},border:{display:false}},y:{ticks:{color:'#999',font:{size:11},callback:v=>'$'+v.toLocaleString()},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}}}})
+});
+
+// C4 — CTR todos
+const allCTR = [
+  {n:'felipe',g:'inf',v:4.92},{n:'yennifer',g:'inf',v:4.17},{n:'sinmoverte',g:'inf',v:3.03},
+  {n:'ropa',g:'tel',v:1.77},{n:'chance',g:'inf',v:1.77},{n:'davidtriana',g:'inf',v:2.56},
+  {n:'jaime',g:'inf',v:2.43},{n:'juaneste2',g:'inf',v:1.63},{n:'juaneste1',g:'inf',v:1.48},
+  {n:'carros',g:'tel',v:1.43},{n:'selfie',g:'tel',v:1.24},{n:'juegaenlinea',g:'inf',v:1.06},
+  {n:'viaje',g:'tel',v:0.83},{n:'restaurante',g:'tel',v:0.94},{n:'yerlicampo',g:'inf',v:1.19}
+].sort((a,b)=>b.v-a.v);
+new Chart(document.getElementById('c4'), {
+  type:'bar',
+  data:{ labels:allCTR.map(v=>v.n),
+    datasets:[{data:allCTR.map(v=>v.v), backgroundColor:allCTR.map(v=>v.g==='tel'?Y:BK), borderRadius:5, borderSkipped:false}]},
+  options: opts({scales:{x:{ticks:{color:'#999',font:{size:10},maxRotation:45,autoSkip:false},grid:{display:false},border:{display:false}},y:{ticks:{color:'#999',font:{size:11},callback:v=>v+'%'},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}}}})
+});
+
+// C5 — Curva retención
+new Chart(document.getElementById('c5'), {
+  type:'line',
+  data:{
+    labels:['25%','50%','75%','95%','100%'],
+    datasets:[
+      {label:'Telomereces (prom)',data:[11.7,6.98,4.9,4.0,3.64], borderColor:Y, borderWidth:3, pointBackgroundColor:Y, tension:0.3, fill:false, pointRadius:5},
+      {label:'Jaime',data:[15.8,13.4,12.3,8.6,8.0], borderColor:BK, borderWidth:3, pointBackgroundColor:BK, tension:0.3, fill:false, pointRadius:5},
+      {label:'Yerlicampo',data:[8.3,3.8,2.3,1.3,1.0], borderColor:GR, borderWidth:2, borderDash:[5,5], pointBackgroundColor:GR, tension:0.3, fill:false, pointRadius:4}
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{ticks:{color:'#999',font:{size:12,family:'Poppins'}},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}},
+      y:{ticks:{color:'#999',font:{size:11,family:'Poppins'},callback:v=>v+'%'},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}}
+    }
+  }
+});
+
+// C6 — Ret 100% Telo
+new Chart(document.getElementById('c6'), {
+  type:'bar',
+  data:{ labels:['Ropa','Selfie','Carros','Restaurante','Viaje'],
+    datasets:[{data:[4.7,4.0,3.5,3.2,2.9], backgroundColor:[BK,Y,Y,Y,GR], borderRadius:6, borderSkipped:false}]},
+  options: opts({scales:{x:{ticks:{color:'#999',font:{size:12}},grid:{display:false},border:{display:false}},y:{ticks:{color:'#999',font:{size:11},callback:v=>v+'%'},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}}}})
+});
+
+// C7 — CPThruPlay
+new Chart(document.getElementById('c7'), {
+  type:'bar',
+  data:{ labels:['Ropa','Selfie','Viaje','Carros','Restaurante'],
+    datasets:[{data:[159,181,206,201,235], backgroundColor:[BK,Y,Y,Y,GR], borderRadius:6, borderSkipped:false}]},
+  options: opts({scales:{x:{ticks:{color:'#999',font:{size:12}},grid:{display:false},border:{display:false}},y:{ticks:{color:'#999',font:{size:11},callback:v=>'$'+v},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}}}})
+});
+
+// C8 — CTR acumulado vs registros
+const pils = ['Restaurante','Carros','Selfie','Viaje','Ropa'];
+new Chart(document.getElementById('c8'), {
+  type:'bar',
+  data:{ labels:pils,
+    datasets:[
+      {label:'Registros',data:[0.94,1.43,1.24,0.83,1.77], backgroundColor:GR, borderRadius:[5,5,5,5], borderSkipped:false},
+      {label:'Acumulado',data:[5.64,4.31,3.06,2.95,2.95], backgroundColor:Y, borderRadius:[5,5,5,5], borderSkipped:false}
+    ]},
+  options: opts({scales:{x:{ticks:{color:'#999',font:{size:12}},grid:{display:false},border:{display:false}},y:{ticks:{color:'#999',font:{size:11},callback:v=>v+'%'},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}}}})
+});
+
+// C9 — CPR acumulado vs registros
+new Chart(document.getElementById('c9'), {
+  type:'bar',
+  data:{ labels:['Viaje','Restaurante','Selfie','Carros','Ropa'],
+    datasets:[
+      {label:'Registros',data:[5572,1985,1748,2036,780], backgroundColor:GR, borderRadius:[5,5,5,5], borderSkipped:false},
+      {label:'Acumulado',data:[246,290,246,394,255], backgroundColor:Y, borderRadius:[5,5,5,5], borderSkipped:false}
+    ]},
+  options: opts({scales:{x:{ticks:{color:'#999',font:{size:12}},grid:{display:false},border:{display:false}},y:{ticks:{color:'#999',font:{size:11},callback:v=>'$'+v.toLocaleString()},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}}}})
+});
+
+// CV1 — Reproducciones por pilar
+new Chart(document.getElementById('cv1'), {
+  type:'bar',
+  data:{ labels:['Carros','Selfie','Restaurante','Ropa','Viaje'],
+    datasets:[{data:[74133,30255,3833,949,945], backgroundColor:[BK,Y,Y,Y,GR], borderRadius:6, borderSkipped:false}]},
+  options: opts({scales:{x:{ticks:{color:'#999',font:{size:12}},grid:{display:false},border:{display:false}},y:{ticks:{color:'#999',font:{size:11},callback:v=>v.toLocaleString()},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}}}})
+});
+
+// CV2 — Reproducciones vs Impresiones
+new Chart(document.getElementById('cv2'), {
+  type:'bar',
+  data:{ labels:['Carros','Selfie','Restaurante','Ropa','Viaje'],
+    datasets:[
+      {label:'Impresiones',data:[75513,30884,3933,962,966], backgroundColor:GR, borderRadius:[5,5,5,5], borderSkipped:false},
+      {label:'Reproducciones',data:[74133,30255,3833,949,945], backgroundColor:Y, borderRadius:[5,5,5,5], borderSkipped:false}
+    ]},
+  options: opts({scales:{x:{ticks:{color:'#999',font:{size:12}},grid:{display:false},border:{display:false}},y:{ticks:{color:'#999',font:{size:11},callback:v=>v.toLocaleString()},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}}}})
+});
+
+// C10 — Telo vs Estáticos acumulado CPR
+const acumAll = [
+  {n:'lunes_50700',g:'est',v:181},{n:'Selfie',g:'tel',v:246},{n:'Viaje',g:'tel',v:246},
+  {n:'lunes_52500',g:'est',v:241},{n:'Ropa',g:'tel',v:255},{n:'sabado_42900C',g:'est',v:270},
+  {n:'sabado_51900',g:'est',v:268},{n:'Restaurante',g:'tel',v:290},{n:'sabado_44700',g:'est',v:280},
+  {n:'miercoles_30000',g:'est',v:295},{n:'baloto_ss',g:'est',v:294},{n:'miercoles_45900',g:'est',v:318},
+  {n:'Carros',g:'tel',v:394},{n:'lunes_45000',g:'est',v:372},{n:'miercoles_47700',g:'est',v:395},
+  {n:'lunes_24-03',g:'est',v:402},{n:'sabado_48000',g:'est',v:404},{n:'miercoles_51000',g:'est',v:426},
+  {n:'sabado_46500',g:'est',v:472}
+].sort((a,b)=>a.v-b.v);
+new Chart(document.getElementById('c10'), {
+  type:'bar',
+  data:{ labels:acumAll.map(v=>v.n),
+    datasets:[{data:acumAll.map(v=>v.v), backgroundColor:acumAll.map(v=>v.g==='tel'?Y:'#CCCCCC'), borderRadius:5, borderSkipped:false}]},
+  options: opts({scales:{x:{ticks:{color:'#999',font:{size:9},maxRotation:45,autoSkip:false},grid:{display:false},border:{display:false}},y:{ticks:{color:'#999',font:{size:11},callback:v=>'$'+v},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}}}})
+});
+</script>
+</body>
+</html>

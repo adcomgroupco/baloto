@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baloto · Recomendación Presupuesto · ADCOM</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F5F5;
+  --black:#1A1A1A;
+  --yellow:#FFC000;
+  --white:#FFFFFF;
+  --t1:#1A1A1A;
+  --t2:#333333;
+  --t3:#999999;
+  --t4:#666666;
+  --green:#4CAF50;
+  --green-light:#E8F5E9;
+  --red:#EF5350;
+  --red-light:#FFEBEE;
+  --border:#E0E0E0;
+  --section-gap:56px;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Poppins',sans-serif;
+  background:var(--bg);
+  color:var(--t1);
+  font-size:15px;
+  line-height:1.6;
+}
+
+/* ── COVER ── */
+.cover{
+  background:var(--black);
+  padding:36px 48px 40px;
+  position:relative;
+  overflow:hidden;
+}
+.cover::after{
+  content:'';
+  position:absolute;
+  right:-80px;top:-80px;
+  width:420px;height:420px;
+  border-radius:50%;
+  border:1px solid rgba(255,192,0,0.08);
+  pointer-events:none;
+}
+.cover-inner{max-width:1200px;margin:0 auto;}
+.cover-header{
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:40px;
+}
+.logo-circle{
+  width:48px;height:48px;border-radius:50%;
+  background:var(--yellow);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.logo-circle svg{width:26px;height:26px;}
+.brand{font-size:20px;font-weight:700;color:var(--white);}
+.brand span{color:var(--yellow);}
+.cover-meta{font-size:13px;color:#555;margin-left:auto;}
+
+.cover-title{
+  font-size:clamp(36px,5vw,64px);
+  font-weight:800;
+  color:var(--white);
+  line-height:1.0;
+  letter-spacing:-0.025em;
+  margin-bottom:10px;
+}
+.cover-title em{color:var(--yellow);font-style:normal;}
+.cover-sub{
+  font-size:15px;color:#666;font-weight:300;
+  margin-bottom:36px;max-width:520px;
+}
+.cover-kpis{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  max-width:680px;
+}
+.cover-kpi{
+  background:#222;
+  border-radius:10px;
+  padding:16px 14px 20px;
+  position:relative;overflow:hidden;
+}
+.cover-kpi::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;
+  height:4px;background:var(--yellow);
+}
+.cover-kpi .n{font-size:24px;font-weight:700;color:var(--white);line-height:1;margin-bottom:4px;}
+.cover-kpi .l{font-size:11px;color:#666;font-weight:400;}
+
+/* ── PAGE BODY ── */
+.page{max-width:1200px;margin:0 auto;padding:0 48px 80px;}
+
+/* ── SECTION HEADER ── */
+.sec-header{
+  display:flex;align-items:flex-end;gap:16px;
+  padding:var(--section-gap) 0 24px;
+  border-bottom:2px solid var(--black);
+  margin-bottom:28px;
+}
+.sec-num{
+  font-size:56px;font-weight:800;
+  color:var(--yellow);line-height:1;
+  letter-spacing:-0.04em;
+}
+.sec-titles{}
+.sec-label{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px;}
+.sec-title{font-size:26px;font-weight:700;color:var(--t1);line-height:1.15;}
+
+/* ── KPI ROW ── */
+.kpi-row{display:grid;gap:12px;margin-bottom:28px;}
+.kpi-5{grid-template-columns:repeat(5,1fr);}
+.kpi-4{grid-template-columns:repeat(4,1fr);}
+.kpi-3{grid-template-columns:repeat(3,1fr);}
+.kpi-2{grid-template-columns:repeat(2,1fr);}
+.kpi-card{
+  background:var(--white);
+  border-radius:10px;
+  border:0.5px solid var(--border);
+  padding:18px 16px 22px;
+  position:relative;overflow:hidden;
+}
+.kpi-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:5px;background:var(--yellow);}
+.kpi-card .kv{font-size:28px;font-weight:700;color:var(--t1);line-height:1;margin-bottom:5px;text-align:center;}
+.kpi-card .kl{font-size:11px;font-weight:600;color:var(--t2);text-align:center;line-height:1.3;}
+.kpi-card .ks{font-size:10px;color:var(--t3);text-align:center;font-weight:300;margin-top:3px;}
+.kpi-card.green-accent::after{background:var(--green);}
+.kpi-card.red-accent::after{background:var(--red);}
+
+/* ── GRID LAYOUTS ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px;}
+.grid-2-thirds{display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-bottom:28px;}
+.grid-1-thirds{display:grid;grid-template-columns:1fr 2fr;gap:24px;margin-bottom:28px;}
+
+/* ── WHITE CARD ── */
+.card{
+  background:var(--white);
+  border-radius:10px;
+  border:0.5px solid var(--border);
+  padding:24px;
+  position:relative;overflow:hidden;
+}
+.card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:5px;background:var(--yellow);}
+.card-title{font-size:13px;font-weight:700;color:var(--t2);margin-bottom:16px;text-transform:uppercase;letter-spacing:0.05em;}
+
+/* ── CHART WRAP ── */
+.chart-wrap{position:relative;width:100%;}
+
+/* ── DATA TABLE ── */
+.data-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+.data-table th{
+  background:var(--black);color:var(--white);
+  font-weight:600;padding:11px 12px;
+  text-align:left;font-size:12px;
+}
+.data-table td{
+  padding:11px 12px;
+  border-bottom:0.5px solid #E8E8E8;
+  font-weight:400;vertical-align:middle;
+  font-size:13px;
+}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr.row-hl{background:#FFFDE7;}
+.data-table tr.row-hl td{font-weight:500;}
+.data-table tr.row-alt{background:#FAFAFA;}
+.data-table tr.row-total{background:var(--yellow);}
+.data-table tr.row-total td{font-weight:700;color:var(--black);font-size:13.5px;}
+.data-table tr.row-muted{opacity:0.5;}
+.td-name{font-weight:600;color:var(--t2);}
+.td-note{font-size:11.5px;color:var(--t3);font-weight:300;}
+.delta{font-weight:700;font-size:12.5px;}
+.delta-up{color:var(--green);}
+.delta-down,.delta-pause{color:var(--red);}
+.delta-same{color:var(--t3);}
+
+/* ── INSIGHT BAR ── */
+.insight{
+  background:var(--white);
+  border-radius:8px;
+  border:0.5px solid var(--border);
+  border-left:5px solid var(--yellow);
+  padding:14px 18px;
+  font-size:13px;
+  color:var(--t4);
+  font-weight:300;
+  line-height:1.7;
+  margin:16px 0 28px;
+}
+.insight strong{color:var(--t1);font-weight:600;}
+
+/* ── FUNNEL CARDS ── */
+.funnel-col{display:flex;flex-direction:column;gap:12px;}
+.funnel-card{
+  background:var(--white);
+  border-radius:10px;
+  border:0.5px solid var(--border);
+  padding:18px;
+  position:relative;overflow:hidden;
+  flex:1;
+}
+.funnel-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:5px;background:var(--yellow);}
+.funnel-pill{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;margin-bottom:10px;
+}
+.pill-y{background:var(--yellow);color:var(--black);}
+.pill-b{background:var(--black);color:var(--white);}
+.funnel-card h4{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:6px;}
+.funnel-card p{font-size:12.5px;color:var(--t4);font-weight:300;line-height:1.6;}
+
+/* ── ACTION CARDS ── */
+.action-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
+.action-card{
+  background:var(--white);
+  border-radius:10px;
+  border:0.5px solid var(--border);
+  padding:20px;
+  position:relative;overflow:hidden;
+}
+.action-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:5px;background:var(--yellow);}
+.action-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.step-num{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--black);color:var(--white);
+  font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.urg{font-size:10px;font-weight:700;padding:3px 10px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;}
+.urg-now{background:var(--red-light);color:var(--red);}
+.urg-soon{background:#FFF8E1;color:#F57F17;}
+.urg-late{background:#F5F5F5;color:var(--t3);}
+.action-title{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:8px;}
+.action-body{font-size:12.5px;color:var(--t4);font-weight:300;line-height:1.6;}
+
+/* ── EXEC ROWS ── */
+.exec-section{background:var(--black);border-radius:14px;padding:32px 36px;margin-bottom:28px;}
+.exec-row{
+  display:flex;gap:18px;align-items:flex-start;
+  padding:20px 0;
+  border-bottom:1px solid #252525;
+}
+.exec-row:last-child{border-bottom:none;padding-bottom:0;}
+.exec-icon{
+  width:36px;height:36px;border-radius:50%;border:2px solid;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;flex-shrink:0;
+}
+.ei-g{border-color:var(--green);color:var(--green);}
+.ei-y{border-color:var(--yellow);color:var(--yellow);}
+.ei-r{border-color:var(--red);color:var(--red);}
+.ei-w{border-color:#333;color:#666;}
+.exec-title{font-size:15px;font-weight:700;color:var(--white);margin-bottom:5px;}
+.exec-body{font-size:13px;color:#666;font-weight:300;line-height:1.7;}
+.exec-body strong{color:var(--yellow);font-weight:600;}
+
+/* ── PROJ BOXES ── */
+.proj-box{border-radius:12px;padding:28px;}
+.proj-before{background:var(--white);border:0.5px solid var(--border);}
+.proj-after{background:var(--black);}
+.proj-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+.proj-before .proj-tag{color:var(--t3);}
+.proj-after .proj-tag{color:var(--yellow);}
+.proj-num{font-size:64px;font-weight:800;line-height:1;margin-bottom:4px;}
+.proj-before .proj-num{color:var(--t3);}
+.proj-after .proj-num{color:var(--white);}
+.proj-unit{font-size:13px;font-weight:300;margin-bottom:20px;}
+.proj-before .proj-unit{color:var(--t3);}
+.proj-after .proj-unit{color:#555;}
+.proj-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:0.5px solid;}
+.proj-before .proj-row{border-color:#EEE;}
+.proj-after .proj-row{border-color:#252525;}
+.proj-camp{font-size:13px;font-weight:300;}
+.proj-before .proj-camp{color:var(--t2);}
+.proj-after .proj-camp{color:#777;}
+.proj-val{font-size:13.5px;font-weight:700;}
+.proj-before .proj-val{color:var(--t1);}
+.proj-after .proj-val{color:var(--white);}
+.proj-delta{font-size:12px;font-weight:700;}
+
+/* ── GAIN BOX ── */
+.gain-box{background:var(--green-light);border-radius:10px;padding:20px 22px;border-left:5px solid var(--green);}
+.gain-num{font-size:40px;font-weight:800;color:#2E7D32;line-height:1;margin-bottom:4px;}
+.gain-label{font-size:13px;font-weight:600;color:#388E3C;margin-bottom:3px;}
+.gain-sub{font-size:12px;color:#555;font-weight:300;}
+
+/* ── FOOTER ── */
+.report-footer{
+  background:var(--black);
+  padding:28px 48px;
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:0;
+}
+.footer-brand{font-size:16px;font-weight:700;color:var(--white);}
+.footer-brand span{color:var(--yellow);}
+.footer-meta{font-size:11px;color:#444;}
+
+/* ── BAR ITEMS ── */
+.bar-item{display:grid;grid-template-columns:130px 1fr 60px;align-items:center;gap:10px;margin-bottom:12px;}
+.bar-label{font-size:12px;font-weight:600;color:var(--t2);text-align:right;}
+.bar-track{background:#EEE;border-radius:4px;height:26px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:10px;font-size:11.5px;font-weight:600;color:var(--white);}
+.bar-val{font-size:13px;font-weight:700;color:var(--t1);}
+
+/* ── LEGEND ── */
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:12px;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t4);}
+.legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+
+@media(max-width:900px){
+  .cover{padding:28px 24px 32px;}
+  .page{padding:0 24px 60px;}
+  .cover-kpis,.kpi-5,.kpi-4,.kpi-3{grid-template-columns:repeat(2,1fr);}
+  .grid-2,.grid-2-thirds,.grid-1-thirds{grid-template-columns:1fr;}
+  .action-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:600px){
+  .action-grid{grid-template-columns:1fr;}
+  .kpi-2{grid-template-columns:1fr;}
+  .bar-item{grid-template-columns:90px 1fr 44px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ COVER ══ -->
+<div class="cover">
+  <div class="cover-inner">
+    <div class="cover-header">
+      <div class="logo-circle">
+        <svg viewBox="0 0 40 40" fill="none">
+          <circle cx="14" cy="20" r="6" fill="#1A1A1A"/>
+          <circle cx="26" cy="20" r="6" fill="#1A1A1A"/>
+          <path d="M14 20 Q20 12 26 20" stroke="#1A1A1A" stroke-width="2.5" fill="none"/>
+        </svg>
+      </div>
+      <div class="brand">AD<span>COM</span></div>
+      <div class="cover-meta">Apuesta Aquí Baloto · Google Ads · Mar–May 2026</div>
+    </div>
+
+    <div class="cover-title">Recomendación de<br><em>Presupuesto</em> por Campaña</div>
+    <div class="cover-sub">Análisis cruzado Google Ads + GA4 · Mar–May 2026 · Propuesta de redistribución sin incrementar inversión</div>
+
+    <div class="cover-kpis">
+      <div class="cover-kpi"><div class="n">$52,9M</div><div class="l">Inversión COP</div></div>
+      <div class="cover-kpi"><div class="n">35.778</div><div class="l">Conversiones</div></div>
+      <div class="cover-kpi"><div class="n">12,2M</div><div class="l">Impresiones</div></div>
+      <div class="cover-kpi"><div class="n">65 días</div><div class="l">Período analizado</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- ══ 01 RESUMEN DE CUENTA ══ -->
+<div class="sec-header">
+  <div class="sec-num">01</div>
+  <div class="sec-titles">
+    <div class="sec-label">Contexto</div>
+    <div class="sec-title">Resumen de cuenta</div>
+  </div>
+</div>
+
+<div class="kpi-row kpi-5">
+  <div class="kpi-card"><div class="kv">$52,9M</div><div class="kl">Inversión total</div><div class="ks">COP · todas las campañas</div></div>
+  <div class="kpi-card"><div class="kv">35.778</div><div class="kl">Conversiones totales</div><div class="ks">Google Ads · cuenta</div></div>
+  <div class="kpi-card"><div class="kv">23.323</div><div class="kl">Compras exitosas</div><div class="ks">65,2% del total</div></div>
+  <div class="kpi-card"><div class="kv">10.474</div><div class="kl">Registros exitosos</div><div class="ks">29,3% del total</div></div>
+  <div class="kpi-card"><div class="kv">$1.477</div><div class="kl">CPA promedio cuenta</div><div class="ks">COP · todas las campañas</div></div>
+</div>
+
+<div class="grid-2">
+  <!-- Donut composición conversiones -->
+  <div class="card">
+    <div class="card-title">Composición de conversiones</div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#1A6D5E;"></div>Compra_Exitosa (65,2%)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#FFC000;"></div>Registro_Exitoso (29,3%)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#888;"></div>YouTube (5,5%)</div>
+    </div>
+    <div class="chart-wrap" style="height:240px;">
+      <canvas id="donutConv" role="img" aria-label="Donut de composición de conversiones: Compras 65.2%, Registros 29.3%, YouTube 5.5%">Compras 65.2%, Registros 29.3%, YouTube 5.5%</canvas>
+    </div>
+  </div>
+
+  <!-- Rol de formatos -->
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <div class="funnel-card">
+      <div class="funnel-pill pill-y">TOP</div>
+      <h4>PMax + dGen → Adquisición de usuarios</h4>
+      <p>Generan ~77% de los Registro_Exitoso. Son el tope del funnel. Los eventos clave GA4 (11.093) coinciden casi exactamente con el total de Registro_Exitoso (10.474) — el tag GA4 mide el registro, no la compra.</p>
+    </div>
+    <div class="funnel-card">
+      <div class="funnel-pill pill-b">BOT</div>
+      <h4>Search → Cierre de compra</h4>
+      <p>Capturan intención caliente. Generan el 70% de las Compra_Exitosa con el CPA más eficiente de la cuenta. Las compras se rastrean solo vía Ads tag.</p>
+    </div>
+  </div>
+</div>
+
+<div class="insight"><strong>Hallazgo GA4:</strong> Los eventos clave GA4 (11.093) equivalen casi exactamente a los Registro_Exitoso en Ads (10.474). Esto confirma que el tag de conversión GA4 está midiendo el registro. Las <strong>Compra_Exitosa (23.323) se rastrean solo vía Ads tag</strong>, limitando la visibilidad del funnel en Analytics.</div>
+
+
+<!-- ══ 02 DIAGNÓSTICO ══ -->
+<div class="sec-header">
+  <div class="sec-num">02</div>
+  <div class="sec-titles">
+    <div class="sec-label">Rendimiento Mar–May 2026</div>
+    <div class="sec-title">Diagnóstico por campaña</div>
+  </div>
+</div>
+
+<div class="kpi-row kpi-4" style="margin-bottom:24px;">
+  <div class="kpi-card green-accent"><div class="kv" style="color:#1A6D5E;">$556</div><div class="kl">Mejor CPA · Search Comp.</div><div class="ks">COP por conversión</div></div>
+  <div class="kpi-card green-accent"><div class="kv" style="color:#1A6D5E;">37,3%</div><div class="kl">Tasa conv. · Search Comp.</div><div class="ks">Más alta de la cuenta</div></div>
+  <div class="kpi-card red-accent"><div class="kv" style="color:var(--red);">2,9s</div><div class="kl">Tiempo sitio · dGen GA4</div><div class="ks">Tráfico accidental</div></div>
+  <div class="kpi-card red-accent"><div class="kv" style="color:var(--red);">18,1%</div><div class="kl">Interacción · dGen GA4</div><div class="ks">Peor de la cuenta</div></div>
+</div>
+
+<!-- Tabla -->
+<div class="card" style="margin-bottom:24px;padding:0;overflow:visible;">
+  <div style="overflow-x:auto;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Campaña</th><th>Tipo</th><th>Inversión</th><th>Conv.</th><th>CPA</th><th>Tasa conv.</th><th>% Interac. GA4</th><th>Tiempo sitio</th><th>Diagnóstico</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="row-hl">
+          <td class="td-name">Search Competencia</td><td>Search</td><td>$8,99M</td><td>16.182</td>
+          <td><strong style="color:#1A6D5E;">$556</strong></td>
+          <td><strong style="color:#1A6D5E;">37,3%</strong></td>
+          <td>61,0%</td><td>76,5s</td>
+          <td><strong style="color:#1A6D5E;">✓ Mejor CPA</strong></td>
+        </tr>
+        <tr class="row-alt">
+          <td class="td-name">Search Categoría</td><td>Search</td><td>$11,48M</td><td>9.432</td><td>$1.217</td><td>25,4%</td><td>53,2%</td><td>68,6s</td><td>Escalar</td>
+        </tr>
+        <tr>
+          <td class="td-name">PMax</td><td>Rend. Máx.</td><td>$20,97M</td><td>7.220</td><td>$2.905</td><td>0,4%</td><td>72,6%</td><td>75,2s</td><td>Aprendizaje</td>
+        </tr>
+        <tr class="row-alt">
+          <td class="td-name">dGen Display</td><td>Dem. Gen.</td><td>$11,42M</td><td>2.936</td>
+          <td><strong style="color:var(--red);">$3.890</strong></td>
+          <td><strong style="color:var(--red);">0,7%</strong></td>
+          <td style="color:var(--red);font-weight:600;">18,1%</td>
+          <td style="color:var(--red);font-weight:600;">2,9s</td>
+          <td><strong style="color:var(--red);">✗ Pausar</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Charts row: CPA + Conversiones + Calidad GA4 -->
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px;">
+  <div class="card">
+    <div class="card-title">CPA por campaña (COP)</div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#3266ad;"></div>Search comp.</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#1A6D5E;"></div>Search cat.</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#FFC000;"></div>PMax</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#EF5350;"></div>dGen</div>
+    </div>
+    <div class="chart-wrap" style="height:200px;">
+      <canvas id="chartCPA" role="img" aria-label="CPA por campaña: Search comp 556, Search cat 1217, PMax 2905, dGen 3890">CPA: Search comp 556, Search cat 1217, PMax 2905, dGen 3890</canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Conversiones por campaña</div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#3266ad;"></div>Search comp.</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#1A6D5E;"></div>Search cat.</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#FFC000;"></div>PMax</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#EF5350;"></div>dGen</div>
+    </div>
+    <div class="chart-wrap" style="height:200px;">
+      <canvas id="chartConv" role="img" aria-label="Conversiones por campaña: Search comp 16182, Search cat 9432, PMax 7220, dGen 2936">Conversiones: 16182, 9432, 7220, 2936</canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Calidad de tráfico GA4</div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#3266ad;border-radius:50%;"></div>% Interacción</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#FFC000;border-radius:50%;"></div>Tasa conv. Ads</div>
+    </div>
+    <div class="chart-wrap" style="height:200px;">
+      <canvas id="chartCalidad" role="img" aria-label="Calidad de tráfico GA4 comparando porcentaje de interacción y tasa de conversión">Calidad GA4 por campaña</canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Registros estimados + Sesiones GA4 -->
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title">Registro_Exitoso estimado por campaña (GA4)</div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#FFC000;"></div>PMax</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#3266ad;"></div>Search comp.</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#1A6D5E;"></div>Search cat.</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#EF5350;"></div>dGen</div>
+    </div>
+    <div class="chart-wrap" style="height:220px;">
+      <canvas id="chartRegistros" role="img" aria-label="Registro Exitoso estimado por campaña: PMax 8077, Search comp 1177, Search cat 1099, dGen 121">Registros: PMax 8077, Search comp 1177, Search cat 1099, dGen 121</canvas>
+    </div>
+    <div class="insight" style="margin:14px 0 0;">Los eventos clave GA4 (11.093) ≈ Registro_Exitoso Ads (10.474). <strong>PMax genera el 77%</strong> de los registros estimados a un costo de ~$2.596 COP por registro.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Sesiones GA4 vs Clics Ads</div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#3266ad;"></div>Clics reportados (Ads)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#FFC000;"></div>Sesiones reales (GA4)</div>
+    </div>
+    <div class="chart-wrap" style="height:220px;">
+      <canvas id="chartSesiones" role="img" aria-label="Comparativa de clics en Ads vs sesiones en GA4 por campaña">Clics Ads vs Sesiones GA4</canvas>
+    </div>
+    <div class="insight" style="margin:14px 0 0;"><strong>PMax: 7,5x más sesiones que clics</strong> — normal por YouTube/Display/Discover. La calidad es buena (72,6% interacción, 75s en sitio). El problema no es el tráfico sino la conversión post-restricciones.</div>
+  </div>
+</div>
+
+<div class="insight"><strong>Diagnóstico GA4:</strong> dGen confirma tráfico accidental (2,9s en sitio, 18% interacción). Search categoría tiene la <strong>mejor tasa de evento clave GA4 (1,86%)</strong> — mayor intención de compra que Search competencia.</div>
+
+
+<!-- ══ 03 RECOMENDACIÓN ══ -->
+<div class="sec-header">
+  <div class="sec-num">03</div>
+  <div class="sec-titles">
+    <div class="sec-label">Propuesta</div>
+    <div class="sec-title">Recomendación de presupuesto</div>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:20px;padding:0;overflow:visible;">
+  <div style="overflow-x:auto;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width:22%;">Campaña</th>
+          <th style="width:12%;">Antes / día</th>
+          <th style="width:13%;">Propuesto / día</th>
+          <th style="width:16%;">Cambio</th>
+          <th>Justificación</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="row-hl">
+          <td class="td-name">Search Competencia</td><td>$98.000</td><td><strong>$143.600</strong></td>
+          <td><span class="delta delta-up">+$45.600 (+47%)</span></td>
+          <td class="td-note">CPA de $556 — el más eficiente. Escalar es la apuesta más segura.</td>
+        </tr>
+        <tr class="row-hl">
+          <td class="td-name">Search Categoría</td><td>$98.000</td><td><strong>$128.400</strong></td>
+          <td><span class="delta delta-up">+$30.400 (+31%)</span></td>
+          <td class="td-note">Mejor tasa de evento clave GA4 (1,86%). Alta intención de compra.</td>
+        </tr>
+        <tr>
+          <td class="td-name">PMax</td><td>$726.000</td><td><strong>$726.000</strong></td>
+          <td><span class="delta delta-same">Sin cambio</span></td>
+          <td class="td-note">Principal fuente de Registro_Exitoso (~77%). Mantener mientras sale de aprendizaje.</td>
+        </tr>
+        <tr class="row-muted">
+          <td class="td-name">dGen Display</td><td>$76.000</td><td><strong>$0</strong></td>
+          <td><span class="delta delta-pause">PAUSAR</span></td>
+          <td class="td-note">2,9s en sitio, 18% interacción, $94.400/registro. Sin retorno medible.</td>
+        </tr>
+        <tr class="row-total">
+          <td>TOTAL DIARIO</td><td>$998.000</td><td>$998.000</td><td>—</td>
+          <td>Mismo presupuesto · mejor distribución</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Gráfica distribución presupuesto antes vs después -->
+<div class="grid-2" style="margin-bottom:24px;">
+  <div class="card">
+    <div class="card-title">Distribución actual de presupuesto</div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#3266ad;"></div>Search comp. (9,8%)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#1A6D5E;"></div>Search cat. (9,8%)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#FFC000;"></div>PMax (72,7%)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#EF5350;"></div>dGen (7,6%)</div>
+    </div>
+    <div class="chart-wrap" style="height:220px;">
+      <canvas id="donutAntes" role="img" aria-label="Donut distribución presupuesto actual: PMax 72.7%, Search comp 9.8%, Search cat 9.8%, dGen 7.6%">Presupuesto actual por campaña</canvas>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Distribución propuesta de presupuesto</div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#3266ad;"></div>Search comp. (14,4%)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#1A6D5E;"></div>Search cat. (12,9%)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#FFC000;"></div>PMax (72,7%)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#888;"></div>dGen (0%)</div>
+    </div>
+    <div class="chart-wrap" style="height:220px;">
+      <canvas id="donutDespues" role="img" aria-label="Donut distribución presupuesto propuesto: PMax 72.7%, Search comp 14.4%, Search cat 12.9%, dGen 0%">Presupuesto propuesto por campaña</canvas>
+    </div>
+  </div>
+</div>
+
+<div class="insight"><strong>Mismo presupuesto total ($998.000 COP/día).</strong> Pausar dGen libera $76.000/día que se redistribuyen al 60% para Search Competencia (+$45.600) y 40% para Search Categoría (+$30.400).</div>
+
+
+<!-- ══ 04 PROYECCIÓN ══ -->
+<div class="sec-header">
+  <div class="sec-num">04</div>
+  <div class="sec-titles">
+    <div class="sec-label">Impacto esperado</div>
+    <div class="sec-title">Proyección de resultados</div>
+  </div>
+</div>
+
+<div class="grid-2" style="margin-bottom:24px;align-items:start;">
+  <div class="proj-box proj-before">
+    <div class="proj-tag">Situación actual</div>
+    <div class="proj-num">526</div>
+    <div class="proj-unit">conversiones / día</div>
+    <div class="proj-row"><span class="proj-camp">Search Competencia</span><span class="proj-val">176/día</span></div>
+    <div class="proj-row"><span class="proj-camp">Search Categoría</span><span class="proj-val">80/día</span></div>
+    <div class="proj-row"><span class="proj-camp">PMax</span><span class="proj-val">250/día</span></div>
+    <div class="proj-row"><span class="proj-camp" style="color:var(--t3);">dGen (activa)</span><span class="proj-val" style="color:var(--t3);">20/día</span></div>
+  </div>
+  <div class="proj-box proj-after">
+    <div class="proj-tag">Con redistribución propuesta</div>
+    <div class="proj-num">614</div>
+    <div class="proj-unit">conversiones / día</div>
+    <div class="proj-row">
+      <span class="proj-camp">Search Competencia</span>
+      <span class="proj-val">258/día</span>
+      <span class="proj-delta" style="color:var(--green);">+47%</span>
+    </div>
+    <div class="proj-row">
+      <span class="proj-camp">Search Categoría</span>
+      <span class="proj-val">106/día</span>
+      <span class="proj-delta" style="color:var(--green);">+33%</span>
+    </div>
+    <div class="proj-row">
+      <span class="proj-camp">PMax</span>
+      <span class="proj-val">250/día</span>
+      <span class="proj-delta" style="color:#444;">igual</span>
+    </div>
+    <div class="proj-row">
+      <span class="proj-camp" style="color:#333;">dGen</span>
+      <span class="proj-val" style="color:#333;">0/día</span>
+      <span class="proj-delta" style="color:var(--red);">pausada</span>
+    </div>
+  </div>
+</div>
+
+<!-- Gráfica proyección + Ganancia -->
+<div class="grid-2" style="margin-bottom:24px;align-items:stretch;">
+  <div class="card">
+    <div class="card-title">Conversiones/día: antes vs propuesto</div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#888;"></div>Actual</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#FFC000;"></div>Propuesto</div>
+    </div>
+    <div class="chart-wrap" style="height:240px;">
+      <canvas id="chartProyeccion" role="img" aria-label="Comparativa de conversiones diarias antes y después de la redistribución">Proyección conversiones diarias</canvas>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <div class="gain-box" style="flex:1;">
+      <div class="gain-num">+88</div>
+      <div class="gain-label">conversiones / día adicionales</div>
+      <div class="gain-sub">Con el mismo presupuesto total de $998.000 COP/día</div>
+    </div>
+    <div class="gain-box" style="flex:1;">
+      <div class="gain-num">+2.640</div>
+      <div class="gain-label">conversiones / mes adicionales</div>
+      <div class="gain-sub">Sin aumentar un peso de presupuesto</div>
+    </div>
+    <div style="background:var(--white);border-radius:10px;border:0.5px solid var(--border);padding:20px;flex:1;">
+      <div style="font-size:13px;font-weight:700;color:var(--t2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">Origen de la ganancia</div>
+      <div style="font-size:13px;color:var(--t4);font-weight:300;line-height:1.7;">La ganancia completa viene de <strong style="color:var(--t1);font-weight:600;">redirigir los $76.000/día de dGen</strong> — una campaña con $94.400 COP por registro estimado — hacia Search, donde el CPA histórico es de $556–$1.217.</div>
+    </div>
+  </div>
+</div>
+
+<div class="insight"><strong>+88 conversiones/día proyectadas = +2.640 conv/mes adicionales sin aumentar un peso de presupuesto.</strong> La ganancia viene exclusivamente de eliminar el gasto ineficiente en dGen y reasignarlo a los canales con mejor retorno demostrado.</div>
+
+
+<!-- ══ 05 PLAN DE ACCIÓN ══ -->
+<div class="sec-header">
+  <div class="sec-num">05</div>
+  <div class="sec-titles">
+    <div class="sec-label">Implementación</div>
+    <div class="sec-title">Plan de acción</div>
+  </div>
+</div>
+
+<div class="action-grid">
+  <div class="action-card">
+    <div class="action-head"><div class="step-num">01</div><span class="urg urg-now">Inmediato</span></div>
+    <div class="action-title">Pausar dGen Display</div>
+    <div class="action-body">Desactivar la campaña inmediatamente. Libera $76.000/día sin impacto negativo medible. Ninguna métrica de Ads ni GA4 la justifica: 18% interacción, 2,9s en sitio, $94.400/registro.</div>
+  </div>
+  <div class="action-card">
+    <div class="action-head"><div class="step-num">02</div><span class="urg urg-now">Inmediato</span></div>
+    <div class="action-title">Escalar Search Competencia</div>
+    <div class="action-body">Aumentar de $98k a $143.600/día (+47%). CPA de $556 — el más eficiente de la cuenta. Revisar posiciones perdidas por presupuesto insuficiente y agregar keywords sin cobertura.</div>
+  </div>
+  <div class="action-card">
+    <div class="action-head"><div class="step-num">03</div><span class="urg urg-now">Inmediato</span></div>
+    <div class="action-title">Aumentar Search Categoría</div>
+    <div class="action-body">Subir de $98k a $128.400/día (+31%). Tiene la mejor tasa de evento clave GA4 (1,86%), indicando usuarios en etapa avanzada de decisión. Mayor intención = mayor valor por clic.</div>
+  </div>
+  <div class="action-card">
+    <div class="action-head"><div class="step-num">04</div><span class="urg urg-soon">Semana 1–2</span></div>
+    <div class="action-title">Estabilizar PMax</div>
+    <div class="action-body">Mantener $726k/día y esperar que salga de la fase de aprendizaje post-restricciones de marzo. Verificar que las restricciones de política se hayan levantado completamente antes de hacer cambios.</div>
+  </div>
+  <div class="action-card">
+    <div class="action-head"><div class="step-num">05</div><span class="urg urg-soon">Semana 2–3</span></div>
+    <div class="action-title">Alinear tracking GA4 ↔ Ads</div>
+    <div class="action-body">Agregar Compra_Exitosa como evento clave en GA4. Hoy se rastrea solo vía Ads tag, limitando la visibilidad del funnel completo en Analytics y la capacidad de optimizar por Smart Bidding.</div>
+  </div>
+  <div class="action-card">
+    <div class="action-head"><div class="step-num">06</div><span class="urg urg-late">A 21 días</span></div>
+    <div class="action-title">Evaluar y ajustar</div>
+    <div class="action-body">Revisar CPA y volumen por campaña. Si PMax sigue por encima de $2.500/registro, evaluar reducir presupuesto y mover más inversión a Search. Monitorear salida de fase de aprendizaje.</div>
+  </div>
+</div>
+
+<div class="insight">Los <strong>pasos 1, 2 y 3 son acciones inmediatas</strong> que no requieren aprobación de presupuesto adicional — solo redistribución interna en Google Ads. Impacto visible en los primeros 7 días.</div>
+
+
+<!-- ══ 06 RESUMEN EJECUTIVO ══ -->
+<div class="sec-header">
+  <div class="sec-num">06</div>
+  <div class="sec-titles">
+    <div class="sec-label">Cierre</div>
+    <div class="sec-title">Resumen ejecutivo</div>
+  </div>
+</div>
+
+<div class="exec-section">
+  <div class="exec-row">
+    <div class="exec-icon ei-g">✓</div>
+    <div>
+      <div class="exec-title">Search es el motor de compras de la cuenta</div>
+      <div class="exec-body">Con solo 39% del presupuesto genera el 71% de las conversiones. Search Competencia tiene el mejor CPA ($556) y debe escalarse de $98k a $143.600/día. Search Categoría tiene la mejor tasa de evento clave GA4 (1,86%).</div>
+    </div>
+  </div>
+  <div class="exec-row">
+    <div class="exec-icon ei-y">✓</div>
+    <div>
+      <div class="exec-title">PMax es el motor de adquisición de usuarios</div>
+      <div class="exec-body">Genera ~77% de los Registro_Exitoso (~8.077 registros). Su CPA en Ads parece alto pero su rol es upper-funnel: adquirir usuarios nuevos que luego Search convierte en compras. Mantener sin cambios.</div>
+    </div>
+  </div>
+  <div class="exec-row">
+    <div class="exec-icon ei-r">✗</div>
+    <div>
+      <div class="exec-title">dGen no tiene justificación en ninguna métrica</div>
+      <div class="exec-body">$94.400 COP por registro estimado, 2,9 segundos promedio en sitio, 18% de interacción en GA4. <strong>Pausar libera $76k/día</strong> sin ningún impacto negativo medible en el funnel.</div>
+    </div>
+  </div>
+  <div class="exec-row">
+    <div class="exec-icon ei-w">→</div>
+    <div>
+      <div class="exec-title">La acción de mayor impacto: redistribuir sin gastar más</div>
+      <div class="exec-body">Mover los $76.000/día de dGen a Search proyecta <strong>+2.640 conversiones adicionales al mes</strong>. Mismo presupuesto, más resultado, sin riesgo. Los 3 primeros pasos son ejecutables hoy.</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end page -->
+
+<!-- FOOTER -->
+<div class="report-footer">
+  <div class="footer-brand">AD<span>COM</span></div>
+  <div class="footer-meta">Apuesta Aquí Baloto · Google Ads · Análisis Mar–May 2026 · Confidencial</div>
+</div>
+
+<script>
+const CAMPS = ['Search comp.','Search cat.','PMax','dGen'];
+const COLORS = ['#3266ad','#1A6D5E','#FFC000','#EF5350'];
+const opts = {
+  responsive:true, maintainAspectRatio:false,
+  plugins:{legend:{display:false}},
+};
+const barOpts = (suffix,max) => ({
+  ...opts,
+  scales:{
+    y:{max, ticks:{callback:v=>v+(suffix||''), font:{size:11}}, grid:{color:'rgba(0,0,0,0.05)'}},
+    x:{grid:{display:false}, ticks:{font:{size:11}}}
+  }
+});
+
+// 1. Donut composición conversiones
+new Chart(document.getElementById('donutConv'),{
+  type:'doughnut',
+  data:{
+    labels:['Compra_Exitosa','Registro_Exitoso','YouTube follow-on'],
+    datasets:[{data:[23323,10474,1953],backgroundColor:['#1A6D5E','#FFC000','#888'],borderWidth:0,hoverOffset:6}]
+  },
+  options:{...opts,cutout:'65%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.raw.toLocaleString('es-CO')+' ('+((c.raw/35750)*100).toFixed(1)+'%)'}}}},
+});
+
+// 2. CPA
+new Chart(document.getElementById('chartCPA'),{
+  type:'bar',
+  data:{labels:CAMPS,datasets:[{data:[556,1217,2905,3890],backgroundColor:COLORS,borderRadius:5,borderSkipped:false}]},
+  options:{...barOpts('',4200),plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' $'+c.raw.toLocaleString('es-CO')+' COP'}}}}
+});
+
+// 3. Conversiones
+new Chart(document.getElementById('chartConv'),{
+  type:'bar',
+  data:{labels:CAMPS,datasets:[{data:[16182,9432,7220,2936],backgroundColor:COLORS,borderRadius:5,borderSkipped:false}]},
+  options:{...barOpts('',18000),plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.raw.toLocaleString('es-CO')+' conv.'}}}}
+});
+
+// 4. Calidad GA4 agrupada
+new Chart(document.getElementById('chartCalidad'),{
+  type:'bar',
+  data:{
+    labels:CAMPS,
+    datasets:[
+      {label:'% Interacción',data:[61.0,53.2,72.6,18.1],backgroundColor:'#3266ad',borderRadius:4,borderSkipped:false},
+      {label:'Tasa conv. Ads',data:[37.3,25.4,0.4,0.7],backgroundColor:'#FFC000',borderRadius:4,borderSkipped:false},
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+c.raw+'%'}}},
+    scales:{
+      y:{max:100,ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'}},
+      x:{grid:{display:false},ticks:{font:{size:11}}}
+    }
+  }
+});
+
+// 5. Registros estimados (horizontal)
+new Chart(document.getElementById('chartRegistros'),{
+  type:'bar',
+  data:{labels:CAMPS,datasets:[{data:[8077,1177,1099,121],backgroundColor:['#FFC000','#3266ad','#1A6D5E','#EF5350'],borderRadius:5,borderSkipped:false}]},
+  options:{...barOpts('',9000),plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' ~'+c.raw.toLocaleString('es-CO')+' registros est.'}}}}
+});
+
+// 6. Sesiones GA4 vs Clics Ads
+new Chart(document.getElementById('chartSesiones'),{
+  type:'bar',
+  data:{
+    labels:CAMPS,
+    datasets:[
+      {label:'Clics Ads',data:[43325,37123,74216,328875],backgroundColor:'rgba(50,102,173,0.5)',borderRadius:4,borderSkipped:false},
+      {label:'Sesiones GA4',data:[73610,56034,558951,299917],backgroundColor:COLORS,borderRadius:4,borderSkipped:false},
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+c.raw.toLocaleString('es-CO')}}},
+    scales:{
+      y:{ticks:{callback:v=>v>=1000?(v/1000).toFixed(0)+'k':v,font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'}},
+      x:{grid:{display:false},ticks:{font:{size:11}}}
+    }
+  }
+});
+
+// 7. Donut presupuesto antes
+new Chart(document.getElementById('donutAntes'),{
+  type:'doughnut',
+  data:{
+    labels:['Search comp.','Search cat.','PMax','dGen'],
+    datasets:[{data:[98000,98000,726000,76000],backgroundColor:['#3266ad','#1A6D5E','#FFC000','#EF5350'],borderWidth:0,hoverOffset:6}]
+  },
+  options:{...opts,cutout:'62%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' $'+c.raw.toLocaleString('es-CO')+'/día ('+((c.raw/998000)*100).toFixed(1)+'%)'}}}},
+});
+
+// 8. Donut presupuesto propuesto
+new Chart(document.getElementById('donutDespues'),{
+  type:'doughnut',
+  data:{
+    labels:['Search comp.','Search cat.','PMax','dGen (pausada)'],
+    datasets:[{data:[143600,128400,726000,0.01],backgroundColor:['#3266ad','#1A6D5E','#FFC000','#E0E0E0'],borderWidth:0,hoverOffset:6}]
+  },
+  options:{...opts,cutout:'62%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw<1?' Pausada':' $'+c.raw.toLocaleString('es-CO')+'/día ('+((c.raw/998000)*100).toFixed(1)+'%)'}}}},
+});
+
+// 9. Proyección antes vs después (grouped)
+new Chart(document.getElementById('chartProyeccion'),{
+  type:'bar',
+  data:{
+    labels:CAMPS,
+    datasets:[
+      {label:'Actual',data:[176,80,250,20],backgroundColor:'rgba(136,136,136,0.6)',borderRadius:4,borderSkipped:false},
+      {label:'Propuesto',data:[258,106,250,0],backgroundColor:['#3266ad','#1A6D5E','#FFC000','#EF5350'],borderRadius:4,borderSkipped:false},
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+c.raw+'/día'}}},
+    scales:{
+      y:{ticks:{callback:v=>v+'/día',font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'}},
+      x:{grid:{display:false},ticks:{font:{size:11}}}
+    }
+  }
+});
+</script>
+</body>
+</html>
