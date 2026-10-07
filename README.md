@@ -12,6 +12,7 @@ Sitio de consulta de flows, reportes, análisis y propuestas de pauta digital pa
 - `reporte-retencion-2026.html`: Campaña de retención · may 2026.
 - `reporte-tiktok-mayo-2026.html`: TikTok Ads · may 2026.
 - `reporte-marzo-vs-abril-2026.html`: Marzo vs abril 2026.
+- `doce-top-feed-septiembre-2026.html`: Doce Top Feed · septiembre 2026.
 - `nueve-top-feed-jul-ago-2026.html`: Nueve Top Feed · jul–ago 2026.
 - `top-feed-branding-jul-ago-2026.html`: Cuatro Top Feed · branding jul–ago 2026.
 - `top-feed-julio-2026.html`: Top Feed · 25 y 27 de julio 2026.
