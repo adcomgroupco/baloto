@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Tablero Pauta Baloto</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/adcom.css">
+<link rel="stylesheet" href="assets/css/tablero.css">
+<script defer src="assets/js/adcom.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="data/baloto_data.js"></script>
+<script src="data/baloto_flow.js"></script>
+</head>
+<body class="con-shell">
+<div id="loading">
+  <div class="spinner"></div>
+  <div id="ld-msg">Cargando datos...</div>
+</div>
+
+<nav class="app-sidebar">
+  <div class="app-sidebar-top">
+    <a class="app-sidebar-brand" href="index.html"><i></i>Master Baloto</a>
+    <div class="app-sidebar-client">
+      <span class="app-sidebar-client-label">Cliente</span>
+      <strong class="app-sidebar-client-name">Baloto, Miloto y Colorloto · full funnel</strong>
+    </div>
+  </div>
+  <div class="app-sidebar-nav">
+    <span class="app-sidebar-nav-title">Secciones</span>
+    <a href="#sec-kpi" class="active"><b></b>Resumen</a>
+    <a href="#sec-funnel"><b></b>Full funnel</a>
+    <a href="#sec-flow"><b></b>Flow: metas por campaña</a>
+    <a href="#sec-curvas"><b></b>Curvas de alcance</a>
+    <a href="#sec-plat"><b></b>Plataforma y etapa</a>
+    <a href="#sec-marca"><b></b>Por marca</a>
+    <a href="#sec-evo"><b></b>Evolución</a>
+    <a href="#sec-det"><b></b>Detalle por campaña</a>
+  </div>
+  <div class="app-sidebar-foot">Datos hasta: <span id="last-upd-side">—</span></div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <div class="tb-row">
+      <span class="topbar-title">Tablero Pauta Baloto</span>
+      <div class="f-sep"></div>
+      <div class="fg"><span class="fl">Desde</span><input type="date" id="f-desde" onchange="onDate()"></div>
+      <div class="fg"><span class="fl">Hasta</span><input type="date" id="f-hasta" onchange="onDate()"></div>
+      <div class="f-sep"></div>
+      <div id="quick" class="fg"></div>
+      <span class="last-upd" id="last-upd"></span>
+    </div>
+    <div class="tb-row">
+      <div class="fg"><span class="fl">Plataforma</span><select id="f-plat" onchange="render()"><option value="">Todas</option><option>Meta</option><option>TikTok</option></select></div>
+      <div class="fg"><span class="fl">Etapa</span><select id="f-etapa" onchange="render()"><option value="">Todas</option><option value="AWARENESS">Awareness</option><option value="ACQUISITION">Adquisición</option><option value="ACTIVATION">Activación</option><option value="RETENTION">Retención</option></select></div>
+      <div class="fg"><span class="fl">Marca</span><select id="f-marca" onchange="render()"><option value="">Todas</option><option>Baloto</option><option>Miloto</option><option>Colorloto</option></select></div>
+      <label class="chk" title="Encendido: la meta completa del mes del flow. Apagado: la parte proporcional a los días del rango."><input type="checkbox" id="f-total" onchange="render()">Meta completa del mes</label>
+      <button class="btn-reset" onclick="resetFilters()">↺ Reset</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="card notice" id="fuentes-note"></div>
+
+    <div class="sec-title" id="sec-kpi"><span></span>Resumen del rango<span class="sec-note" id="rango-note"></span></div>
+    <div class="kpi-grid" id="kpi-grid"></div>
+
+    <div class="sec-title" id="sec-funnel"><span></span>Full funnel<span class="sec-note" id="funnel-note"></span></div>
+    <div class="stage-grid" id="stage-grid"></div>
+    <div class="card funnel" id="funnel"></div>
+
+    <div class="sec-title" id="sec-flow"><span></span>Flow del mes: metas por KPI y campaña<span class="sec-note" id="flow-note"></span></div>
+    <div class="card tcard">
+      <div class="tbar"><button class="tbtn" onclick="expandAll(true)">Ver campañas reales</button><button class="tbtn" onclick="expandAll(false)">Contraer</button><span class="sp"></span><span class="sec-note" id="flow-legend">Pacing: inversión real frente a la esperada a la fecha · verde ±10%, ámbar ±25%</span></div>
+      <div class="tscroll"><table><thead id="flow-head"></thead><tbody id="flow-body"></tbody></table></div>
+      <div class="foot-note" id="flow-foot"></div>
+    </div>
+
+    <div class="sec-title" id="sec-curvas"><span></span>Curvas de alcance · parte alta del funnel<span class="sec-note" id="curva-note"></span><span style="margin-left:auto;display:flex;gap:6px" id="curva-meses"></span></div>
+    <div class="kpi-grid" id="curva-kpis"></div>
+    <div class="curve-grid">
+      <div class="card chart-card"><div class="chart-h">Alcance acumulado por día del mes</div><div class="chart-s">TikTok, personas únicas desde el día 1. Los puntos grandes son días con Top Feed.</div><div class="chart-wrap"><canvas id="ch-alc-dia"></canvas></div></div>
+      <div class="card chart-card"><div class="chart-h">Curva de alcance contra inversión</div><div class="chart-s">Cada mes desde el día 1. La línea punteada es la curva ajustada (logarítmica) y el rombo, la proyección con el presupuesto del mes.</div><div class="chart-wrap"><canvas id="ch-alc-inv"></canvas></div></div>
+    </div>
+    <div class="curve-grid">
+      <div class="card chart-card"><div class="chart-h">Frecuencia acumulada</div><div class="chart-s">Impresiones sobre alcance acumulado, por día del mes.</div><div class="chart-wrap"><canvas id="ch-frec"></canvas></div></div>
+      <div class="card chart-card"><div class="chart-h">Alcance nuevo por cada millón invertido</div><div class="chart-s">Personas que entran por primera vez en el mes, por tramo de 7 días. Cuando baja, cada peso compra más frecuencia y menos gente nueva.</div><div class="chart-wrap"><canvas id="ch-marg"></canvas></div></div>
+    </div>
+    <div class="card tcard"><div class="tbar"><b style="font-size:12px">Alcance por mes y fuente</b><span class="sp"></span><span class="sec-note">alcance deduplicado dentro de cada fuente y mes · no se suma entre fuentes</span></div><div class="tscroll"><table><thead id="curva-head"></thead><tbody id="curva-body"></tbody></table></div></div>
+    <div class="flag-card" id="curva-flag"></div>
+
+    <div class="sec-title" id="sec-plat"><span></span>Plataforma y etapa</div>
+    <div class="card tcard"><div class="tscroll"><table><thead id="plat-head"></thead><tbody id="plat-body"></tbody></table></div></div>
+
+    <div class="sec-title" id="sec-marca"><span></span>Por marca</div>
+    <div class="card tcard"><div class="tscroll"><table><thead id="marca-head"></thead><tbody id="marca-body"></tbody></table></div></div>
+
+    <div class="sec-title" id="sec-evo"><span></span>Evolución<span class="sec-note" id="evo-note"></span><span style="margin-left:auto;display:flex;gap:6px"><button class="qbtn on" data-ev="mes" onclick="setEvo('mes')">Mes a mes</button><button class="qbtn" data-ev="sem" onclick="setEvo('sem')">Semana a semana</button></span></div>
+    <div class="card chart-card"><div class="chart-wrap"><canvas id="ch-evo"></canvas></div></div>
+    <div class="card tcard"><div class="tscroll"><table><thead id="evo-head"></thead><tbody id="evo-body"></tbody></table></div></div>
+
+    <div class="sec-title" id="sec-det"><span></span>Detalle por campaña</div>
+    <div class="card tcard">
+      <div class="tbar"><span class="sec-note" id="det-note"></span><span class="sp"></span><input type="search" id="q" placeholder="Buscar campaña" oninput="renderDetalle()" style="width:240px"></div>
+      <div class="tscroll"><table><thead id="det-head"></thead><tbody id="det-body"></tbody></table></div>
+      <div class="foot-note">
+        <b>Fuente</b>: APIs de Meta Ads (cuenta ADCOM 2025 - BALOTO) y TikTok Ads (ADCOM - Baloto), diario por campaña. <b>Registros y compras</b>: eventos de plataforma (píxel de Meta: CompleteRegistration y Purchase; TikTok: registro de usuario y pago completado), no GA4.
+        <b>Ingresos</b>: valor de compra del píxel de Meta; TikTok no envía valor. <b>Etapa y marca</b> salen del nombre de la campaña (awa / acq / act / ret; adcom_baloto / miloto / colorloto); los Top Feed de TikTok cuentan como awareness.
+        <b>Metas</b>: flow de medios del mes, por línea de campaña, proporcionales a los días del rango salvo con "Meta completa del mes".
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const D = window.BALOTO_DATA, FL = window.BALOTO_FLOW || {};
+const MESES = ['','ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const MESES_L = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const ETAPAS = ['AWARENESS','ACQUISITION','ACTIVATION','RETENTION'];
+const ET_LBL = {AWARENESS:'Awareness', ACQUISITION:'Adquisición', ACTIVATION:'Activación', RETENTION:'Retención', OTRA:'Otra'};
+const ET_COL = {AWARENESS:'#ffd400', ACQUISITION:'#7dd3fc', ACTIVATION:'#a78bfa', RETENTION:'#4ade80', OTRA:'#d4d4d4'};
+const CONECTADOS = ['Meta','TikTok'];
+let CHARTS = {}, EVO = 'mes', QUICK = 'mes', CURVA = null, SORT = {col:'inv', dir:-1}, OPEN = {};
+
+// ── Formato ─────────────────────────────────────────────────────────────────
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fCOP = n => (n && isFinite(n)) ? '$' + Math.round(n).toLocaleString('es-CO') : '—';
+const fM = n => (n && isFinite(n)) ? '$' + (n/1e6).toLocaleString('es-CO',{maximumFractionDigits:1}) + ' M' : '—';
+const fN = n => (n && isFinite(n)) ? Math.round(n).toLocaleString('es-CO') : '—';
+const fMM = n => (n && isFinite(n)) ? (n/1e6).toLocaleString('es-CO',{maximumFractionDigits:2}) + ' M' : '—';
+const fD = (n, d=2) => (n && isFinite(n)) ? n.toLocaleString('es-CO',{minimumFractionDigits:d, maximumFractionDigits:d}) : '—';
+const fP = n => (n === null || n === undefined || !isFinite(n)) ? '—' : (n*100).toLocaleString('es-CO',{maximumFractionDigits:1}) + '%';
+const div = (a, b) => b ? a/b : null;
+const fDate = s => { const p = s.split('-'); return `${+p[2]} ${MESES[+p[1]]}` };
+const days = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 864e5) + 1;
+const addDays = (s, n) => new Date(Date.parse(s) + n*864e5).toISOString().slice(0,10);
+const weekStart = s => { const d = new Date(Date.parse(s)); return addDays(s, -((d.getUTCDay() + 6) % 7)) };
+const monthEnd = m => { const [y, mo] = m.split('-').map(Number); return `${m}-${String(new Date(Date.UTC(y, mo, 0)).getUTCDate()).padStart(2,'0')}` };
+const mesLbl = m => MESES_L[+m.slice(5,7)] + ' ' + m.slice(0,4);
+const pctCls = p => p === null ? 't-mute' : p >= .9 ? 't-pos' : p >= .6 ? 't-mid' : 't-neg';
+const pace = p => p === null ? 'p-off' : Math.abs(p - 1) <= .1 ? 'p-pos' : Math.abs(p - 1) <= .25 ? 'p-mid' : 'p-neg';
+// costo: verde si está en meta o por debajo, ámbar hasta 25% por encima
+const costCls = (c, m) => (c === null || !m) ? '' : c <= m ? 't-pos' : c <= m * 1.25 ? 't-mid' : 't-neg';
+
+// ── Datos ───────────────────────────────────────────────────────────────────
+const C = D.campanas;
+const ROWS = D.diario.map(r => ({d:r[0], c:C[r[1]], ci:r[1], inv:r[2], imp:r[3], alc:r[4], cli:r[5], vid:r[6], reg:r[7], com:r[8], ing:r[9]}));
+const Z = () => ({inv:0, imp:0, cli:0, vid:0, reg:0, com:0, ing:0});
+function add(a, r){ for(const k in a) a[k] += r[k] || 0; return a }
+function M(t){ return {...t, cpm: div(t.inv*1000, t.imp), ctr: div(t.cli, t.imp), cpc: div(t.inv, t.cli), cpr: div(t.inv, t.reg),
+  cpa: div(t.inv, t.com), roas: div(t.ing, t.inv), r2c: div(t.com, t.reg)} }
+const sum = rows => M(rows.reduce((a, r) => add(a, r), Z()));
+function group(rows, key){ const g = {}; rows.forEach(r => { const k = key(r); (g[k] = g[k] || Z()); add(g[k], r) }); return g }
+
+function F(){ const g = id => document.getElementById(id).value;
+  return {desde: g('f-desde'), hasta: g('f-hasta'), plat: g('f-plat'), etapa: g('f-etapa'), marca: g('f-marca'), total: document.getElementById('f-total').checked} }
+const pasaCamp = (c, f) => (!f.plat || c.plat === f.plat) && (!f.etapa || c.etapa === f.etapa) && (!f.marca || c.marca === f.marca);
+const filas = f => ROWS.filter(r => r.d >= f.desde && r.d <= f.hasta && pasaCamp(r.c, f));
+
+// ── Flow: metas del mes que contiene la fecha final ─────────────────────────
+function flowDe(f){
+  const mes = f.hasta.slice(0,7), fl = FL[mes];
+  if(!fl) return null;
+  const ini = mes + '-01', fin = monthEnd(mes);
+  const a = f.desde > ini ? f.desde : ini, b = f.hasta < fin ? f.hasta : fin;
+  const share = f.total ? 1 : (a > b ? 0 : days(a, b) / days(ini, fin));
+  // días del mes ya corridos con datos: base del pacing
+  const hasta = D.hasta < fin ? D.hasta : fin, corrido = hasta < ini ? 0 : days(ini, hasta) / days(ini, fin);
+  const lineas = fl.lineas.filter(l => (!f.plat || l.medio === f.plat || camposDe(l.id).some(c => c.plat === f.plat))
+    && (!f.etapa || l.etapa === f.etapa) && (!f.marca || l.marca === f.marca));
+  return {mes, fl, share, corrido, ini, fin, a, b, lineas};
+}
+const camposDe = id => C.filter(c => c.linea === id);
+const conectada = l => CONECTADOS.includes(l.medio) || camposDe(l.id).length > 0;
+function metas(fw){ const t = {ppto:0, reg:0, com:0, pptoOff:0};
+  if(!fw) return t;
+  fw.lineas.forEach(l => { if(conectada(l)){ t.ppto += l.ppto * fw.share; t.reg += l.registros * fw.share; t.com += l.compras * fw.share } else t.pptoOff += l.ppto });
+  return t }
+
+// ── Filtros rápidos ─────────────────────────────────────────────────────────
+function setQuick(k){
+  const fin = D.hasta; let a, b = fin;
+  if(k === 'mes') a = fin.slice(0,8) + '01';
+  else if(k === 'mesAnt'){ const m = addDays(fin.slice(0,8) + '01', -1); a = m.slice(0,8) + '01'; b = m }
+  else if(k === '30') a = addDays(fin, -29);
+  else if(k === 'trim') a = addDays(fin, -89);
+  else a = fin.slice(0,4) + '-01-01';
+  document.getElementById('f-desde').value = a; document.getElementById('f-hasta').value = b;
+  QUICK = k; render() }
+function onDate(){ QUICK = ''; render() }
+function resetFilters(){ ['f-plat','f-etapa','f-marca'].forEach(id => document.getElementById(id).value = ''); document.getElementById('f-total').checked = false; setQuick('mes') }
+
+// ── Render ──────────────────────────────────────────────────────────────────
+function render(){
+  const f = F(); if(!f.desde || !f.hasta) return;
+  document.querySelectorAll('#quick .qbtn').forEach(b => b.classList.toggle('on', b.dataset.q === QUICK));
+  const rows = filas(f), T = sum(rows), fw = flowDe(f), G = metas(fw);
+  document.getElementById('rango-note').textContent = `${fDate(f.desde)} – ${fDate(f.hasta)} ${f.hasta.slice(0,4)} · ${days(f.desde, f.hasta)} días`;
+  renderKPIs(T, G, fw); renderFunnel(rows, T, fw, G); renderFlow(f, fw); renderCurvas(f);
+  renderPlat(rows); renderMarca(rows); renderEvo(f); renderDetalle();
+}
+function bar(p, lbl){ if(p === null) return '';
+  return `<div class="kpi-bwrap"><div class="kpi-brow"><span>${lbl}</span><b class="${pctCls(p)}">${fP(p)}</b></div><div class="kpi-bar"><div class="kpi-bfill ${p >= .9 ? 'bg-pos' : p >= .6 ? 'bg-mid' : 'bg-neg'}" style="width:${Math.min(p, 1)*100}%"></div></div></div>` }
+function renderKPIs(T, G, fw){
+  const k = (l, v, sub, extra) => `<div class="card kpi-card"><div class="kpi-label">${l}</div><div class="kpi-value">${v}</div>${sub ? `<div class="kpi-sub">${sub}</div>` : ''}${extra || ''}</div>`;
+  const cprM = div(G.ppto, G.reg), cpaM = div(G.ppto, G.com);
+  const pac = fw && G.ppto ? div(T.inv, G.ppto / fw.share * Math.min(fw.corrido, fw.share || 1)) : null;
+  document.getElementById('kpi-grid').innerHTML = [
+    k('Inversión', fCOP(T.inv), G.ppto ? 'meta del rango ' + fCOP(G.ppto) : 'sin flow para este mes', bar(div(T.inv, G.ppto), 'Ejecución vs meta')),
+    k('Impresiones', fN(T.imp), 'CPM ' + fCOP(T.cpm)),
+    k('Clics', fN(T.cli), `CTR ${fP(T.ctr)} · CPC ${fCOP(T.cpc)}`),
+    k('Registros', fN(T.reg), G.reg ? 'meta ' + fN(G.reg) : '', bar(div(T.reg, G.reg), 'Cumplimiento')),
+    k('Costo por registro', fCOP(T.cpr), cprM ? `<span class="${costCls(T.cpr, cprM)}">meta ${fCOP(cprM)}</span>` : ''),
+    k('Compras', fN(T.com), G.com ? 'meta ' + fN(G.com) : '', bar(div(T.com, G.com), 'Cumplimiento')),
+    k('Costo por compra', fCOP(T.cpa), cpaM ? `<span class="${costCls(T.cpa, cpaM)}">meta ${fCOP(cpaM)}</span>` : ''),
+    k('Compras por registro', fD(T.r2c, 1), 'compras de plataforma sobre registros'),
+    k('Ingresos (píxel Meta)', fCOP(T.ing), 'ROAS ' + (T.roas ? fD(T.roas, 1) + 'x' : '—') + ' sobre toda la inversión'),
+    k('Pacing del mes', fw ? fP(pac) : '—', fw ? `${fP(fw.corrido)} del mes corrido · ${mesLbl(fw.mes)}` : 'sin flow para este mes'),
+  ].join('');
+}
+
+function renderFunnel(rows, T, fw, G){
+  const por = group(rows, r => r.c.etapa), tot = T.inv || 1;
+  const plan = fw ? fw.fl.etapas : {};
+  const planCon = {}; if(fw) fw.lineas.filter(conectada).forEach(l => planCon[l.etapa] = (planCon[l.etapa] || 0) + l.ppto);
+  const planTot = Object.values(planCon).reduce((a, b) => a + b, 0) || 1;
+  const it = (l, v, c) => `<div><div class="nm-label">${l}</div><div class="nm-value ${c||''}">${v}</div></div>`;
+  const metaEt = (e, k) => { if(!fw) return 0; return fw.lineas.filter(l => l.etapa === e && conectada(l)).reduce((a, l) => a + l[k] * fw.share, 0) };
+  document.getElementById('stage-grid').innerHTML = ETAPAS.map(e => {
+    const t = M(por[e] || Z()), sh = t.inv / tot, ps = planCon[e] ? planCon[e] / planTot : null;
+    const pptoE = metaEt(e, 'ppto'), regE = metaEt(e, 'registros'), comE = metaEt(e, 'compras');
+    let main, lbl, grid;
+    if(e === 'AWARENESS'){ main = fN(t.imp); lbl = 'Impresiones';
+      grid = it('CPM', fCOP(t.cpm)) + it('Clics', fN(t.cli)) + it('CTR', fP(t.ctr)) + it('Video 2 s / ThruPlay', fN(t.vid)) }
+    else if(e === 'ACQUISITION'){ main = fN(t.reg); lbl = 'Registros' + (regE ? ' · meta ' + fN(regE) : '');
+      grid = it('Costo por registro', fCOP(t.cpr), costCls(t.cpr, div(pptoE, regE))) + it('Meta CPR', fCOP(div(pptoE, regE))) + it('Compras', fN(t.com)) + it('CPC', fCOP(t.cpc)) }
+    else { main = fN(t.com); lbl = 'Compras' + (comE ? ' · meta ' + fN(comE) : '');
+      grid = it('Costo por compra', fCOP(t.cpa), costCls(t.cpa, div(pptoE, comE))) + it('Meta CPA', fCOP(div(pptoE, comE))) +
+        (e === 'RETENTION' ? it('Ingresos píxel', fM(t.ing)) + it('ROAS', t.roas ? fD(t.roas, 1) + 'x' : '—') : it('Registros', fN(t.reg)) + it('CPR', fCOP(t.cpr))) }
+    return `<div class="card stage ${e === 'AWARENESS' ? 's-awa' : ''}"><div class="stage-h"><b>${ET_LBL[e]}</b><span>${fCOP(t.inv)}</span></div>
+      <div class="stage-main">${main}</div><div class="stage-lbl">${lbl}</div><div class="nm-grid">${grid}</div>
+      <div class="mix"><i style="width:${sh*100}%;background:${ET_COL[e]}"></i></div>
+      <div class="mix-lbl"><span>${fP(sh)} de la inversión</span><span>${ps === null ? 'sin plan' : 'plan ' + fP(ps)}${plan[e] ? ' · flow ' + fP(plan[e]) : ''}</span></div>
+      ${pptoE ? bar(div(t.inv, pptoE), 'Inversión vs meta') : ''}</div>` }).join('');
+  document.getElementById('funnel-note').textContent = fw ? `plan = peso de cada etapa en las líneas conectadas del flow de ${mesLbl(fw.mes).toLowerCase()} · flow = peso en el flow completo` : '';
+  const steps = [['Impresiones', T.imp, ''], ['Clics', T.cli, fP(T.ctr) + ' de impresiones'], ['Registros', T.reg, fP(div(T.reg, T.cli)) + ' de clics'], ['Compras', T.com, fD(T.r2c, 1) + ' por registro']];
+  const mx = Math.max(...steps.map(s => Math.log10(Math.max(s[1], 1))), 1);
+  document.getElementById('funnel').innerHTML = '<div class="f-row f-head"><div></div><div>escala logarítmica</div><div class="f-val"><span>Volumen</span><span>Tasa</span></div><div class="f-cost"><span>Costo por etapa</span></div></div>' +
+    steps.map(([l, v, c], i) => `<div class="f-row"><div class="f-lbl">${l}</div><div class="f-track"><div class="f-fill${i === steps.length - 1 ? ' dark' : ''}" style="width:${Math.max(Math.log10(Math.max(v, 1))/mx*100, .4)}%"></div></div>
+      <div class="f-val"><b>${fN(v)}</b><span class="t-mute">${c}</span></div><div class="f-cost"><b>${i === 0 ? fCOP(T.cpm) : fCOP(div(T.inv, v))}</b><span class="t-mute">${i === 0 ? 'CPM' : ''}</span></div></div>`).join('');
+}
+
+// ── Flow por línea ──────────────────────────────────────────────────────────
+function renderFlow(f, fw){
+  const head = ['Campaña del flow','Etapa','Medio','Ppto mes','Meta a la fecha','Invertido','Pacing','Registros','Costo por registro','Compras','Costo por compra','Cumplimiento compras'];
+  document.getElementById('flow-head').innerHTML = '<tr>' + head.map((h, i) => `<th class="${i > 2 ? 'r' : ''}">${h}</th>`).join('') + '</tr>';
+  if(!fw){ document.getElementById('flow-body').innerHTML = `<tr><td colspan="${head.length}" class="t-mute">No hay flow cargado para ${mesLbl(f.hasta.slice(0,7)).toLowerCase()}. Flows disponibles: ${Object.keys(FL).map(mesLbl).join(', ') || 'ninguno'}.</td></tr>`;
+    document.getElementById('flow-note').textContent = ''; document.getElementById('flow-foot').textContent = ''; return }
+  const rows = filas(f).filter(r => r.d >= fw.ini);
+  const porC = group(rows, r => r.ci);
+  const tr = (cells, cls, attr) => `<tr class="${cls||''}" ${attr||''}>${cells.map((c, i) => `<td class="${i > 2 ? 'r' : ''}">${c}</td>`).join('')}</tr>`;
+  const dual = (v, m, fmt) => `<span class="meta-dual"><b>${fmt(v)}</b><small>meta ${fmt(m)}</small></span>`;
+  const costo = (c, m) => `<span class="meta-dual"><b class="${costCls(c, m)}">${fCOP(c)}</b><small>meta ${fCOP(m)}</small></span>`;
+  let html = '', TT = Z(), TM = {ppto:0, exp:0, reg:0, com:0, mes:0};
+  fw.lineas.forEach(l => {
+    const cs = camposDe(l.id).filter(c => pasaCamp(c, f)), t = M(cs.reduce((a, c) => add(a, porC[C.indexOf(c)] || Z()), Z()));
+    const exp = l.ppto * fw.share, reg = l.registros * fw.share, com = l.compras * fw.share;
+    const cpaM = div(l.ppto, l.compras), cprM = div(l.ppto, l.registros), con = conectada(l);
+    // pacing contra lo que ya debió invertirse en los días corridos del mes, no contra el rango completo
+    const debido = l.ppto * Math.min(fw.corrido, fw.share || 1), pc = con ? div(t.inv, debido) : null;
+    if(con){ add(TT, t); TM.ppto += l.ppto; TM.exp += exp; TM.reg += reg; TM.com += com; TM.mes += debido }
+    const nm = `${cs.length ? `<span class="tog ${OPEN[l.id] ? 'open' : ''}">▶</span>` : '<span class="tog"></span>'}<b>${esc(l.campana)}</b> <span class="t-mute">· ${esc(l.marca)}</span>`;
+    html += tr([nm, `<span class="et et-${l.etapa}">${ET_LBL[l.etapa]}</span>`, esc(l.medio) + (cs.length && !cs.every(c => c.plat === l.medio) ? ' <span class="t-mute">(real: ' + [...new Set(cs.map(c => c.plat))].join(', ') + ')</span>' : ''),
+      fCOP(l.ppto), fCOP(exp), con ? fCOP(t.inv) : '<span class="pill p-off">sin fuente</span>', con ? `<span class="pill ${pace(pc)}">${fP(pc)}</span>` : '—',
+      con ? dual(t.reg, reg, fN) : fN(reg), con ? costo(t.cpr, cprM) : fCOP(cprM), con ? dual(t.com, com, fN) : fN(com), con ? costo(t.cpa, cpaM) : fCOP(cpaM),
+      con ? `<b class="${pctCls(div(t.com, com))}">${fP(div(t.com, com))}</b>` : '—'], 'lv1', `onclick="tog('${l.id}')"`);
+    cs.forEach(c => { const x = M(porC[C.indexOf(c)] || Z());
+      html += tr([`<span class="t-mute">${esc(c.plat)}</span> · ${esc(c.nombre)}`, '', '', '', '', fCOP(x.inv), '', fN(x.reg), fCOP(x.cpr), fN(x.com), fCOP(x.cpa), ''], 'lv3 ' + (OPEN[l.id] ? '' : 'hidden'), `data-p="${l.id}"`) });
+  });
+  // campañas con inversión que no pertenecen a ninguna línea del flow
+  const ids = new Set(fw.fl.lineas.map(l => l.id));
+  const fuera = Object.entries(porC).filter(([ci, t]) => t.inv > 0 && !ids.has(C[ci].linea));
+  if(fuera.length){ const t = M(fuera.reduce((a, [, x]) => add(a, x), Z())); add(TT, t);
+    html += tr([`<span class="tog ${OPEN.fuera ? 'open' : ''}">▶</span><b>Fuera del flow</b> <span class="t-mute">· ${fuera.length} campaña${fuera.length > 1 ? 's' : ''}</span>`, '', '', '—', '—', fCOP(t.inv), '—', fN(t.reg), fCOP(t.cpr), fN(t.com), fCOP(t.cpa), '—'], 'lv1', `onclick="tog('fuera')"`);
+    fuera.forEach(([ci, x]) => { const m = M(x); html += tr([`<span class="t-mute">${esc(C[ci].plat)}</span> · ${esc(C[ci].nombre)}`, `<span class="et et-${C[ci].etapa}">${ET_LBL[C[ci].etapa]}</span>`, '', '', '', fCOP(m.inv), '', fN(m.reg), fCOP(m.cpr), fN(m.com), fCOP(m.cpa), ''], 'lv3 ' + (OPEN.fuera ? '' : 'hidden'), 'data-p="fuera"') }) }
+  const T = M(TT), pcT = div(T.inv, TM.mes);
+  html += tr(['Total líneas conectadas' + (fuera.length ? ' + fuera del flow' : ''), '', '', fCOP(TM.ppto), fCOP(TM.exp), fCOP(T.inv), `<span class="pill ${pace(pcT)}">${fP(pcT)}</span>`,
+    dual(T.reg, TM.reg, fN), costo(T.cpr, div(TM.ppto, TM.reg ? TM.reg / fw.share : 0)), dual(T.com, TM.com, fN), costo(T.cpa, div(TM.ppto, TM.com ? TM.com / fw.share : 0)), `<b class="${pctCls(div(T.com, TM.com))}">${fP(div(T.com, TM.com))}</b>`], 'tr-total');
+  document.getElementById('flow-body').innerHTML = html;
+  const off = fw.lineas.filter(l => !conectada(l));
+  document.getElementById('flow-note').textContent = `${mesLbl(fw.mes)} · total del mes ${fCOP(fw.fl.total_mes)} con gestión y fee · ${fw.lineas.length} líneas`;
+  document.getElementById('flow-foot').innerHTML = `<b>Meta a la fecha</b>: presupuesto de la línea × ${f.total ? 'mes completo' : fP(fw.share) + ' del mes (días del rango)'}. <b>Pacing</b>: invertido sobre lo que debía llevarse al ${fDate(D.hasta)} (${fP(fw.corrido)} del mes). ` +
+    (off.length ? `<b>Sin fuente</b>: ${off.map(l => esc(l.campana)).join(', ')} (${fCOP(off.reduce((a, l) => a + l.ppto, 0))}) corren en Google Ads, que no está conectado a este tablero; quedan fuera de los totales y de las metas del resumen. ` : '') +
+    `La línea de cobro de premios figura en Google Ads en el flow, pero hoy corre en Meta: se mide con la campaña real.`;
+}
+function tog(id){ OPEN[id] = !OPEN[id]; render() }
+function expandAll(v){ (F() && flowDe(F())?.fl.lineas || []).forEach(l => OPEN[l.id] = v); OPEN.fuera = v; render() }
+
+// ── Curvas de alcance ───────────────────────────────────────────────────────
+// R(s) = a·ln(1 + s/b): rendimiento decreciente sin techo fijo. Con los meses de Top Feed ajusta
+// mejor que una curva con techo (R² 0,994–0,997), que subestimaba el alcance ya logrado.
+// b se busca en una grilla y a sale por mínimos cuadrados. Alcance nuevo por millón = a / (b + s).
+function ajuste(pts){
+  const s = pts.map(p => p.x), y = pts.map(p => p.y), sm = Math.max(...s);
+  if(pts.length < 4 || !sm) return null;
+  let best = null;
+  for(let i = 0; i <= 240; i++){ const b = sm * Math.pow(10, -3 + i * 0.02);
+    const g = s.map(v => Math.log(1 + v / b)), a = g.reduce((t, gi, j) => t + gi * y[j], 0) / g.reduce((t, gi) => t + gi * gi, 0);
+    const e = g.reduce((t, gi, j) => t + (a * gi - y[j]) ** 2, 0);
+    if(!best || e < best.e) best = {a, b, e} }
+  const ym = y.reduce((t, v) => t + v, 0) / y.length, sst = y.reduce((t, v) => t + (v - ym) ** 2, 0);
+  return {...best, r2: sst ? 1 - best.e / sst : null, R: x => best.a * Math.log(1 + x / best.b), marg: x => best.a / (best.b + x)} }
+function renderCurvas(f){
+  const cv = D.curvas || [];
+  if(!cv.length) return;
+  if(!CURVA || !cv.find(c => c.mes === CURVA)) CURVA = (cv.find(c => c.mes === f.hasta.slice(0,7)) || cv[cv.length - 1]).mes;
+  document.getElementById('curva-meses').innerHTML = cv.map(c => `<button class="qbtn ${c.mes === CURVA ? 'on' : ''}" onclick="CURVA='${c.mes}';render()">${MESES_L[+c.mes.slice(5,7)]}</button>`).join('');
+  const sel = cv.find(c => c.mes === CURVA), tt = sel.tiktok, last = tt[tt.length - 1] || [0,0,0,0];
+  // con menos de 14 días la curva todavía no tiene forma: se ajusta el último mes con datos suficientes
+  const base14 = cv.slice(0, cv.indexOf(sel) + 1).reverse().find(c => c.tiktok.length >= 14), fitTT = base14 ? base14.tiktok : [];
+  const fitMes = base14 ? base14.mes : null, fit = ajuste(fitTT.map(p => ({x: p[1]/1e6, y: p[3]/1e6})));
+  const fitOtro = fitMes && fitMes !== CURVA, fitLbl = fitMes ? MESES_L[+fitMes.slice(5,7)].toLowerCase() : '';
+  const wk = tt.length > 7 ? tt[tt.length - 8] : [0,0,0,0], nuevo = div(last[3] - wk[3], (last[1] - wk[1]) / 1e6);
+  const ttFlow = FL[CURVA] ? FL[CURVA].lineas.filter(l => l.medio === 'TikTok').reduce((t, l) => t + l.ppto, 0) : 0;
+  const fitFin = fitTT.length ? fitTT[fitTT.length - 1][1] : 0, pptoProy = ttFlow || fitFin * 1.5;
+  const pptoLbl = ttFlow ? 'el ppto TikTok del flow' : '+50% de inversión';
+  const tfDias = new Set(ROWS.filter(r => r.c.linea === 'awa_tiktok' && r.inv > 0 && r.c.nombre.includes('topfeed')).map(r => r.d));
+  const k = (l, v, sub) => `<div class="card kpi-card"><div class="kpi-label">${l}</div><div class="kpi-value">${v}</div>${sub ? `<div class="kpi-sub">${sub}</div>` : ''}</div>`;
+  document.getElementById('curva-kpis').innerHTML = [
+    k('Alcance TikTok del mes', fMM(last[3]), `${mesLbl(CURVA)} · al ${fDate(last[0] || CURVA + '-01')}`),
+    k('Frecuencia', fD(div(last[2], last[3]), 2), fN(last[2]) + ' impresiones'),
+    k('Costo por mil alcanzados', fCOP(div(last[1]*1000, last[3])), 'inversión ' + fM(last[1])),
+    k(`Proyección con ${pptoLbl}`, fit ? fMM(fit.R(pptoProy / 1e6) * 1e6) : '—', fit ? `curva de ${fitLbl} (R² ${fD(fit.r2, 3)}) · ${fN(fit.marg(pptoProy / 1e6) * 1e6)} personas nuevas por $1 M en ese punto` : 'faltan días para ajustar'),
+    k('Alcance nuevo por $1 M', fN(nuevo), 'últimos 7 días con datos del mes'),
+  ].join('');
+  document.getElementById('curva-note').textContent = 'TikTok a nivel cuenta · Meta sin campañas de awareness desde agosto';
+  const css = getComputedStyle(document.body), fg = css.getPropertyValue('--fg-muted').trim() || '#888';
+  const colors = ['#d4d4d4','#a3a3a3','#ffd400','#050505'], col = i => colors[colors.length - cv.length + i] || '#d4d4d4';
+  const ds = (fn, extra) => cv.map((c, i) => ({label: MESES_L[+c.mes.slice(5,7)], data: c.tiktok.map(fn), borderColor: col(i), backgroundColor: col(i),
+    borderWidth: c.mes === CURVA ? 3 : 1.6, tension: .25, pointRadius: c.tiktok.map(p => tfDias.has(p[0]) ? 3.5 : 0), ...extra}));
+  const base = (yt, xt, tip) => ({responsive:true, maintainAspectRatio:false, interaction:{mode:'nearest', intersect:false}, parsing:false,
+    plugins:{legend:{labels:{boxWidth:10, font:{family:'Poppins', size:11}, color:fg}}, tooltip:{callbacks:{label: tip}}},
+    scales:{x:{type:'linear', ticks:{color:fg, font:{size:10}}, grid:{display:false}, title:{display:true, text:xt, color:fg, font:{size:10}}},
+      y:{beginAtZero:true, ticks:{color:fg, font:{size:10}}, title:{display:true, text:yt, color:fg, font:{size:10}}}}});
+  const day = p => +p[0].slice(8,10);
+  draw('ch-alc-dia', 'line', {datasets: ds(p => ({x: day(p), y: p[3]/1e6}))}, base('Millones de personas', 'Día del mes', c => `${c.dataset.label}, día ${c.raw.x}: ${fD(c.raw.y, 2)} M personas`));
+  const sets = ds(p => ({x: p[1]/1e6, y: p[3]/1e6}));
+  if(fit){ const sm = Math.max(fitFin / 1e6 * 1.3, pptoProy / 1e6 * 1.05), pts = [];
+    for(let i = 0; i <= 40; i++){ const x = sm * i / 40; pts.push({x, y: fit.R(x)}) }
+    sets.push({label: 'Curva ' + fitLbl, data: pts, borderColor: '#050505', borderDash: [5,4], borderWidth: 1.5, pointRadius: 0, backgroundColor: '#050505'});
+    sets.push({label: 'Proyección', data: [{x: pptoProy / 1e6, y: fit.R(pptoProy / 1e6)}], borderColor: '#b91c1c', backgroundColor: '#b91c1c', pointRadius: 6, pointStyle: 'rectRot', showLine: false}) }
+  draw('ch-alc-inv', 'line', {datasets: sets}, base('Millones de personas', 'Inversión acumulada (millones COP)', c => `${c.dataset.label}: ${fD(c.raw.y, 2)} M personas con $${fD(c.raw.x, 1)} M`));
+  draw('ch-frec', 'line', {datasets: ds(p => ({x: day(p), y: div(p[2], p[3]) || 0}))}, base('Frecuencia', 'Día del mes', c => `${c.dataset.label}, día ${c.raw.x}: ${fD(c.raw.y, 2)}`));
+  const marg = cv.map((c, i) => { const pts = []; for(let j = 6; j < c.tiktok.length; j += 7){ const a = j >= 7 ? c.tiktok[j-7] : [0,0,0,0], b = c.tiktok[j];
+      pts.push({x: day(b), y: div(b[3] - a[3], (b[1] - a[1]) / 1e6) || 0}) }
+    return {label: MESES_L[+c.mes.slice(5,7)], data: pts, borderColor: col(i), backgroundColor: col(i), borderWidth: c.mes === CURVA ? 3 : 1.6, tension: .2, pointRadius: 3} });
+  draw('ch-marg', 'line', {datasets: marg}, base('Personas nuevas por $1 M', 'Día del mes (fin del tramo)', c => `${c.dataset.label}, hasta el día ${c.raw.x}: ${fN(c.raw.y)} personas nuevas por $1 M`));
+  // tabla por mes y fuente
+  const fila = (nm, pts) => { const p = pts[pts.length - 1]; if(!p || !p[3]) return '';
+    return `<td>${nm}</td><td class="r">${fCOP(p[1])}</td><td class="r">${fN(p[2])}</td><td class="r">${fN(p[3])}</td><td class="r">${fD(div(p[2], p[3]), 2)}</td><td class="r">${fCOP(div(p[1]*1000, p[3]))}</td><td class="r">${fCOP(div(p[1]*1000, p[2]))}</td>` };
+  document.getElementById('curva-head').innerHTML = '<tr><th>Mes</th><th>Fuente</th><th class="r">Inversión</th><th class="r">Impresiones</th><th class="r">Alcance</th><th class="r">Frecuencia</th><th class="r">Costo x mil alcanzados</th><th class="r">CPM</th></tr>';
+  document.getElementById('curva-body').innerHTML = cv.slice().reverse().map(c => [['TikTok · cuenta', c.tiktok], ['Meta · awareness', c.meta_awa], ['Meta · cuenta', c.meta]]
+    .map(([nm, pts]) => { const r = fila(nm, pts); return r ? `<tr><td><b>${mesLbl(c.mes)}</b></td>${r}</tr>` : '' }).join('')).join('');
+  // lectura automática del mes elegido
+  const prev = cv[cv.indexOf(sel) - 1], pl = prev ? prev.tiktok[prev.tiktok.length - 1] : null;
+  const cmr = div(last[1]*1000, last[3]), cmrP = pl ? div(pl[1]*1000, pl[3]) : null;
+  const fl = FL[CURVA], awaPlan = fl ? fl.lineas.filter(l => l.etapa === 'AWARENESS') : [];
+  document.getElementById('curva-flag').innerHTML = `<b>Lectura de ${mesLbl(CURVA).toLowerCase()}:</b> TikTok llegó a ${fMM(last[3])} de personas con ${fM(last[1])}, a frecuencia ${fD(div(last[2], last[3]), 2)}` +
+    (cmrP ? ` y ${fCOP(cmr)} por mil alcanzados (${cmr > cmrP ? '+' : ''}${fP(div(cmr - cmrP, cmrP))} frente a ${MESES_L[+prev.mes.slice(5,7)].toLowerCase()}).` : '.') +
+    (fit ? (fitOtro ? ` Con ${tt.length} días todavía no hay curva propia; se usa la de ${fitLbl}.` : '') +
+      ` Con esa curva, el primer ${fM(1e7)} compra ${fMM(fit.R(10) * 1e6)} de personas y al final de ${fitLbl} (${fM(fitFin)}) cada millón adicional sumaba solo ${fN(fit.marg(fitFin / 1e6) * 1e6)} personas nuevas: la mayor parte de la inversión de cierre de mes ya compra frecuencia.` +
+      ` Con ${pptoLbl} (${fM(pptoProy)}) la proyección es de ${fMM(fit.R(pptoProy / 1e6) * 1e6)} de personas en el mes.` : '') +
+    (awaPlan.length ? ` El flow asigna ${fCOP(awaPlan.reduce((a, l) => a + l.ppto, 0))} a awareness (${awaPlan.map(l => l.medio).join(' y ')}); ${sel.meta_awa.length ? '' : '<b>Meta no tiene campaña de awareness activa</b>, así que la línea de Meta del flow no se está ejecutando.'}` : '') +
+    ` El alcance de TikTok es el de toda la cuenta: la API no deja deduplicar solo las campañas de awareness, pero en los meses con Top Feed esas campañas son la mayor parte de la inversión.`;
+}
+function draw(id, type, data, options){ if(CHARTS[id]) CHARTS[id].destroy(); CHARTS[id] = new Chart(document.getElementById(id), {type, data, options}) }
+
+// ── Tablas genéricas ────────────────────────────────────────────────────────
+const COLS = [['inv','Inversión',fCOP],['pct','% inv.',fP],['imp','Impresiones',fN],['cpm','CPM',fCOP],['cli','Clics',fN],['ctr','CTR',fP],['reg','Registros',fN],['cpr','Costo / registro',fCOP],['com','Compras',fN],['cpa','Costo / compra',fCOP],['ing','Ingresos píxel',fCOP],['roas','ROAS',v => v ? fD(v, 1) + 'x' : '—']];
+const thead = first => '<tr>' + first.map(h => `<th>${h}</th>`).join('') + COLS.map(c => `<th class="r">${c[1]}</th>`).join('') + '</tr>';
+const tcells = (t, tot) => COLS.map(([k, , fm]) => `<td class="r">${k === 'pct' ? fP(div(t.inv, tot)) : fm(t[k])}</td>`).join('');
+function renderPlat(rows){
+  const tot = sum(rows), g = group(rows, r => r.c.plat + '|' + r.c.etapa), plats = [...new Set(rows.map(r => r.c.plat))].sort();
+  document.getElementById('plat-head').innerHTML = thead(['Plataforma','Etapa']);
+  document.getElementById('plat-body').innerHTML = plats.map(p => { const t = sum(rows.filter(r => r.c.plat === p));
+    return `<tr class="lv1"><td>${p}</td><td></td>${tcells(t, tot.inv)}</tr>` + ETAPAS.concat('OTRA').filter(e => g[p + '|' + e]).map(e =>
+      `<tr><td></td><td><span class="et et-${e}">${ET_LBL[e]}</span></td>${tcells(M(g[p + '|' + e]), tot.inv)}</tr>`).join('') }).join('') +
+    `<tr class="tr-total"><td>Total</td><td></td>${tcells(tot, tot.inv)}</tr>`;
+}
+function renderMarca(rows){
+  const tot = sum(rows), g = group(rows, r => r.c.marca);
+  document.getElementById('marca-head').innerHTML = thead(['Marca']);
+  document.getElementById('marca-body').innerHTML = ['Baloto','Miloto','Colorloto'].filter(m => g[m]).map(m => `<tr><td><b>${m}</b></td>${tcells(M(g[m]), tot.inv)}</tr>`).join('') +
+    `<tr class="tr-total"><td>Total</td>${tcells(tot, tot.inv)}</tr>`;
+}
+function setEvo(k){ EVO = k; document.querySelectorAll('[data-ev]').forEach(b => b.classList.toggle('on', b.dataset.ev === k)); render() }
+function renderEvo(f){
+  const mes = EVO === 'mes', rows = mes ? ROWS.filter(r => r.d <= f.hasta && pasaCamp(r.c, f)) : filas(f);
+  const key = r => mes ? r.d.slice(0,7) : weekStart(r.d), g = group(rows, key), ks = Object.keys(g).sort();
+  const parcial = k => mes && k === D.hasta.slice(0,7) && D.hasta !== monthEnd(k);
+  const lab = k => mes ? MESES[+k.slice(5,7)] + ' ' + k.slice(2,4) + (parcial(k) ? '*' : '') : fDate(k);
+  document.getElementById('evo-note').textContent = mes ? `todos los meses hasta la fecha final, con los filtros de plataforma, etapa y marca${ks.some(parcial) ? ' · * mes en curso, al ' + fDate(D.hasta) : ''}` : 'semanas de lunes a domingo dentro del rango';
+  const ge = {}; rows.forEach(r => { const k = key(r) + '|' + r.c.etapa; ge[k] = (ge[k] || 0) + r.inv });
+  const css = getComputedStyle(document.body), fg = css.getPropertyValue('--fg-muted').trim() || '#888';
+  draw('ch-evo', 'bar', {labels: ks.map(lab), datasets: [
+    ...ETAPAS.map(e => ({type:'bar', label: ET_LBL[e], data: ks.map(k => Math.round(ge[k + '|' + e] || 0)), backgroundColor: ET_COL[e], stack:'inv', yAxisID:'y1', order:3})),
+    {type:'line', label:'Compras', data: ks.map(k => g[k].com), borderColor:'#050505', backgroundColor:'#050505', tension:.25, yAxisID:'y', order:0},
+    {type:'line', label:'Registros', data: ks.map(k => g[k].reg), borderColor:'#b45309', backgroundColor:'#b45309', borderDash:[4,3], tension:.25, yAxisID:'y2', order:1}]},
+    {responsive:true, maintainAspectRatio:false, interaction:{mode:'index', intersect:false},
+      plugins:{legend:{labels:{boxWidth:10, font:{family:'Poppins', size:11}, color:fg}}, tooltip:{callbacks:{label: c => c.dataset.label + ': ' + (c.dataset.yAxisID === 'y1' ? fCOP(c.raw) : fN(c.raw))}}},
+      scales:{x:{stacked:true, ticks:{color:fg, font:{size:10}}, grid:{display:false}},
+        y1:{stacked:true, position:'left', beginAtZero:true, ticks:{color:fg, font:{size:10}, callback: v => '$' + (v/1e6) + ' M'}, title:{display:true, text:'Inversión por etapa', color:fg, font:{size:10}}},
+        y:{position:'right', beginAtZero:true, grid:{display:false}, ticks:{color:fg, font:{size:10}}, title:{display:true, text:'Compras', color:fg, font:{size:10}}},
+        y2:{position:'right', beginAtZero:true, display:false}}});
+  const tot = sum(rows);
+  document.getElementById('evo-head').innerHTML = thead([mes ? 'Mes' : 'Semana']);
+  document.getElementById('evo-body').innerHTML = ks.slice().reverse().map(k => `<tr><td>${mes ? mesLbl(k) + (parcial(k) ? ' (en curso)' : '') : fDate(k) + ' – ' + fDate(addDays(k, 6))}</td>${tcells(M(g[k]), tot.inv)}</tr>`).join('') +
+    `<tr class="tr-total"><td>Total</td>${tcells(tot, tot.inv)}</tr>`;
+}
+function sortBy(c){ SORT = {col: c, dir: SORT.col === c ? -SORT.dir : -1}; renderDetalle() }
+function renderDetalle(){
+  const f = F(), rows = filas(f), tot = sum(rows), g = group(rows, r => r.ci), q = document.getElementById('q').value.toLowerCase();
+  const list = Object.entries(g).map(([ci, t]) => ({c: C[ci], t: M(t)})).filter(x => !q || x.c.nombre.toLowerCase().includes(q));
+  list.sort((a, b) => ((a.t[SORT.col] ?? -1) - (b.t[SORT.col] ?? -1)) * SORT.dir);
+  document.getElementById('det-head').innerHTML = '<tr><th>Campaña</th><th>Plataforma</th><th>Etapa</th><th>Marca</th>' +
+    COLS.map(c => `<th class="r sortable ${SORT.col === c[0] ? 'sort-act' : ''}" onclick="sortBy('${c[0] === 'pct' ? 'inv' : c[0]}')">${c[1]}${SORT.col === c[0] ? (SORT.dir < 0 ? ' ↓' : ' ↑') : ''}</th>`).join('') + '</tr>';
+  document.getElementById('det-body').innerHTML = list.map(x => `<tr><td>${esc(x.c.nombre)}</td><td>${x.c.plat}</td><td><span class="et et-${x.c.etapa}">${ET_LBL[x.c.etapa]}</span></td><td>${x.c.marca}</td>${tcells(x.t, tot.inv)}</tr>`).join('') +
+    `<tr class="tr-total"><td>Total</td><td></td><td></td><td></td>${tcells(tot, tot.inv)}</tr>`;
+  document.getElementById('det-note').textContent = `${list.length} campañas con datos en el rango`;
+}
+
+// ── Arranque ────────────────────────────────────────────────────────────────
+(function init(){
+  if(!D){ document.getElementById('ld-msg').textContent = 'Falta data/baloto_data.js'; return }
+  const q = [['mes','Mes actual'],['mesAnt','Mes anterior'],['30','Últimos 30 días'],['trim','Últimos 90 días'],['anio','Año']];
+  document.getElementById('quick').innerHTML = q.map(([k, l]) => `<button class="qbtn" data-q="${k}" onclick="setQuick('${k}')">${l}</button>`).join('');
+  const hasta = fDate(D.hasta) + ' ' + D.hasta.slice(0,4);
+  document.getElementById('last-upd').textContent = 'Datos hasta el ' + hasta; document.getElementById('last-upd-side').textContent = hasta;
+  ['f-desde','f-hasta'].forEach(id => { document.getElementById(id).min = ROWS[0]?.d || '2026-01-01'; document.getElementById(id).max = D.hasta });
+  document.getElementById('fuentes-note').innerHTML = `<b>Fuentes conectadas:</b> Meta Ads y TikTok Ads por API, diario por campaña, actualizado al ${hasta}. ` +
+    `<b>Sin conectar:</b> Google Ads, GA4, X y programática, que en la hoja de fuente de datos sí aparecen; las líneas de Google del flow se muestran con su meta pero sin ejecución. ` +
+    `<b>Ojo con el píxel de Meta:</b> del 18 al 23 de septiembre casi no registró compras (de unas 5.000 diarias a menos de 350), y desde el 24 de septiembre las compras volvieron pero llegan con valor $0. Los ingresos y el ROAS desde el 18 de septiembre no son confiables.`;
+  setQuick('mes');
+  document.getElementById('loading').style.display = 'none';
+})();
+</script>
+</body>
+</html>

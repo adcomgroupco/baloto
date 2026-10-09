@@ -5,6 +5,9 @@ Sitio de consulta de flows, reportes, análisis y propuestas de pauta digital pa
 ## Contenido
 
 - `index.html`: Master Baloto, página principal con enlace a todos los documentos.
+- `tablero-baloto.html`: tablero de seguimiento full funnel (Meta y TikTok): metas del flow por campaña, curvas de alcance, plataforma, marca y evolución.
+- `data/baloto_data.js`: datos diarios por campaña y curvas de alcance que lee el tablero.
+- `data/baloto_flow.js`: metas del flow por mes y línea de campaña.
 - `flow-octubre-2026.html`: flow de medios de octubre 2026 (Meta, TikTok y Google Ads).
 - `reporte-cobro-premios-meta.html`: Cobro de premios · Meta Ads · ago 2026.
 - `reporte-engagement-baloto-miloto.html`: Engagement Baloto y Miloto · jul 2026.
@@ -30,3 +33,19 @@ Abre `index.html` en un navegador para acceder a los documentos.
 ## Convención de nombres
 
 Los archivos de contenido usan `kebab-case`. Los documentos estándar de GitHub conservan sus nombres convencionales, por ejemplo `README.md`.
+
+## Actualizar el tablero de seguimiento
+
+Los datos se generan desde el repositorio Meta-Ads-CLI, con las APIs de Meta Ads y TikTok Ads:
+
+```
+.venv/bin/python scripts/clients/baloto/build_baloto_tablero.py --out ../GitHub/baloto/data/baloto_data.js
+```
+
+Cuando llegue el flow de un mes nuevo, se agrega su meta (el archivo acumula meses):
+
+```
+.venv/bin/python scripts/clients/baloto/build_baloto_flow.py --xlsx "~/Downloads/[Baloto] Flow de medios - Noviembre.xlsx" --mes 2026-11 --out ../GitHub/baloto/data/baloto_flow.js
+```
+
+Google Ads, GA4, X y programática no están conectados: la cuenta de Google Ads de Baloto no está en el MCC de Adcom.

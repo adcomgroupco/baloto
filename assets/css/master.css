@@ -52,3 +52,4 @@ a.card:hover p,a.card:hover .card-top{color:#f4f4f1}
 .footer{background:#050505; color:#f4f4f1; border-top:6px solid var(--accent)}
 .footer span:first-child::before{content:""; display:inline-block; width:9px; height:9px;
   margin-right:9px; border-radius:50%; background:var(--accent)}
+.franja .grupo + .grupo{margin-top:var(--s-6)}
