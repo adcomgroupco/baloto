@@ -17,6 +17,7 @@ Sitio de consulta de flows, reportes, análisis y propuestas de pauta digital pa
 - `reporte-marzo-vs-abril-2026.html`: Marzo vs abril 2026.
 - `plan-post-acumulado-octubre-2026.html`: plan digital para recuperar las jugadas tras el premio del 3 de octubre (borrador para gerencia).
 - `promo-italia-octubre-2026.html`: Promo Italia, Meta y TikTok, con anuncios y audiencias · oct 2026.
+- `top-feed-consolidado-jul-sep-2026.html`: consolidado instructivo del alcance de los 27 Top Feed de TikTok, con vistas previas · jul–sep 2026.
 - `doce-top-feed-septiembre-2026.html`: Doce Top Feed · septiembre 2026.
 - `nueve-top-feed-jul-ago-2026.html`: Nueve Top Feed · jul–ago 2026.
 - `top-feed-branding-jul-ago-2026.html`: Cuatro Top Feed · branding jul–ago 2026.
