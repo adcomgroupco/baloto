@@ -558,7 +558,13 @@ function notaFuentes(){
   document.getElementById('last-upd').textContent = 'Datos hasta el ' + hasta; document.getElementById('last-upd-side').textContent = hasta;
   ['f-desde','f-hasta'].forEach(id => { document.getElementById(id).min = ROWS[0]?.d || '2026-01-01'; document.getElementById(id).max = D.hasta });
   document.getElementById('ld-msg').textContent = 'Leyendo la hoja de fuente de datos...';
-  const listo = () => { construir(); notaFuentes(); setQuick('mes'); document.getElementById('loading').style.display = 'none' };
+  // ?mes=AAAA-MM (desde los botones del Master Baloto) abre ese mes completo, hasta el último día con datos
+  const mesUrl = (new URLSearchParams(location.search).get('mes') || '').match(/^\d{4}-\d{2}$/)?.[0];
+  const abrirMes = m => { const fin = monthEnd(m) < D.hasta ? monthEnd(m) : D.hasta;
+    document.getElementById('f-desde').value = m + '-01'; document.getElementById('f-hasta').value = fin;
+    QUICK = m === D.hasta.slice(0,7) ? 'mes' : ''; render() };
+  const listo = () => { construir(); notaFuentes(); if(mesUrl && mesUrl + '-01' <= D.hasta) abrirMes(mesUrl); else setQuick('mes');
+    document.getElementById('loading').style.display = 'none' };
   leerHoja().then(rows => { HOJA = parseHoja(rows); if(!HOJA.length) throw new Error('la pestaña llegó vacía'); listo() })
     .catch(e => { console.warn(e); HOJA = null; HOJA_ERR = e.message || String(e);
       const r = document.getElementById('f-res'); r.value = 'plat'; r.disabled = true; listo() });
