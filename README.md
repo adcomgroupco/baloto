@@ -15,6 +15,7 @@ Sitio de consulta de flows, reportes, análisis y propuestas de pauta digital pa
 - `reporte-retencion-2026.html`: Campaña de retención · may 2026.
 - `reporte-tiktok-mayo-2026.html`: TikTok Ads · may 2026.
 - `reporte-marzo-vs-abril-2026.html`: Marzo vs abril 2026.
+- `plan-post-acumulado-octubre-2026.html`: plan digital para recuperar las jugadas tras el premio del 3 de octubre (borrador para gerencia).
 - `promo-italia-octubre-2026.html`: Promo Italia, Meta y TikTok, con anuncios y audiencias · oct 2026.
 - `doce-top-feed-septiembre-2026.html`: Doce Top Feed · septiembre 2026.
 - `nueve-top-feed-jul-ago-2026.html`: Nueve Top Feed · jul–ago 2026.
