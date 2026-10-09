@@ -48,4 +48,4 @@ Cuando llegue el flow de un mes nuevo, se agrega su meta (el archivo acumula mes
 .venv/bin/python scripts/clients/baloto/build_baloto_flow.py --xlsx "~/Downloads/[Baloto] Flow de medios - Noviembre.xlsx" --mes 2026-11 --out ../GitHub/baloto/data/baloto_flow.js
 ```
 
-Google Ads, GA4, X y programática no están conectados: la cuenta de Google Ads de Baloto no está en el MCC de Adcom.
+Compras, registros e ingresos salen de GA4, en la pestaña RESUMEN GENERAL de la hoja [Baloto] Fuente de datos, que el tablero lee en vivo; de ahí sale también la inversión de Google Ads, X y programática. La hoja debe estar compartida como "Cualquier persona con el enlace: lector". Si no carga, el tablero usa los resultados de plataforma y lo avisa. Para probar sin la hoja: `tablero-baloto.html?hoja=archivo.csv` servido por http, con las mismas columnas.

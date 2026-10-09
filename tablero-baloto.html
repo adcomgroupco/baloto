@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="assets/css/tablero.css">
 <script defer src="assets/js/adcom.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="data/baloto_data.js"></script>
 <script src="data/baloto_flow.js"></script>
 </head>
@@ -54,9 +55,10 @@
       <span class="last-upd" id="last-upd"></span>
     </div>
     <div class="tb-row">
-      <div class="fg"><span class="fl">Plataforma</span><select id="f-plat" onchange="render()"><option value="">Todas</option><option>Meta</option><option>TikTok</option></select></div>
+      <div class="fg"><span class="fl">Plataforma</span><select id="f-plat" onchange="render()"><option value="">Todas</option></select></div>
       <div class="fg"><span class="fl">Etapa</span><select id="f-etapa" onchange="render()"><option value="">Todas</option><option value="AWARENESS">Awareness</option><option value="ACQUISITION">Adquisición</option><option value="ACTIVATION">Activación</option><option value="RETENTION">Retención</option></select></div>
       <div class="fg"><span class="fl">Marca</span><select id="f-marca" onchange="render()"><option value="">Todas</option><option>Baloto</option><option>Miloto</option><option>Colorloto</option></select></div>
+      <div class="fg"><span class="fl">Resultados</span><select id="f-res" onchange="construir();render()" title="De dónde salen compras, registros e ingresos"><option value="ga4">GA4 · hoja</option><option value="plat">Plataforma · API</option></select></div>
       <label class="chk" title="Encendido: la meta completa del mes del flow. Apagado: la parte proporcional a los días del rango."><input type="checkbox" id="f-total" onchange="render()">Meta completa del mes</label>
       <button class="btn-reset" onclick="resetFilters()">↺ Reset</button>
     </div>
@@ -122,7 +124,7 @@ const MESES_L = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Ag
 const ETAPAS = ['AWARENESS','ACQUISITION','ACTIVATION','RETENTION'];
 const ET_LBL = {AWARENESS:'Awareness', ACQUISITION:'Adquisición', ACTIVATION:'Activación', RETENTION:'Retención', OTRA:'Otra'};
 const ET_COL = {AWARENESS:'#ffd400', ACQUISITION:'#7dd3fc', ACTIVATION:'#a78bfa', RETENTION:'#4ade80', OTRA:'#d4d4d4'};
-const CONECTADOS = ['Meta','TikTok'];
+let CONECTADOS = ['Meta','TikTok'];
 let CHARTS = {}, EVO = 'mes', QUICK = 'mes', CURVA = null, SORT = {col:'inv', dir:-1}, OPEN = {};
 
 // ── Formato ─────────────────────────────────────────────────────────────────
@@ -146,8 +148,110 @@ const pace = p => p === null ? 'p-off' : Math.abs(p - 1) <= .1 ? 'p-pos' : Math.
 const costCls = (c, m) => (c === null || !m) ? '' : c <= m ? 't-pos' : c <= m * 1.25 ? 't-mid' : 't-neg';
 
 // ── Datos ───────────────────────────────────────────────────────────────────
-const C = D.campanas;
-const ROWS = D.diario.map(r => ({d:r[0], c:C[r[1]], ci:r[1], inv:r[2], imp:r[3], alc:r[4], cli:r[5], vid:r[6], reg:r[7], com:r[8], ing:r[9]}));
+// Inversión, impresiones, clics y alcance de Meta y TikTok vienen de las APIs (data/baloto_data.js).
+// Compras, registros e ingresos vienen de GA4 en la pestaña RESUMEN GENERAL de la hoja de fuente de datos,
+// que también trae la inversión de los medios sin API (Google Ads, X, programática).
+const SHEET_ID = '1zEv8npIyHnoaEXKZDRh-vpyo88RU0WmKUgSKwSYzaMU', SHEET_TAB = 'RESUMEN GENERAL';
+const API_PLAT = ['Meta','TikTok'];
+const API_ROWS = D ? D.diario.map(r => ({d:r[0], ci:r[1], inv:r[2], imp:r[3], alc:r[4], cli:r[5], vid:r[6], reg:r[7], com:r[8], ing:r[9]})) : [];
+let C = [], ROWS = [], HOJA = null, HOJA_ERR = '', SEQ = 0;
+
+// ── Hoja: lectura ───────────────────────────────────────────────────────────
+function num(v){ if(typeof v === 'number') return isFinite(v) ? v : 0;
+  const s = String(v ?? '').replace(/[$\s%]/g,''); if(!s) return 0;
+  return parseFloat(s.indexOf(',') >= 0 ? s.replace(/\./g,'').replace(',','.') : s.replace(/\./g,'')) || 0 }
+function isoD(v){ const m = String(v||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if(m) return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+  const i = String(v||'').match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+  return i ? `${i[1]}-${i[2].padStart(2,'0')}-${i[3].padStart(2,'0')}` : '' }
+const norm = s => String(s||'').trim().toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const nkey = s => String(s||'').trim().toLowerCase().replace(/\s+/g,' ');
+function medioDe(s){ const t = norm(s);
+  if(/FACEBOOK|META|INSTAGRAM/.test(t)) return 'Meta'; if(/TIKTOK/.test(t)) return 'TikTok';
+  if(/GOOGLE|YOUTUBE|SEARCH|PMAX|DISPLAY/.test(t)) return 'Google Ads'; if(/TWITTER|^X$/.test(t)) return 'X';
+  if(/PROGRAM/.test(t)) return 'Programática'; return t ? t.charAt(0) + t.slice(1).toLowerCase() : 'Otros' }
+function gvizRows(res){
+  if(res?.status !== 'ok' || !res.table) throw new Error('Respuesta inválida de Google Sheets');
+  const cols = res.table.cols || [];
+  return [cols.map(c => c.label), ...(res.table.rows || []).map(row => cols.map((col, i) => { const c = row.c?.[i];
+    if(!c || c.v === null || c.v === undefined) return '';
+    if(col.type === 'date' || col.type === 'datetime'){ if(c.f) return c.f; const m = String(c.v).match(/^Date\((\d+),(\d+),(\d+)/); if(m) return `${m[3]}/${+m[2]+1}/${m[1]}` }
+    return c.v }))] }
+// En la web se lee CSV. Abriendo el archivo local no hay CORS, así que se usa JSONP.
+// ?hoja=archivo.csv carga un CSV con el mismo formato (para probar sin la hoja).
+function leerHoja(){
+  const prueba = new URLSearchParams(location.search).get('hoja');
+  if(prueba || location.protocol.startsWith('http')) return new Promise((ok, ko) => {
+    const u = prueba || `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_TAB)}&headers=1&_=${Date.now()}`;
+    Papa.parse(u, {download:true, header:false, skipEmptyLines:true, complete: r => ok(r.data), error: () => ko(new Error('sin acceso a la hoja'))}) });
+  return new Promise((ok, ko) => {
+    const cb = `__baloto_${Date.now()}_${++SEQ}`, s = document.createElement('script');
+    const t = setTimeout(() => { fin(); ko(new Error('la hoja no respondió')) }, 12000);
+    const fin = () => { clearTimeout(t); s.remove(); delete window[cb] };
+    window[cb] = r => { fin(); try{ ok(gvizRows(r)) } catch(e){ ko(e) } };
+    const u = new URL(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq`);
+    u.searchParams.set('tqx', `out:json;responseHandler:${cb}`); u.searchParams.set('sheet', SHEET_TAB); u.searchParams.set('headers', '1');
+    s.src = u.toString(); s.async = true; s.onerror = () => { fin(); ko(new Error('sin acceso a la hoja')) }; document.head.appendChild(s) }) }
+// columnas por nombre: la hoja se rearma con cada refresco de Power My Analytics
+function parseHoja(rows){
+  const h = (rows[0] || []).map(norm), col = lbl => h.indexOf(norm(lbl));
+  const req = {d:'Date', camp:'Campaign Name', medio:'Medio', etapa:'Etapa', reg:'Registros GA4', com:'Compras GA4'};
+  const c = {}; Object.entries(req).forEach(([k, l]) => { c[k] = col(l); if(c[k] < 0) throw new Error('Falta la columna ' + l + ' en ' + SHEET_TAB) });
+  Object.entries({ing:'Ingresos GA4', inv:'Amount Spent', imp:'Impressions', cli:'Link Clicks', vid:'ThruPlays', tipo:'Tipo',
+    regP:'Registros', comP:'Compras', ingP:'Ingresos'}).forEach(([k, l]) => c[k] = col(l));
+  const v = (x, k) => c[k] >= 0 ? num(x[c[k]]) : 0;
+  return rows.slice(1).map(x => ({d: isoD(x[c.d]), name: String(x[c.camp] || '').trim(), medio: medioDe(x[c.medio]), etapa: norm(x[c.etapa]),
+    tipo: c.tipo >= 0 ? String(x[c.tipo] || '') : '', inv: v(x,'inv'), imp: v(x,'imp'), cli: v(x,'cli'), vid: v(x,'vid'),
+    reg: v(x,'reg'), com: v(x,'com'), ing: v(x,'ing'), regP: v(x,'regP'), comP: v(x,'comP'), ingP: v(x,'ingP')}))
+    .filter(r => r.d && r.name).map(r => ({...r, key: nkey(r.name)})) }
+
+// ── Clasificación (la misma de build_baloto_tablero.py) ─────────────────────
+function etapaNombre(n){ n = n.toLowerCase();
+  if(/awareness|_awa_|topfeed|_consi/.test(n)) return 'AWARENESS'; if(/_acq_|_conv_meta_general/.test(n)) return 'ACQUISITION';
+  if(/_act_/.test(n)) return 'ACTIVATION'; if(/_ret_|acumulado/.test(n)) return 'RETENTION'; return 'OTRA' }
+function marcaNombre(n, tipo){ n = n.toLowerCase(); const t = String(tipo||'').toLowerCase();
+  if(/miloto/.test(n) || t.includes('miloto')) return 'Miloto'; if(/colorloto/.test(n) || t.includes('colorloto')) return 'Colorloto'; return 'Baloto' }
+function lineaNombre(plat, n, etapa){ n = n.toLowerCase();
+  if(plat === 'Meta'){ if(n.includes('_awa_')) return 'awa_meta'; if(n.includes('_acq_')) return 'acq_meta'; if(n.includes('promocional')) return 'promo_meta';
+    if(n.includes('conversion_videos')) return 'videos'; if(n.includes('_act_')) return 'crm'; if(n.includes('cobrodepremios')) return 'cobro';
+    if(n.includes('adcom_colorloto')) return 'colorloto_meta'; if(n.includes('adcom_miloto') && n.includes('ret_acumulado')) return 'miloto_acum_meta';
+    if(n.includes('adcom_miloto')) return 'miloto_meta'; if(n.includes('ret_acumulado')) return 'baloto_acum_meta' }
+  if(plat === 'TikTok'){ if(/topfeed|awareness|_awa_/.test(n)) return 'awa_tiktok'; if(n.includes('_acq_')) return 'acq_tiktok';
+    if(n.includes('promocional')) return 'promo_tiktok'; if(n.includes('adcom_miloto')) return 'miloto_tiktok'; if(n.includes('_ret_')) return 'baloto_tiktok' }
+  // Google Ads: la línea sale de la etapa homologada en la hoja
+  if(plat === 'Google Ads'){ if(/cobro/.test(n)) return 'cobro'; if(/promo/.test(n)) return 'promo_google';
+    if(etapa === 'ACTIVATION') return 'act_google'; if(etapa === 'ACQUISITION' || etapa === 'AWARENESS') return 'traf_google' }
+  return '' }
+
+// ── Cruce API + hoja ────────────────────────────────────────────────────────
+function construir(){
+  const modo = HOJA ? document.getElementById('f-res').value : 'plat';
+  C = D.campanas.map(c => ({...c}));
+  ROWS = API_ROWS.map(r => ({...r, c: C[r.ci]}));
+  if(!HOJA){ CONECTADOS = API_PLAT.slice(); return }
+  const idx = new Map(C.map((c, i) => [c.plat + '|' + nkey(c.nombre), i]));
+  const camp = h => { const k = h.medio + '|' + h.key;
+    if(!idx.has(k)){ const et = ETAPAS.includes(h.etapa) ? h.etapa : etapaNombre(h.name);
+      idx.set(k, C.length); C.push({plat: h.medio, nombre: h.name, etapa: et, marca: marcaNombre(h.name, h.tipo), linea: lineaNombre(h.medio, h.name, et), hoja: true}) }
+    return idx.get(k) };
+  const extra = new Map(), fila = (d, ci) => { const k = d + '|' + ci;
+    if(!extra.has(k)) extra.set(k, {d, ci, inv:0, imp:0, alc:0, cli:0, vid:0, reg:0, com:0, ing:0}); return extra.get(k) };
+  // medios sin API: entrega desde la hoja; con "Plataforma", también sus resultados de plataforma
+  HOJA.forEach(h => { if(API_PLAT.includes(h.medio)) return;
+    if(h.inv || h.imp || h.cli || (modo === 'plat' && (h.regP || h.comP))){ const r = fila(h.d, camp(h));
+      r.inv += h.inv; r.imp += h.imp; r.cli += h.cli; r.vid += h.vid; if(modo === 'plat'){ r.reg += h.regP; r.com += h.comP; r.ing += h.ingP } } });
+  if(modo === 'ga4'){
+    const res = new Map();
+    HOJA.forEach(h => { if(!(h.reg || h.com || h.ing)) return; const k = h.d + '|' + h.medio + '|' + h.key;
+      const t = res.get(k) || {reg:0, com:0, ing:0, h}; t.reg += h.reg; t.com += h.com; t.ing += h.ing; res.set(k, t) });
+    ROWS.forEach(r => { const t = res.get(r.d + '|' + r.c.plat + '|' + nkey(r.c.nombre));
+      r.reg = t ? t.reg : 0; r.com = t ? t.com : 0; r.ing = t ? t.ing : 0; if(t) t.usado = true });
+    // resultados de GA4 sin fila de API ese día (o de medios sin API): van en su propia fila
+    res.forEach(t => { if(t.usado) return; const r = fila(t.h.d, camp(t.h)); r.reg += t.reg; r.com += t.com; r.ing += t.ing });
+  }
+  ROWS = ROWS.concat([...extra.values()].map(r => ({...r, c: C[r.ci]})));
+  CONECTADOS = [...new Set(C.filter(c => !c.hoja || c.plat !== 'Otros').map(c => c.plat))];
+}
 const Z = () => ({inv:0, imp:0, cli:0, vid:0, reg:0, com:0, ing:0});
 function add(a, r){ for(const k in a) a[k] += r[k] || 0; return a }
 function M(t){ return {...t, cpm: div(t.inv*1000, t.imp), ctr: div(t.cli, t.imp), cpc: div(t.inv, t.cli), cpr: div(t.inv, t.reg),
@@ -196,6 +300,7 @@ function resetFilters(){ ['f-plat','f-etapa','f-marca'].forEach(id => document.g
 // ── Render ──────────────────────────────────────────────────────────────────
 function render(){
   const f = F(); if(!f.desde || !f.hasta) return;
+  if(HOJA) notaFuentes();
   document.querySelectorAll('#quick .qbtn').forEach(b => b.classList.toggle('on', b.dataset.q === QUICK));
   const rows = filas(f), T = sum(rows), fw = flowDe(f), G = metas(fw);
   document.getElementById('rango-note').textContent = `${fDate(f.desde)} – ${fDate(f.hasta)} ${f.hasta.slice(0,4)} · ${days(f.desde, f.hasta)} días`;
@@ -216,8 +321,8 @@ function renderKPIs(T, G, fw){
     k('Costo por registro', fCOP(T.cpr), cprM ? `<span class="${costCls(T.cpr, cprM)}">meta ${fCOP(cprM)}</span>` : ''),
     k('Compras', fN(T.com), G.com ? 'meta ' + fN(G.com) : '', bar(div(T.com, G.com), 'Cumplimiento')),
     k('Costo por compra', fCOP(T.cpa), cpaM ? `<span class="${costCls(T.cpa, cpaM)}">meta ${fCOP(cpaM)}</span>` : ''),
-    k('Compras por registro', fD(T.r2c, 1), 'compras de plataforma sobre registros'),
-    k('Ingresos (píxel Meta)', fCOP(T.ing), 'ROAS ' + (T.roas ? fD(T.roas, 1) + 'x' : '—') + ' sobre toda la inversión'),
+    k('Compras por registro', fD(T.r2c, 1), (resGA4() ? 'compras GA4' : 'compras de plataforma') + ' sobre registros'),
+    k(resGA4() ? 'Ingresos GA4' : 'Ingresos (píxel Meta)', fCOP(T.ing), 'ROAS ' + (T.roas ? fD(T.roas, 1) + 'x' : '—') + ' sobre toda la inversión'),
     k('Pacing del mes', fw ? fP(pac) : '—', fw ? `${fP(fw.corrido)} del mes corrido · ${mesLbl(fw.mes)}` : 'sin flow para este mes'),
   ].join('');
 }
@@ -239,7 +344,7 @@ function renderFunnel(rows, T, fw, G){
       grid = it('Costo por registro', fCOP(t.cpr), costCls(t.cpr, div(pptoE, regE))) + it('Meta CPR', fCOP(div(pptoE, regE))) + it('Compras', fN(t.com)) + it('CPC', fCOP(t.cpc)) }
     else { main = fN(t.com); lbl = 'Compras' + (comE ? ' · meta ' + fN(comE) : '');
       grid = it('Costo por compra', fCOP(t.cpa), costCls(t.cpa, div(pptoE, comE))) + it('Meta CPA', fCOP(div(pptoE, comE))) +
-        (e === 'RETENTION' ? it('Ingresos píxel', fM(t.ing)) + it('ROAS', t.roas ? fD(t.roas, 1) + 'x' : '—') : it('Registros', fN(t.reg)) + it('CPR', fCOP(t.cpr))) }
+        (e === 'RETENTION' ? it('Ingresos', fM(t.ing)) + it('ROAS', t.roas ? fD(t.roas, 1) + 'x' : '—') : it('Registros', fN(t.reg)) + it('CPR', fCOP(t.cpr))) }
     return `<div class="card stage ${e === 'AWARENESS' ? 's-awa' : ''}"><div class="stage-h"><b>${ET_LBL[e]}</b><span>${fCOP(t.inv)}</span></div>
       <div class="stage-main">${main}</div><div class="stage-lbl">${lbl}</div><div class="nm-grid">${grid}</div>
       <div class="mix"><i style="width:${sh*100}%;background:${ET_COL[e]}"></i></div>
@@ -379,7 +484,7 @@ function renderCurvas(f){
 function draw(id, type, data, options){ if(CHARTS[id]) CHARTS[id].destroy(); CHARTS[id] = new Chart(document.getElementById(id), {type, data, options}) }
 
 // ── Tablas genéricas ────────────────────────────────────────────────────────
-const COLS = [['inv','Inversión',fCOP],['pct','% inv.',fP],['imp','Impresiones',fN],['cpm','CPM',fCOP],['cli','Clics',fN],['ctr','CTR',fP],['reg','Registros',fN],['cpr','Costo / registro',fCOP],['com','Compras',fN],['cpa','Costo / compra',fCOP],['ing','Ingresos píxel',fCOP],['roas','ROAS',v => v ? fD(v, 1) + 'x' : '—']];
+const COLS = [['inv','Inversión',fCOP],['pct','% inv.',fP],['imp','Impresiones',fN],['cpm','CPM',fCOP],['cli','Clics',fN],['ctr','CTR',fP],['reg','Registros',fN],['cpr','Costo / registro',fCOP],['com','Compras',fN],['cpa','Costo / compra',fCOP],['ing','Ingresos',fCOP],['roas','ROAS',v => v ? fD(v, 1) + 'x' : '—']];
 const thead = first => '<tr>' + first.map(h => `<th>${h}</th>`).join('') + COLS.map(c => `<th class="r">${c[1]}</th>`).join('') + '</tr>';
 const tcells = (t, tot) => COLS.map(([k, , fm]) => `<td class="r">${k === 'pct' ? fP(div(t.inv, tot)) : fm(t[k])}</td>`).join('');
 function renderPlat(rows){
@@ -433,6 +538,18 @@ function renderDetalle(){
 }
 
 // ── Arranque ────────────────────────────────────────────────────────────────
+const resGA4 = () => !!HOJA && document.getElementById('f-res').value === 'ga4';
+function notaFuentes(){
+  const hasta = fDate(D.hasta) + ' ' + D.hasta.slice(0,4), sinApi = CONECTADOS.filter(p => !API_PLAT.includes(p));
+  document.getElementById('fuentes-note').innerHTML = HOJA
+    ? `<b>Fuentes:</b> inversión, impresiones, clics y alcance de Meta y TikTok por API, al ${hasta}. ${resGA4() ? '<b>Compras, registros e ingresos: GA4</b>' : '<b>Compras, registros e ingresos: plataforma</b> (píxel de Meta, eventos de TikTok)'}, desde ${SHEET_TAB} de la hoja de fuente de datos` +
+      (sinApi.length ? `, que también aporta la inversión de ${sinApi.join(', ')}.` : '.') + ` Cambia el origen de los resultados con el selector <b>Resultados</b>.`
+    : `<b>Fuentes conectadas:</b> Meta Ads y TikTok Ads por API, diario por campaña, actualizado al ${hasta}. <b>La hoja de fuente de datos no cargó</b> (${esc(HOJA_ERR)}): ` +
+      `compras y registros son los de plataforma, y Google Ads, GA4, X y programática no aparecen. Para leerla, la hoja debe estar compartida como "Cualquier persona con el enlace: lector". ` +
+      `<b>Ojo con el píxel de Meta:</b> del 18 al 23 de septiembre casi no registró compras (de unas 5.000 diarias a menos de 350), y desde el 24 de septiembre las compras volvieron pero llegan con valor $0.`;
+  const sel = document.getElementById('f-plat'), v = sel.value;
+  sel.innerHTML = '<option value="">Todas</option>' + CONECTADOS.map(p => `<option${p === v ? ' selected' : ''}>${esc(p)}</option>`).join('');
+}
 (function init(){
   if(!D){ document.getElementById('ld-msg').textContent = 'Falta data/baloto_data.js'; return }
   const q = [['mes','Mes actual'],['mesAnt','Mes anterior'],['30','Últimos 30 días'],['trim','Últimos 90 días'],['anio','Año']];
@@ -440,11 +557,11 @@ function renderDetalle(){
   const hasta = fDate(D.hasta) + ' ' + D.hasta.slice(0,4);
   document.getElementById('last-upd').textContent = 'Datos hasta el ' + hasta; document.getElementById('last-upd-side').textContent = hasta;
   ['f-desde','f-hasta'].forEach(id => { document.getElementById(id).min = ROWS[0]?.d || '2026-01-01'; document.getElementById(id).max = D.hasta });
-  document.getElementById('fuentes-note').innerHTML = `<b>Fuentes conectadas:</b> Meta Ads y TikTok Ads por API, diario por campaña, actualizado al ${hasta}. ` +
-    `<b>Sin conectar:</b> Google Ads, GA4, X y programática, que en la hoja de fuente de datos sí aparecen; las líneas de Google del flow se muestran con su meta pero sin ejecución. ` +
-    `<b>Ojo con el píxel de Meta:</b> del 18 al 23 de septiembre casi no registró compras (de unas 5.000 diarias a menos de 350), y desde el 24 de septiembre las compras volvieron pero llegan con valor $0. Los ingresos y el ROAS desde el 18 de septiembre no son confiables.`;
-  setQuick('mes');
-  document.getElementById('loading').style.display = 'none';
+  document.getElementById('ld-msg').textContent = 'Leyendo la hoja de fuente de datos...';
+  const listo = () => { construir(); notaFuentes(); setQuick('mes'); document.getElementById('loading').style.display = 'none' };
+  leerHoja().then(rows => { HOJA = parseHoja(rows); if(!HOJA.length) throw new Error('la pestaña llegó vacía'); listo() })
+    .catch(e => { console.warn(e); HOJA = null; HOJA_ERR = e.message || String(e);
+      const r = document.getElementById('f-res'); r.value = 'plat'; r.disabled = true; listo() });
 })();
 </script>
 </body>
