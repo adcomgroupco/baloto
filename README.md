@@ -27,6 +27,7 @@ Sitio de consulta de flows, reportes, análisis y propuestas de pauta digital pa
 - `informe-telomereces-mayo-2026.html`: Videos Telomereces · may 2026.
 - `informe-telomereces-abril-2026.html`: Videos Telomereces · abr 2026.
 - `recomendacion-presupuesto.html`: Recomendación de presupuesto · may 2026.
+- `reportes/`: reporte general mensual de 2026 en PDF (febrero a agosto), enlazado en Reportes mensuales.
 - `assets/`: recursos visuales y estilos del sitio. `master.css` agrega el negro y amarillo del índice; `reportes.css` es el estilo de las páginas de flow.
 
 ## Uso local
