@@ -155,6 +155,11 @@ const SHEET_ID = '1zEv8npIyHnoaEXKZDRh-vpyo88RU0WmKUgSKwSYzaMU', SHEET_TAB = 'RE
 const API_PLAT = ['Meta','TikTok'];
 const API_ROWS = D ? D.diario.map(r => ({d:r[0], ci:r[1], inv:r[2], imp:r[3], alc:r[4], cli:r[5], vid:r[6], reg:r[7], com:r[8], ing:r[9]})) : [];
 let C = [], ROWS = [], HOJA = null, HOJA_ERR = '', SEQ = 0;
+const LINEA_ET = {}; Object.values(FL).forEach(m => m.lineas.forEach(l => LINEA_ET[l.id] = l.etapa));
+// Desde el 1 de octubre un cambio en Tag Manager dejó de enviar el valor de compra a GA4 (ya corregido).
+// Para esos días el ingreso se estima con el ticket medio GA4 de 2026 de cada canal (ene–sep, sin el 18–23 sep).
+const TICKET = {'Meta':4193, 'Google Ads':4740, 'TikTok':4154, 'X':4690, 'Programática':4690}, SIN_VALOR_DESDE = '2026-10-01';
+const ticketDe = p => TICKET[p] || 4690;
 
 // ── Hoja: lectura ───────────────────────────────────────────────────────────
 function num(v){ if(typeof v === 'number') return isFinite(v) ? v : 0;
@@ -236,8 +241,10 @@ function construir(){
   if(!HOJA){ CONECTADOS = API_PLAT.slice(); return }
   const idx = new Map(C.map((c, i) => [c.plat + '|' + nkey(c.nombre), i]));
   const camp = h => { const k = h.medio + '|' + h.key;
-    if(!idx.has(k)){ const et = ETAPAS.includes(h.etapa) ? h.etapa : etapaNombre(h.name);
-      idx.set(k, C.length); C.push({plat: h.medio, nombre: h.name, etapa: et, marca: marcaNombre(h.name, h.tipo), linea: lineaNombre(h.medio, h.name, et), hoja: true}) }
+    if(!idx.has(k)){ let et = ETAPAS.includes(h.etapa) ? h.etapa : etapaNombre(h.name);
+      const ln = lineaNombre(h.medio, h.name, et);
+      if(LINEA_ET[ln]) et = LINEA_ET[ln];   // la etapa del flow manda sobre la homologación de la hoja
+      idx.set(k, C.length); C.push({plat: h.medio, nombre: h.name, etapa: et, marca: marcaNombre(h.name, h.tipo), linea: ln, hoja: true}) }
     return idx.get(k) };
   const extra = new Map(), fila = (d, ci) => { const k = d + '|' + ci;
     if(!extra.has(k)) extra.set(k, {d, ci, inv:0, imp:0, alc:0, cli:0, vid:0, reg:0, com:0, ing:0}); return extra.get(k) };
@@ -249,10 +256,11 @@ function construir(){
     const res = new Map();
     HOJA.forEach(h => { if(!(h.reg || h.com || h.ing)) return; const k = h.d + '|' + h.medio + '|' + h.key;
       const t = res.get(k) || {reg:0, com:0, ing:0, h}; t.reg += h.reg; t.com += h.com; t.ing += h.ing; res.set(k, t) });
+    const ingDe = (t, d, p) => (!t.ing && t.com && d >= SIN_VALOR_DESDE) ? t.com * ticketDe(p) : t.ing;
     ROWS.forEach(r => { const t = res.get(r.d + '|' + r.c.plat + '|' + nkey(r.c.nombre));
-      r.reg = t ? t.reg : 0; r.com = t ? t.com : 0; r.ing = t ? t.ing : 0; if(t) t.usado = true });
+      r.reg = t ? t.reg : 0; r.com = t ? t.com : 0; r.ing = t ? ingDe(t, r.d, r.c.plat) : 0; if(t){ t.usado = true; r.est = !t.ing && t.com && r.d >= SIN_VALOR_DESDE } });
     // resultados de GA4 sin fila de API ese día (o de medios sin API): van en su propia fila
-    res.forEach(t => { if(t.usado) return; const r = fila(t.h.d, camp(t.h)); r.reg += t.reg; r.com += t.com; r.ing += t.ing });
+    res.forEach(t => { if(t.usado) return; const r = fila(t.h.d, camp(t.h)); r.reg += t.reg; r.com += t.com; r.ing += ingDe(t, t.h.d, t.h.medio); if(!t.ing && t.com && t.h.d >= SIN_VALOR_DESDE) r.est = true });
   }
   ROWS = ROWS.concat([...extra.values()].map(r => ({...r, c: C[r.ci]})));
   CONECTADOS = [...new Set(C.filter(c => !c.hoja || c.plat !== 'Otros').map(c => c.plat))];
@@ -307,9 +315,9 @@ function render(){
   const f = F(); if(!f.desde || !f.hasta) return;
   if(HOJA) notaFuentes();
   // GA4 dejó de enviar el valor de compra en algunos días: se avisa cuando el rango tiene compras sin ingresos
-  if(resGA4()){ const sinValor = [...new Set(filas(f).filter(r => r.com > 0 && !r.ing).map(r => r.d))].sort();
+  if(resGA4()){ const est = [...new Set(filas(f).filter(r => r.est).map(r => r.d))].sort();
     const el = document.getElementById('fuentes-note');
-    if(sinValor.length) el.innerHTML += ` <b>Ingresos GA4:</b> ${sinValor.length} día${sinValor.length > 1 ? 's' : ''} del rango tiene${sinValor.length > 1 ? 'n' : ''} compras sin valor en GA4 (desde el ${fDate(sinValor[0])}); los ingresos y el ROAS de esos días no están completos.` }
+    if(est.length) el.innerHTML += ` <b>Ingresos estimados:</b> desde el ${fDate(est[0])} un cambio en Tag Manager dejó de enviar el valor de compra a GA4 (ya corregido). Para esos ${est.length} días el ingreso se calcula con el ticket medio GA4 de 2026 de cada canal: Meta ${fCOP(TICKET.Meta)}, Google ${fCOP(TICKET['Google Ads'])}, TikTok ${fCOP(TICKET.TikTok)}.` }
   document.querySelectorAll('#quick .qbtn').forEach(b => b.classList.toggle('on', b.dataset.q === QUICK));
   const rows = filas(f), T = sum(rows), fw = flowDe(f), G = metas(fw);
   document.getElementById('rango-note').textContent = `${fDate(f.desde)} – ${fDate(f.hasta)} ${f.hasta.slice(0,4)} · ${days(f.desde, f.hasta)} días`;

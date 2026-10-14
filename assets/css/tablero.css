@@ -149,3 +149,12 @@ select:focus,input:focus{border-color:var(--accent-fg)}
 .notice b{color:var(--black)}
 @media(max-width:1300px){.stage-grid{grid-template-columns:repeat(2,1fr)}.curve-grid{grid-template-columns:1fr}}
 @media(max-width:700px){.stage-grid{grid-template-columns:1fr}}
+
+/* adcom.css le da relleno y grid a .card (fichas del índice); en el tablero la tarjeta es solo la superficie, como en Corpas */
+.content .card{padding:0;display:block;gap:0}
+.content .kpi-card{padding:14px}
+.content .chart-card{padding:14px}
+.content .funnel{padding:16px 18px;display:grid;gap:9px}
+.content .stage{padding:14px 14px 12px}
+.notice{display:block;padding:10px 14px}
+.notice b{display:inline}
