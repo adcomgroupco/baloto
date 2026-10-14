@@ -200,10 +200,13 @@ function parseHoja(rows){
   Object.entries({ing:'Ingresos GA4', inv:'Amount Spent', imp:'Impressions', cli:'Link Clicks', vid:'ThruPlays', tipo:'Tipo',
     regP:'Registros', comP:'Compras', ingP:'Ingresos'}).forEach(([k, l]) => c[k] = col(l));
   const v = (x, k) => c[k] >= 0 ? num(x[c[k]]) : 0;
-  return rows.slice(1).map(x => ({d: isoD(x[c.d]), name: String(x[c.camp] || '').trim(), medio: medioDe(x[c.medio]), etapa: norm(x[c.etapa]),
+  return rows.slice(1).map(x => ({d: isoD(x[c.d]), name: String(x[c.camp] || '').trim(), medio: medioDe(x[c.medio]), medioRaw: x[c.medio], etapa: norm(x[c.etapa]),
     tipo: c.tipo >= 0 ? String(x[c.tipo] || '') : '', inv: v(x,'inv'), imp: v(x,'imp'), cli: v(x,'cli'), vid: v(x,'vid'),
     reg: v(x,'reg'), com: v(x,'com'), ing: v(x,'ing'), regP: v(x,'regP'), comP: v(x,'comP'), ingP: v(x,'ingP')}))
-    .filter(r => r.d && r.name).map(r => ({...r, key: nkey(r.name)})) }
+    .filter(r => r.d && r.name)
+    // tráfico que no es pauta de Adcom (orgánico, directo, CRM) no entra al tablero
+    .filter(r => !/NO ADCOM|SIN MEDIO/.test(norm(r.medioRaw)))
+    .map(r => ({...r, key: nkey(r.name)})) }
 
 // ── Clasificación (la misma de build_baloto_tablero.py) ─────────────────────
 function etapaNombre(n){ n = n.toLowerCase();
@@ -219,7 +222,9 @@ function lineaNombre(plat, n, etapa){ n = n.toLowerCase();
   if(plat === 'TikTok'){ if(/topfeed|awareness|_awa_/.test(n)) return 'awa_tiktok'; if(n.includes('_acq_')) return 'acq_tiktok';
     if(n.includes('promocional')) return 'promo_tiktok'; if(n.includes('adcom_miloto')) return 'miloto_tiktok'; if(n.includes('_ret_')) return 'baloto_tiktok' }
   // Google Ads: la línea sale de la etapa homologada en la hoja
+  // Google Ads: Search de categoría y competencia es la línea Conversion_ACT del flow; PMax, la de tráfico
   if(plat === 'Google Ads'){ if(/cobro/.test(n)) return 'cobro'; if(/promo/.test(n)) return 'promo_google';
+    if(/search_(category|competencia)/.test(n)) return 'act_google'; if(/pmax|search/.test(n)) return 'traf_google';
     if(etapa === 'ACTIVATION') return 'act_google'; if(etapa === 'ACQUISITION' || etapa === 'AWARENESS') return 'traf_google' }
   return '' }
 
@@ -301,6 +306,10 @@ function resetFilters(){ ['f-plat','f-etapa','f-marca'].forEach(id => document.g
 function render(){
   const f = F(); if(!f.desde || !f.hasta) return;
   if(HOJA) notaFuentes();
+  // GA4 dejó de enviar el valor de compra en algunos días: se avisa cuando el rango tiene compras sin ingresos
+  if(resGA4()){ const sinValor = [...new Set(filas(f).filter(r => r.com > 0 && !r.ing).map(r => r.d))].sort();
+    const el = document.getElementById('fuentes-note');
+    if(sinValor.length) el.innerHTML += ` <b>Ingresos GA4:</b> ${sinValor.length} día${sinValor.length > 1 ? 's' : ''} del rango tiene${sinValor.length > 1 ? 'n' : ''} compras sin valor en GA4 (desde el ${fDate(sinValor[0])}); los ingresos y el ROAS de esos días no están completos.` }
   document.querySelectorAll('#quick .qbtn').forEach(b => b.classList.toggle('on', b.dataset.q === QUICK));
   const rows = filas(f), T = sum(rows), fw = flowDe(f), G = metas(fw);
   document.getElementById('rango-note').textContent = `${fDate(f.desde)} – ${fDate(f.hasta)} ${f.hasta.slice(0,4)} · ${days(f.desde, f.hasta)} días`;
