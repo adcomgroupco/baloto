@@ -175,6 +175,7 @@
       <div class="foot-note">
         <b>Fuente</b>: APIs de Meta Ads (cuenta ADCOM 2025 - BALOTO) y TikTok Ads (ADCOM - Baloto), diario por campaña. <b>Registros y compras</b>: eventos de plataforma (píxel de Meta: CompleteRegistration y Purchase; TikTok: registro de usuario y pago completado), no GA4.
         <b>Ingresos</b>: valor de compra del píxel de Meta; TikTok no envía valor. <b>Etapa y marca</b> salen del nombre de la campaña (awa / acq / act / ret; adcom_baloto / miloto / colorloto); los Top Feed de TikTok cuentan como awareness.
+        <b>Corrección de UTM</b>: los resultados GA4 de MiLoto retención en TikTok y de Italia 2 en TikTok, que llegaron con el nombre de otra campaña hasta el 27 de octubre, se reasignan a su campaña.
         <b>Metas</b>: flow de medios del mes, por línea de campaña, proporcionales a los días del rango salvo con "Meta completa del mes". El presupuesto real y el pacing están en la pestaña Presupuesto y pacing.
       </div>
     </div>
@@ -285,15 +286,27 @@ function parseHoja(rows){
   const req = {d:'Date', camp:'Campaign Name', medio:'Medio', etapa:'Etapa', reg:'Registros GA4', com:'Compras GA4'};
   const c = {}; Object.entries(req).forEach(([k, l]) => { c[k] = col(l); if(c[k] < 0) throw new Error('Falta la columna ' + l + ' en ' + SHEET_TAB) });
   Object.entries({ing:'Ingresos GA4', inv:'Amount Spent', imp:'Impressions', cli:'Link Clicks', vid:'ThruPlays', tipo:'Tipo',
-    regP:'Registros', comP:'Compras', ingP:'Ingresos'}).forEach(([k, l]) => c[k] = col(l));
+    regP:'Registros', comP:'Compras', ingP:'Ingresos', fm:'Source / Medium'}).forEach(([k, l]) => c[k] = col(l));
   const v = (x, k) => c[k] >= 0 ? num(x[c[k]]) : 0;
   return rows.slice(1).map(x => ({d: isoD(x[c.d]), name: String(x[c.camp] || '').trim(), medio: medioDe(x[c.medio]), medioRaw: x[c.medio], etapa: norm(x[c.etapa]),
     tipo: c.tipo >= 0 ? String(x[c.tipo] || '') : '', inv: v(x,'inv'), imp: v(x,'imp'), cli: v(x,'cli'), vid: v(x,'vid'),
-    reg: v(x,'reg'), com: v(x,'com'), ing: v(x,'ing'), regP: v(x,'regP'), comP: v(x,'comP'), ingP: v(x,'ingP')}))
-    .filter(r => r.d && r.name)
+    reg: v(x,'reg'), com: v(x,'com'), ing: v(x,'ing'), regP: v(x,'regP'), comP: v(x,'comP'), ingP: v(x,'ingP'),
+    fm: c.fm >= 0 ? norm(x[c.fm]) : ''}))
+    .filter(r => r.d && r.name).map(corregirUtm)
     // tráfico que no es pauta de Adcom (orgánico, directo, CRM) no entra al tablero
     .filter(r => !/NO ADCOM|SIN MEDIO/.test(norm(r.medioRaw)))
     .map(r => ({...r, key: nkey(r.name)})) }
+
+// Anuncios de TikTok que llevaron el utm_campaign de otra campaña (corregidos en TikTok el 27 oct 2026):
+// MiLoto retención de TikTok usaba el nombre de la campaña de Meta, e Italia 2 el de la Italia original.
+// GA4 registró sus resultados con ese nombre; aquí se devuelven a la campaña que los generó.
+const UTM_CORREGIDOS = [
+  {de: 'adcom_miloto_fb_ret_conversion-rmkt-ret_miloto', si: h => /TIKTOK/.test(h.fm), a: 'adcom_miloto_tiktok_ret_conversion-rmkt-ret_miloto', medio: 'TikTok'},
+  {de: 'adcom_baloto_tiktok_act_conversion_promocional-italia', si: h => h.d >= '2026-10-13', a: 'adcom_baloto_tiktok_act_conversion_promocional-italia_2', medio: 'TikTok'},
+];
+function corregirUtm(h){
+  const r = UTM_CORREGIDOS.find(x => x.de === h.name && x.si(h));
+  return r && !h.inv ? {...h, name: r.a, medio: r.medio} : h }
 
 // ── Clasificación (la misma de build_baloto_tablero.py) ─────────────────────
 function etapaNombre(n){ n = n.toLowerCase();
