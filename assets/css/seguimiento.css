@@ -1,0 +1,70 @@
+/* Seguimientos de presupuesto: lo que agregan las páginas por cuenta y el índice sobre
+   adcom.css y tablero.css. Mismas piezas que el seguimiento de Baloto. */
+
+/* barra de avance: relleno = consumo, línea negra = esperado a la fecha */
+.pbar{position:relative;height:8px;background:var(--gray-100);border-radius:4px;min-width:90px}
+.pbar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+.pbar b{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--black)}
+.blk td{background:var(--gray-50) !important;font-weight:700;color:var(--black) !important;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.grid-2 .chart-card{margin-bottom:0}
+@media(max-width:1100px){.grid-2{grid-template-columns:1fr}}
+.kpi-grid.kpi-6{grid-template-columns:repeat(6,1fr)}
+@media(max-width:1500px){.kpi-grid.kpi-6{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:900px){.kpi-grid.kpi-6{grid-template-columns:repeat(2,1fr)}}
+.notice a{color:var(--black);font-weight:600}
+
+/* alertas: una ficha por alerta, con franja de severidad */
+.alert-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:20px}
+.content .alert{padding:12px 14px;display:grid;gap:6px;align-content:start;border-left:4px solid var(--gray-200)}
+.alert p{font-size:12px;color:var(--gray-600);line-height:1.5}
+.alert small{font-size:11px;color:var(--gray-400);word-break:break-all}
+.alert .pill{justify-self:start}
+.alert-3{border-left-color:var(--c-neg) !important}
+.alert-2{border-left-color:var(--c-mid) !important}
+.alert-1{border-left-color:var(--c-pos) !important}
+
+/* ── índice ─────────────────────────────────────────────────────────── */
+.estado-wrap{background:var(--raised);border:1px solid var(--rule);border-radius:var(--radius);overflow-x:auto}
+.estado{width:100%;border-collapse:collapse;font-size:.92rem;min-width:900px}
+.estado th{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-muted);
+  text-align:left;padding:12px 14px;border-bottom:2px solid var(--rule);white-space:nowrap}
+.estado th,.estado td{text-align:left}
+.estado td{padding:14px;border-top:1px solid var(--rule);vertical-align:top}
+.estado .alerta-main .pill{opacity:1}
+.estado th.r,.estado td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.estado tr.fila{cursor:pointer}
+.estado tr.fila:hover td{background:var(--sunken)}
+.estado .cuenta b{display:block;font-size:1rem}
+.estado .cuenta small{color:var(--fg-muted);font-size:.78rem}
+.estado .alerta-main{display:grid;gap:4px;max-width:46ch;justify-items:start}
+.estado .alerta-main .txt{font-size:.85rem;color:var(--fg-secondary);line-height:1.45}
+.estado .mas{font-size:.75rem;color:var(--fg-muted)}
+.estado .ir{font-weight:700;text-decoration:none;color:var(--fg);white-space:nowrap}
+.estado .ir:hover{color:var(--accent-fg)}
+.estado .pbar{margin-top:6px}
+.estado .pill{font-size:.72rem;padding:2px 9px}
+.p-pos{background:#DCFCE7;color:#14532D} .p-mid{background:#FEF3C7;color:#92400E} .p-neg{background:#FEE2E2;color:#991B1B} .p-off{background:var(--sunken);color:var(--fg-secondary)}
+.pill{display:inline-block;font-weight:700;border-radius:999px;white-space:nowrap}
+
+.resumen-cuentas{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.ficha{display:grid;gap:10px;align-content:start}
+.ficha .ficha-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ficha .cifras{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;font-variant-numeric:tabular-nums}
+.ficha .cifras small{display:block;font-size:.72rem;color:var(--fg-muted);font-weight:600}
+.ficha .cifras b{font-size:1.02rem}
+.ficha ul{list-style:none;padding:0;margin:0;display:grid;gap:6px;font-size:.82rem;color:var(--fg-secondary);line-height:1.4}
+.ficha li{padding-left:12px;position:relative}
+.ficha li::before{content:"";position:absolute;left:0;top:.5em;width:6px;height:6px;border-radius:50%;background:var(--fg-muted)}
+.ficha li.s3::before{background:#b91c1c} .ficha li.s2::before{background:#b45309} .ficha li.s1::before{background:#15803d}
+.cargando{color:var(--fg-muted);font-size:.9rem}
+
+/* consumo mapeado vs plataforma */
+.kpi-grid.kpi-4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:1100px){.kpi-grid.kpi-4{grid-template-columns:repeat(2,1fr)}}
+.cruce-grid{align-items:start}
+.cruce-grid .tcard{margin-bottom:0}
+.tscroll-alto{max-height:420px;overflow-y:auto}
+.cruce-foot{margin:-2px 0 20px;padding:8px 2px;border-top:0}
+.td-nom{max-width:380px;overflow:hidden;text-overflow:ellipsis}
+.estado .t-mute,.t-mute{color:var(--fg-muted);font-size:.75rem}

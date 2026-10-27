@@ -9,19 +9,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/adcom.css">
 <link rel="stylesheet" href="assets/css/tablero.css">
+<link rel="stylesheet" href="assets/css/seguimiento.css">
+<style>.cpx{display:block;font-size:10px;color:var(--gray-400);font-weight:400}.kpi-grid.kpi-4{grid-template-columns:repeat(4,1fr)}@media(max-width:900px){.kpi-grid.kpi-4{grid-template-columns:repeat(2,1fr)}}</style>
 <script defer src="assets/js/adcom.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<script src="data/baloto_presupuesto.js"></script>
-<style>
-.pbar{position:relative;height:8px;background:var(--gray-100);border-radius:4px;min-width:90px}
-.pbar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
-.pbar b{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--black)}
-.blk td{background:var(--gray-50) !important;font-weight:700;color:var(--black) !important;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.grid-2 .chart-card{margin-bottom:0}
-@media(max-width:1100px){.grid-2{grid-template-columns:1fr}}
-</style>
+<script src="data/hoja_baloto.js"></script>
+<script src="data/consumo_plataformas.js"></script>
+<script src="data/resultados_baloto.js"></script>
+<script src="assets/js/hoja.js"></script>
+<script src="assets/js/resultados.js"></script>
 </head>
 <body class="con-shell">
 <div id="loading">
@@ -34,13 +31,16 @@
     <a class="app-sidebar-brand" href="index.html"><i></i>Master Baloto</a>
     <div class="app-sidebar-client">
       <span class="app-sidebar-client-label">Cliente</span>
-      <strong class="app-sidebar-client-name">Baloto, Miloto y Colorloto · presupuesto</strong>
+      <strong class="app-sidebar-client-name" id="cliente">Baloto</strong>
     </div>
   </div>
   <div class="app-sidebar-nav">
     <span class="app-sidebar-nav-title">Secciones</span>
     <a href="#sec-kpi" class="active"><b></b>Resumen del mes</a>
-    <a href="#sec-medio"><b></b>Por medio y etapa</a>
+    <a href="#sec-res"><b></b>Registros y compras</a>
+    <a href="#sec-alertas"><b></b>Alertas</a>
+    <a href="#sec-cruce"><b></b>Mapeado vs plataforma</a>
+    <a href="#sec-medio"><b></b>Por medio</a>
     <a href="#sec-camp"><b></b>Campañas</a>
     <a href="#sec-hist"><b></b>Histórico</a>
   </div>
@@ -50,13 +50,13 @@
 <div class="main">
   <div class="topbar">
     <div class="tb-row">
-      <span class="topbar-title">Seguimiento de presupuesto</span>
+      <span class="topbar-title">Seguimiento de presupuesto · Baloto</span>
       <div class="f-sep"></div>
-      <div class="fg"><span class="fl">Mes</span><select id="f-mes" onchange="render()"></select></div>
-      <div class="fg"><span class="fl">Medio</span><select id="f-medio" onchange="render()"><option value="">Todos</option></select></div>
-      <div class="fg"><span class="fl">Marca</span><select id="f-marca" onchange="render()"><option value="">Todas</option></select></div>
-      <div class="fg"><span class="fl">Estado</span><select id="f-estado" onchange="render()"><option value="">Todos</option></select></div>
-      <button class="btn-reset" onclick="resetFilters()">↺ Reset</button>
+      <div class="fg"><span class="fl">Mes</span><select id="f-mes"></select></div>
+      <div class="fg"><span class="fl">Medio</span><select id="f-medio"><option value="">Todos</option></select></div>
+      <div class="fg" id="dim-fg"></div>
+      <div class="fg"><span class="fl">Estado</span><select id="f-estado"><option value="">Todos</option></select></div>
+      <button class="btn-reset" id="btn-reset">↺ Reset</button>
       <span class="last-upd" id="last-upd"></span>
     </div>
   </div>
@@ -65,18 +65,38 @@
     <div class="card notice" id="fuente-note"></div>
 
     <div class="sec-title" id="sec-kpi"><span></span>Resumen del mes<span class="sec-note" id="kpi-note"></span></div>
-    <div class="kpi-grid" id="kpi-grid"></div>
+    <div class="kpi-grid kpi-6" id="kpi-grid"></div>
 
-    <div class="sec-title" id="sec-medio"><span></span>Por medio y etapa</div>
+    <div class="sec-title" id="sec-res"><span></span>Registros y compras GA4<span class="sec-note" id="res-note"></span></div>
+    <div class="kpi-grid kpi-4" id="res-grid"></div>
+
+    <div class="sec-title" id="sec-alertas"><span></span>Alertas de presupuesto y consumo<span class="sec-note">mes en curso, a la fecha de corte</span></div>
+    <div id="alertas"></div>
+
+    <div class="sec-title" id="sec-cruce"><span></span>Consumo mapeado vs plataforma<span class="sec-note" id="cruce-note"></span></div>
+    <div class="kpi-grid kpi-4" id="cruce-kpi"></div>
+    <div class="grid-2 cruce-grid">
+      <div class="card tcard">
+        <div class="tbar"><b class="chart-h">Gastan en plataforma y no están en la hoja</b></div>
+        <div class="tscroll"><table><thead><tr><th>Plataforma</th><th>Campaña</th><th class="r">Consumo</th></tr></thead><tbody id="sinmap-body"></tbody></table></div>
+      </div>
+      <div class="card tcard">
+        <div class="tbar"><b class="chart-h">Campañas de la hoja frente a la plataforma</b><span class="sp"></span><span class="sec-note">ordenadas por diferencia</span></div>
+        <div class="tscroll tscroll-alto"><table><thead><tr><th>Nomenclatura</th><th class="r">Hoja</th><th class="r">Plataforma</th><th class="r">Diferencia</th><th></th></tr></thead><tbody id="concil-body"></tbody></table></div>
+      </div>
+    </div>
+    <div class="foot-note cruce-foot">Cada campaña con consumo en Meta, Google Ads o TikTok se busca por nombre en las nomenclaturas del mes en la hoja (sin tildes, espacios ni signos). <b>Sin mapear</b> es lo que la plataforma gastó en campañas que la hoja no tiene. Las filas sin nomenclatura en la hoja no se pueden cruzar. Las plataformas devuelven el nombre <b>actual</b> de cada campaña: si se renombró, en meses anteriores puede salir sin mapear.</div>
+
+    <div class="sec-title" id="sec-medio"><span></span>Por medio</div>
     <div class="grid-2">
       <div class="card chart-card"><div class="chart-h">Presupuesto y consumo por medio</div><div class="chart-s">Barra gris: presupuesto del mes. Barra amarilla: consumo a la fecha de corte.</div><div class="chart-wrap"><canvas id="ch-medio"></canvas></div></div>
-      <div class="card chart-card"><div class="chart-h">Presupuesto y consumo por etapa</div><div class="chart-s">Mismo corte, agrupado por etapa del funnel.</div><div class="chart-wrap"><canvas id="ch-etapa"></canvas></div></div>
+      <div class="card chart-card"><div class="chart-h" id="ch2-h">Presupuesto y consumo</div><div class="chart-s">Mismo corte, con otra agrupación.</div><div class="chart-wrap"><canvas id="ch-2"></canvas></div></div>
     </div>
     <div class="card tcard"><div class="tscroll"><table><thead id="medio-head"></thead><tbody id="medio-body"></tbody></table></div></div>
 
     <div class="sec-title" id="sec-camp"><span></span>Campañas del mes<span class="sec-note">pacing: consumo real frente al esperado a la fecha · verde ±10%, ámbar ±25%</span></div>
     <div class="card tcard">
-      <div class="tbar"><span class="sec-note" id="camp-note"></span><span class="sp"></span><input type="search" id="q" placeholder="Buscar campaña" oninput="renderCamp()" style="width:240px"></div>
+      <div class="tbar"><span class="sec-note" id="camp-note"></span><span class="sp"></span><input type="search" id="q" placeholder="Buscar campaña" style="width:240px"></div>
       <div class="tscroll"><table><thead id="camp-head"></thead><tbody id="camp-body"></tbody></table></div>
       <div class="foot-note">
         <b>Esperado a la fecha</b>: presupuesto × días transcurridos ÷ días de campaña, contados hasta la fecha de corte de la hoja.
@@ -85,249 +105,20 @@
       </div>
     </div>
 
-    <div class="sec-title" id="sec-hist"><span></span>Histórico mensual</div>
+    <div class="sec-title" id="sec-hist"><span></span>Histórico mensual<span class="sec-note" id="hist-note"></span></div>
     <div class="card chart-card"><div class="chart-wrap"><canvas id="ch-hist"></canvas></div></div>
-    <div class="card tcard"><div class="tscroll"><table><thead id="hist-head"></thead><tbody id="hist-body"></tbody></table></div></div>
+    <div class="card tcard">
+      <div class="tscroll"><table><thead id="hist-head"></thead><tbody id="hist-body"></tbody></table></div>
+      <div class="foot-note">
+        <b>Presupuesto</b>: suma de las campañas del bloque del mes en la hoja. <b>Consumo hoja</b>: lo que registra la hoja.
+        <b>Plataformas</b>: consumo real de Meta, Google Ads y TikTok por API. <b>Hoja vs plat.</b>: diferencia entre ambos, que incluye medios sin API (X, programática).
+        Clic en un mes para verlo arriba.
+      </div>
+    </div>
   </div>
 </div>
 
-<script>
-// Hoja "Seguimiento" de presupuesto de Baloto. Se lee en vivo; si no responde, se usa la copia de data/baloto_presupuesto.js.
-const SHEET_ID = '1VhrT6JiqnJGDxiZ6Qsz4zR4ejXrSf2Ugq9Y8eTUcx94', GID = '1156637178';
-const MESES_L = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-const MES_N = {ENERO:1,FEBRERO:2,MARZO:3,ABRIL:4,MAYO:5,JUNIO:6,JULIO:7,AGOSTO:8,SEPTIEMBRE:9,OCTUBRE:10,NOVIEMBRE:11,DICIEMBRE:12};
-const ETAPAS = ['AWARENESS','CONSIDERATION','ACQUISITION','ACTIVATION','CONVERSION','RETENTION','OTRA'];
-const ET_LBL = {AWARENESS:'Awareness', CONSIDERATION:'Consideración', ACQUISITION:'Adquisición', ACTIVATION:'Activación', CONVERSION:'Conversión', RETENTION:'Retención', OTRA:'Otra'};
-const ESTADOS = ['Activado','Pendiente','Detenido','Finalizado'];
-let CAMP = [], MESES = [], CORTE = '', RESUMEN = {}, FUENTE = '', CHARTS = {};
-
-// ── Formato ─────────────────────────────────────────────────────────────────
-const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const fCOP = n => (n && isFinite(n)) ? (n < 0 ? '−$' : '$') + Math.abs(Math.round(n)).toLocaleString('es-CO') : '—';
-const fM = n => (n && isFinite(n)) ? '$' + (n/1e6).toLocaleString('es-CO',{maximumFractionDigits:1}) + ' M' : '—';
-const fP = n => (n === null || n === undefined || !isFinite(n)) ? '—' : (n*100).toLocaleString('es-CO',{maximumFractionDigits:1}) + '%';
-const div = (a, b) => b ? a/b : null;
-const pace = p => p === null ? 'p-off' : Math.abs(p - 1) <= .1 ? 'p-pos' : Math.abs(p - 1) <= .25 ? 'p-mid' : 'p-neg';
-const paceCol = p => p === null ? 'var(--gray-300)' : Math.abs(p - 1) <= .1 ? 'var(--c-pos)' : Math.abs(p - 1) <= .25 ? 'var(--c-mid)' : 'var(--c-neg)';
-const mesLbl = m => MESES_L[+m.slice(5,7)] + ' ' + m.slice(0,4);
-const fDate = s => s ? `${+s.slice(8,10)}/${+s.slice(5,7)}` : '';
-const dias = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 864e5) + 1;
-
-function num(v){ const s = String(v ?? '').replace(/[$\s%]/g,'').replace(/^-(?=\D)/,'-'); if(!s || s[0] === '#') return 0;
-  const neg = /^-|^−/.test(s); const t = s.replace(/^[-−]/,'');
-  const n = parseFloat(t.indexOf(',') >= 0 ? t.replace(/\./g,'').replace(',','.') : t.replace(/\./g,'')) || 0;
-  return neg ? -n : n }
-function isoD(v){ const m = String(v||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  return m ? `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}` : '' }
-const norm = s => String(s||'').trim().toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
-function medio(s){ const n = norm(s);
-  if(/^(META|FB|FACEBOOK)/.test(n)) return 'Meta';
-  if(/^TIK/.test(n)) return 'TikTok';
-  if(/^(GOOGLE|GG|YOUTUBE)/.test(n)) return 'Google';
-  if(/^PROG/.test(n)) return 'Programática';
-  if(n === 'X' || /TWITTER/.test(n)) return 'X';
-  return s ? s.trim() : 'Otro' }
-function marca(s){ const n = norm(s);
-  if(/COLOR/.test(n) && /MILOTO/.test(n)) return 'Miloto y Colorloto';
-  if(/COLOR/.test(n)) return 'Colorloto';
-  if(/MILOTO/.test(n)) return 'Miloto';
-  if(/TRILOTO/.test(n)) return 'Triloto';
-  if(/GENERAL/.test(n)) return 'General';
-  return 'Baloto' }
-function etapa(s){ const n = norm(s);
-  if(/AWA/.test(n)) return 'AWARENESS';
-  if(/CONSI/.test(n)) return 'CONSIDERATION';
-  if(/ACQ|ADQ/.test(n)) return 'ACQUISITION';
-  if(/ACT/.test(n)) return 'ACTIVATION';
-  if(/CONV/.test(n)) return 'CONVERSION';
-  if(/RET/.test(n)) return 'RETENTION';
-  return 'OTRA' }
-
-// ── Lectura de la hoja ──────────────────────────────────────────────────────
-// La pestaña tiene un bloque por mes (título del mes, encabezados y campañas) y sub-bloques
-// (Top Feed, CRM, Influencers) que pertenecen al mes anterior. Cada fila de campaña tiene Estado.
-function parse(grid){
-  const g = grid.map(r => r.map(c => String(c ?? '').trim()));
-  // resumen superior
-  for(const r of g.slice(0, 10)) r.forEach((c, i) => {
-    const k = norm(c), v = r[i+1];
-    if(k === 'TOTAL INVERTIDO') RESUMEN.total = num(v);
-    if(k === 'PTTO MES EN CURSO') RESUMEN.ppto = num(v);
-    if(k === 'CONSUMO MES EN CURSO') RESUMEN.cons = num(v);
-    if(k === 'FECHA CORTE'){ for(let j = 1; j < 4; j++){ const d = isoD((g[g.indexOf(r)+1] || [])[i+j-1] || r[i+j]); if(d){ CORTE = d; break } } }
-  });
-  const out = []; let sec = null, col = null, bloque = '';
-  g.forEach((r, ix) => {
-    const head = r.findIndex(c => norm(c) === 'NOMENCLATURA');
-    if(head >= 0 && r.some(c => norm(c) === 'ESTADO')){
-      col = {}; r.forEach((c, i) => { const k = norm(c); if(!(k in col)) col[k] = i });
-      const prev = [1, 2, 3].map(k => (g[ix-k] || [])[0]).find(c => c) || '';
-      const mn = MES_N[norm(prev)];
-      if(mn){ sec = {mes:mn, filas:[]}; bloque = '' }
-      else bloque = 'sub';
-      return }
-    if(!col || !sec) return;
-    const est = r[col['ESTADO']];
-    if(!ESTADOS.includes(est)) return;
-    const ini = isoD(r[col['FECHA INICIO']]), fin = isoD(r[col['FECHA FIN']]);
-    const ppto = num(r[col['PRESUPUESTO']]), cons = num(r[col['CONSUMO']]);
-    if(!ppto && !cons) return;
-    const c0 = r[0];
-    const blq = bloque === 'sub' ? (norm(c0) === 'TOP FEED' ? 'Top Feed' : norm(c0) === 'INFLUENCERS' || norm(c0) === 'CRUCERO' ? 'Influencers' : 'CRM') : 'Pauta del mes';
-    const f = {sec, ini, fin, est, ppto, cons, bloque:blq,
-      marca: marca(r[col['INICIATIVA']] || c0),
-      etapa: etapa(r[2]) , medio: medio(r[3]), metrica: r[4], nom: r[5] || '(campaña por crear)'};
-    if(blq === 'Top Feed'){ f.etapa = 'AWARENESS'; f.dia = r[2] }
-    out.push(f);
-  });
-  // año de cada bloque de mes: el más común entre las fechas de inicio
-  const secs = [...new Set(out.map(f => f.sec))];
-  secs.forEach(s => { const cnt = {}; out.filter(f => f.sec === s && f.ini).forEach(f => cnt[f.ini.slice(0,4)] = (cnt[f.ini.slice(0,4)] || 0) + 1);
-    const y = Object.entries(cnt).sort((a, b) => b[1] - a[1])[0]?.[0] || '2026';
-    s.key = `${y}-${String(s.mes).padStart(2,'0')}` });
-  out.forEach(f => f.mes = f.sec.key);
-  if(!CORTE) CORTE = new Date().toISOString().slice(0,10);
-  return out }
-
-// Esperado a la fecha de corte
-function calc(f){
-  const d = f.ini && f.fin ? Math.max(1, dias(f.ini, f.fin)) : 0;
-  let t = !d ? 1 : CORTE < f.ini ? 0 : CORTE >= f.fin ? d : dias(f.ini, CORTE);
-  if(f.est === 'Finalizado') t = d || 1;
-  f.diasTot = d; f.diasTr = t; f.diasRest = Math.max(0, d - t);
-  f.esp = d ? f.ppto * t / d : f.ppto;
-  f.rem = f.ppto - f.cons;
-  f.pc = div(f.cons, f.ppto); f.pi = d ? t / d : 1;
-  f.pace = f.esp ? f.cons / f.esp : null;
-  f.diario = f.est === 'Activado' && f.diasRest ? Math.max(0, f.rem) / f.diasRest : null;
-  return f }
-
-async function cargar(){
-  try {
-    const u = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}&_=${Date.now()}`;
-    const res = await fetch(u); if(!res.ok) throw new Error(res.status);
-    const txt = await res.text(); if(/<html/i.test(txt.slice(0, 200))) throw new Error('sin acceso');
-    FUENTE = 'vivo'; return Papa.parse(txt).data
-  } catch(e){
-    FUENTE = 'copia'; return Papa.parse(window.BALOTO_PPTO_CSV || '').data }
-}
-
-// ── Render ──────────────────────────────────────────────────────────────────
-function filtradas(mes){
-  const md = document.getElementById('f-medio').value, mc = document.getElementById('f-marca').value, es = document.getElementById('f-estado').value;
-  return CAMP.filter(f => (!mes || f.mes === mes) && (!md || f.medio === md) && (!mc || f.marca === mc) && (!es || f.est === es)) }
-function suma(rows){ const t = {ppto:0, cons:0, esp:0}; rows.forEach(f => { t.ppto += f.ppto; t.cons += f.cons; t.esp += f.esp }); t.rem = t.ppto - t.cons; t.pc = div(t.cons, t.ppto); t.pace = t.esp ? t.cons / t.esp : null; return t }
-const pbar = f => `<div class="pbar" title="Consumo ${fP(f.pc)} · esperado ${fP(div(f.esp, f.ppto))}"><i style="width:${Math.min(f.pc || 0, 1)*100}%;background:${paceCol(f.pace)}"></i><b style="left:${Math.min(div(f.esp, f.ppto) || 0, 1)*100}%"></b></div>`;
-
-function render(){
-  const mes = document.getElementById('f-mes').value, rows = filtradas(mes), T = suma(rows);
-  const act = rows.filter(f => f.est === 'Activado'), pend = rows.filter(f => f.est === 'Pendiente');
-  const corteIn = CORTE.slice(0,7) === mes;
-  const k = (l, v, sub, extra) => `<div class="card kpi-card"><div class="kpi-label">${l}</div><div class="kpi-value">${v}</div>${sub ? `<div class="kpi-sub">${sub}</div>` : ''}${extra || ''}</div>`;
-  const bar = (lbl, p) => `<div class="kpi-bwrap"><div class="kpi-brow"><span>${lbl}</span><b>${fP(p)}</b></div><div class="kpi-bar"><div class="kpi-bfill bg-pos" style="width:${Math.min(p || 0, 1)*100}%"></div></div></div>`;
-  document.getElementById('kpi-grid').innerHTML = [
-    k('Presupuesto', fM(T.ppto), `${rows.length} campañas`),
-    k('Consumo', fM(T.cons), `${fP(T.pc)} del presupuesto`, bar('Consumo', T.pc)),
-    k('Esperado a la fecha', fM(T.esp), corteIn ? `al ${fDate(CORTE)}` : 'mes cerrado', bar('Ideal', div(T.esp, T.ppto))),
-    k('Pacing', `<span class="pill ${pace(T.pace)}" style="font-size:16px;padding:3px 12px">${fP(T.pace)}</span>`, 'consumo ÷ esperado'),
-    k('Por consumir', fM(T.rem), corteIn && act.length ? `${act.length} activas · ${pend.length} pendientes` : `${pend.length} pendientes`),
-  ].join('');
-  document.getElementById('kpi-note').textContent = `${mesLbl(mes)} · corte ${fDate(CORTE)}`;
-  renderMedio(rows); renderCamp(); renderHist();
-}
-
-function grupo(rows, key, orden){
-  const m = {}; rows.forEach(f => (m[f[key]] = m[f[key]] || []).push(f));
-  const ks = Object.keys(m).sort((a, b) => orden ? orden.indexOf(a) - orden.indexOf(b) : suma(m[b]).ppto - suma(m[a]).ppto);
-  return ks.map(x => [x, suma(m[x])]) }
-
-function barras(id, data, lbl){
-  if(CHARTS[id]) CHARTS[id].destroy();
-  CHARTS[id] = new Chart(document.getElementById(id), {type:'bar',
-    data:{labels:data.map(d => lbl ? lbl(d[0]) : d[0]), datasets:[
-      {label:'Presupuesto', data:data.map(d => d[1].ppto/1e6), backgroundColor:'#d4d4d4', borderRadius:4},
-      {label:'Consumo', data:data.map(d => d[1].cons/1e6), backgroundColor:'#ffd400', borderRadius:4}]},
-    options:{maintainAspectRatio:false, plugins:{legend:{position:'bottom'}, tooltip:{callbacks:{label:c => `${c.dataset.label}: $${c.raw.toLocaleString('es-CO',{maximumFractionDigits:1})} M`}}},
-      scales:{y:{ticks:{callback:v => '$' + v + ' M'}, grid:{color:'#f0f0f0'}}, x:{grid:{display:false}}}}}) }
-
-function renderMedio(rows){
-  const gm = grupo(rows, 'medio'), ge = grupo(rows, 'etapa', ETAPAS);
-  barras('ch-medio', gm); barras('ch-etapa', ge, e => ET_LBL[e]);
-  const th = ['Medio','Campañas','Presupuesto','Consumo','% consumo','Esperado','Pacing','Por consumir'];
-  document.getElementById('medio-head').innerHTML = `<tr>${th.map((h, i) => `<th class="${i ? 'r' : ''}">${h}</th>`).join('')}</tr>`;
-  const n = m => rows.filter(f => f.medio === m).length;
-  const tr = (c, cls) => `<tr class="${cls||''}">${c.map((x, i) => `<td class="${i ? 'r' : ''}">${x}</td>`).join('')}</tr>`;
-  const T = suma(rows);
-  document.getElementById('medio-body').innerHTML = gm.map(([m, t]) => tr([`<b>${esc(m)}</b>`, n(m), fCOP(t.ppto), fCOP(t.cons), fP(t.pc), fCOP(t.esp), `<span class="pill ${pace(t.pace)}">${fP(t.pace)}</span>`, fCOP(t.rem)])).join('')
-    + tr(['Total', rows.length, fCOP(T.ppto), fCOP(T.cons), fP(T.pc), fCOP(T.esp), `<span class="pill ${pace(T.pace)}">${fP(T.pace)}</span>`, fCOP(T.rem)], 'tr-total') }
-
-function renderCamp(){
-  const mes = document.getElementById('f-mes').value, q = document.getElementById('q').value.toLowerCase();
-  const rows = filtradas(mes).filter(f => !q || (f.nom + ' ' + f.medio + ' ' + f.marca).toLowerCase().includes(q));
-  const th = ['Campaña','Marca','Etapa','Medio','Estado','Fechas','Presupuesto','Consumo','Avance','Pacing','Por consumir','Diario sug.'];
-  document.getElementById('camp-head').innerHTML = `<tr>${th.map((h, i) => `<th class="${i > 5 ? 'r' : ''}">${h}</th>`).join('')}</tr>`;
-  const estCls = e => e === 'Activado' ? 'p-pos' : e === 'Pendiente' ? 'p-mid' : e === 'Detenido' ? 'p-neg' : 'p-off';
-  const bloques = [...new Set(rows.map(f => f.bloque))];
-  let html = '';
-  bloques.forEach(b => {
-    const rs = rows.filter(f => f.bloque === b).sort((x, y) => ETAPAS.indexOf(x.etapa) - ETAPAS.indexOf(y.etapa) || y.ppto - x.ppto);
-    if(bloques.length > 1) html += `<tr class="blk"><td colspan="12">${esc(b)} · ${rs.length}</td></tr>`;
-    html += rs.map(f => `<tr>
-      <td title="${esc(f.nom)}">${esc(f.dia ? `${f.dia} · ` : '')}${esc(f.nom.length > 40 ? f.nom.slice(0, 38) + '…' : f.nom)}</td>
-      <td>${esc(f.marca)}</td><td>${ET_LBL[f.etapa]}</td><td>${esc(f.medio)}</td>
-      <td><span class="pill ${estCls(f.est)}">${esc(f.est)}</span></td>
-      <td>${f.ini === f.fin ? fDate(f.ini) : `${fDate(f.ini)} – ${fDate(f.fin)}`}</td>
-      <td class="r">${fCOP(f.ppto)}</td><td class="r">${fCOP(f.cons)}</td>
-      <td class="r">${pbar(f)}</td>
-      <td class="r">${f.est === 'Pendiente' ? '<span class="pill p-off">sin iniciar</span>' : `<span class="pill ${pace(f.pace)}">${fP(f.pace)}</span>`}</td>
-      <td class="r">${fCOP(f.rem)}</td><td class="r">${f.diario ? fCOP(f.diario) : '—'}</td></tr>`).join('');
-  });
-  const T = suma(rows);
-  html += `<tr class="tr-total"><td colspan="6">Total</td><td class="r">${fCOP(T.ppto)}</td><td class="r">${fCOP(T.cons)}</td><td class="r">${pbar(T)}</td><td class="r"><span class="pill ${pace(T.pace)}">${fP(T.pace)}</span></td><td class="r">${fCOP(T.rem)}</td><td></td></tr>`;
-  document.getElementById('camp-body').innerHTML = html;
-  document.getElementById('camp-note').textContent = `${rows.length} campañas · ${mesLbl(mes)}`;
-}
-
-function renderHist(){
-  const rows = filtradas(''), gm = MESES.map(m => [m, suma(rows.filter(f => f.mes === m))]).filter(d => d[1].ppto || d[1].cons);
-  if(CHARTS.hist) CHARTS.hist.destroy();
-  const sel = document.getElementById('f-mes').value;
-  CHARTS.hist = new Chart(document.getElementById('ch-hist'), {type:'bar',
-    data:{labels:gm.map(d => mesLbl(d[0]).replace(/(\w{3})\w* (\d{2})(\d{2})/, '$1 $3')), datasets:[
-      {label:'Presupuesto', data:gm.map(d => d[1].ppto/1e6), backgroundColor:gm.map(d => d[0] === sel ? '#a3a3a3' : '#d4d4d4'), borderRadius:4},
-      {label:'Consumo', data:gm.map(d => d[1].cons/1e6), backgroundColor:gm.map(d => d[0] === sel ? '#111' : '#ffd400'), borderRadius:4}]},
-    options:{maintainAspectRatio:false, plugins:{legend:{position:'bottom'}, tooltip:{callbacks:{label:c => `${c.dataset.label}: $${c.raw.toLocaleString('es-CO',{maximumFractionDigits:1})} M`}}},
-      onClick:(e, el) => { if(el.length){ document.getElementById('f-mes').value = gm[el[0].index][0]; render() } },
-      scales:{y:{ticks:{callback:v => '$' + v + ' M'}, grid:{color:'#f0f0f0'}}, x:{grid:{display:false}}}}});
-  const md = [...new Set(rows.map(f => f.medio))].sort((a, b) => suma(rows.filter(f => f.medio === b)).cons - suma(rows.filter(f => f.medio === a)).cons);
-  document.getElementById('hist-head').innerHTML = `<tr><th>Mes</th><th class="r">Presupuesto</th><th class="r">Consumo</th><th class="r">% consumo</th>${md.map(m => `<th class="r">${esc(m)}</th>`).join('')}</tr>`;
-  document.getElementById('hist-body').innerHTML = [...gm].reverse().map(([m, t]) => `<tr style="cursor:pointer${m === sel ? ';font-weight:700' : ''}" onclick="document.getElementById('f-mes').value='${m}';render();document.getElementById('sec-kpi').scrollIntoView({behavior:'smooth'})">
-    <td>${mesLbl(m)}</td><td class="r">${fCOP(t.ppto)}</td><td class="r">${fCOP(t.cons)}</td><td class="r">${fP(t.pc)}</td>
-    ${md.map(x => `<td class="r">${fCOP(suma(rows.filter(f => f.mes === m && f.medio === x)).cons)}</td>`).join('')}</tr>`).join('');
-}
-
-function resetFilters(){
-  ['f-medio','f-marca','f-estado'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('q').value = '';
-  document.getElementById('f-mes').value = MESES.includes(CORTE.slice(0,7)) ? CORTE.slice(0,7) : MESES[MESES.length-1];
-  render() }
-
-(async () => {
-  const grid = await cargar();
-  CAMP = parse(grid).map(calc);
-  MESES = [...new Set(CAMP.map(f => f.mes))].sort();
-  const opt = (id, vals) => document.getElementById(id).insertAdjacentHTML('beforeend', vals.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join(''));
-  document.getElementById('f-mes').innerHTML = [...MESES].reverse().map(m => `<option value="${m}">${mesLbl(m)}</option>`).join('');
-  opt('f-medio', [...new Set(CAMP.map(f => f.medio))].sort());
-  opt('f-marca', [...new Set(CAMP.map(f => f.marca))].sort());
-  opt('f-estado', ESTADOS.filter(e => CAMP.some(f => f.est === e)));
-  document.getElementById('corte-side').textContent = fDate(CORTE) + '/' + CORTE.slice(0,4);
-  document.getElementById('last-upd').textContent = FUENTE === 'vivo' ? 'Hoja en vivo' : 'Copia del 17/10/2026';
-  document.getElementById('fuente-note').innerHTML = `<b>Fuente</b>: hoja de seguimiento de presupuesto de Baloto${FUENTE === 'vivo' ? ', leída en vivo al abrir la página' : ' (copia guardada; la hoja no respondió)'}. Fecha de corte de la hoja: <b>${fDate(CORTE)}/${CORTE.slice(0,4)}</b>.`
-    + (RESUMEN.total ? ` Total invertido acumulado: <b>${fCOP(RESUMEN.total)}</b>.` : '');
-  resetFilters();
-  document.getElementById('loading').style.display = 'none';
-})();
-</script>
+<script>window.CUENTA = 'baloto';</script>
+<script src="assets/js/seguimiento.js"></script>
 </body>
 </html>
