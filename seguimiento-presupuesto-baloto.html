@@ -5,120 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>Seguimiento Presupuesto Baloto</title>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/adcom.css">
-<link rel="stylesheet" href="assets/css/tablero.css">
-<link rel="stylesheet" href="assets/css/seguimiento.css">
-<style>.cpx{display:block;font-size:10px;color:var(--gray-400);font-weight:400}.kpi-grid.kpi-4{grid-template-columns:repeat(4,1fr)}@media(max-width:900px){.kpi-grid.kpi-4{grid-template-columns:repeat(2,1fr)}}</style>
-<script defer src="assets/js/adcom.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<script src="data/hoja_baloto.js"></script>
-<script src="data/consumo_plataformas.js"></script>
-<script src="data/resultados_baloto.js"></script>
-<script src="assets/js/hoja.js"></script>
-<script src="assets/js/resultados.js"></script>
+<!-- El seguimiento de presupuesto ahora vive en el tablero, pestaña "Presupuesto y pacing" -->
+<meta http-equiv="refresh" content="0; url=tablero-baloto.html?tab=presupuesto">
+<script>location.replace('tablero-baloto.html' + (location.search ? location.search + '&' : '?') + 'tab=presupuesto');</script>
+<style>body{font-family:Poppins,-apple-system,sans-serif;background:#f5f5f5;color:#1a1a1a;padding:40px 16px}</style>
 </head>
-<body class="con-shell">
-<div id="loading">
-  <div class="spinner"></div>
-  <div id="ld-msg">Cargando hoja de seguimiento...</div>
-</div>
-
-<nav class="app-sidebar">
-  <div class="app-sidebar-top">
-    <a class="app-sidebar-brand" href="index.html"><i></i>Master Baloto</a>
-    <div class="app-sidebar-client">
-      <span class="app-sidebar-client-label">Cliente</span>
-      <strong class="app-sidebar-client-name" id="cliente">Baloto</strong>
-    </div>
-  </div>
-  <div class="app-sidebar-nav">
-    <span class="app-sidebar-nav-title">Secciones</span>
-    <a href="#sec-kpi" class="active"><b></b>Resumen del mes</a>
-    <a href="#sec-res"><b></b>Registros y compras</a>
-    <a href="#sec-alertas"><b></b>Alertas</a>
-    <a href="#sec-cruce"><b></b>Mapeado vs plataforma</a>
-    <a href="#sec-medio"><b></b>Por medio</a>
-    <a href="#sec-camp"><b></b>Campañas</a>
-    <a href="#sec-hist"><b></b>Histórico</a>
-  </div>
-  <div class="app-sidebar-foot">Fecha de corte: <span id="corte-side">—</span></div>
-</nav>
-
-<div class="main">
-  <div class="topbar">
-    <div class="tb-row">
-      <span class="topbar-title">Seguimiento de presupuesto · Baloto</span>
-      <div class="f-sep"></div>
-      <div class="fg"><span class="fl">Mes</span><select id="f-mes"></select></div>
-      <div class="fg"><span class="fl">Medio</span><select id="f-medio"><option value="">Todos</option></select></div>
-      <div class="fg" id="dim-fg"></div>
-      <div class="fg"><span class="fl">Estado</span><select id="f-estado"><option value="">Todos</option></select></div>
-      <button class="btn-reset" id="btn-reset">↺ Reset</button>
-      <span class="last-upd" id="last-upd"></span>
-    </div>
-  </div>
-
-  <div class="content">
-    <div class="card notice" id="fuente-note"></div>
-
-    <div class="sec-title" id="sec-kpi"><span></span>Resumen del mes<span class="sec-note" id="kpi-note"></span></div>
-    <div class="kpi-grid kpi-6" id="kpi-grid"></div>
-
-    <div class="sec-title" id="sec-res"><span></span>Registros y compras GA4<span class="sec-note" id="res-note"></span></div>
-    <div class="kpi-grid kpi-4" id="res-grid"></div>
-
-    <div class="sec-title" id="sec-alertas"><span></span>Alertas de presupuesto y consumo<span class="sec-note">mes en curso, a la fecha de corte</span></div>
-    <div id="alertas"></div>
-
-    <div class="sec-title" id="sec-cruce"><span></span>Consumo mapeado vs plataforma<span class="sec-note" id="cruce-note"></span></div>
-    <div class="kpi-grid kpi-4" id="cruce-kpi"></div>
-    <div class="grid-2 cruce-grid">
-      <div class="card tcard">
-        <div class="tbar"><b class="chart-h">Gastan en plataforma y no están en la hoja</b></div>
-        <div class="tscroll"><table><thead><tr><th>Plataforma</th><th>Campaña</th><th class="r">Consumo</th></tr></thead><tbody id="sinmap-body"></tbody></table></div>
-      </div>
-      <div class="card tcard">
-        <div class="tbar"><b class="chart-h">Campañas de la hoja frente a la plataforma</b><span class="sp"></span><span class="sec-note">ordenadas por diferencia</span></div>
-        <div class="tscroll tscroll-alto"><table><thead><tr><th>Nomenclatura</th><th class="r">Hoja</th><th class="r">Plataforma</th><th class="r">Diferencia</th><th></th></tr></thead><tbody id="concil-body"></tbody></table></div>
-      </div>
-    </div>
-    <div class="foot-note cruce-foot">Cada campaña con consumo en Meta, Google Ads o TikTok se busca por nombre en las nomenclaturas del mes en la hoja (sin tildes, espacios ni signos). <b>Sin mapear</b> es lo que la plataforma gastó en campañas que la hoja no tiene. Las filas sin nomenclatura en la hoja no se pueden cruzar. Las plataformas devuelven el nombre <b>actual</b> de cada campaña: si se renombró, en meses anteriores puede salir sin mapear.</div>
-
-    <div class="sec-title" id="sec-medio"><span></span>Por medio</div>
-    <div class="grid-2">
-      <div class="card chart-card"><div class="chart-h">Presupuesto y consumo por medio</div><div class="chart-s">Barra gris: presupuesto del mes. Barra amarilla: consumo a la fecha de corte.</div><div class="chart-wrap"><canvas id="ch-medio"></canvas></div></div>
-      <div class="card chart-card"><div class="chart-h" id="ch2-h">Presupuesto y consumo</div><div class="chart-s">Mismo corte, con otra agrupación.</div><div class="chart-wrap"><canvas id="ch-2"></canvas></div></div>
-    </div>
-    <div class="card tcard"><div class="tscroll"><table><thead id="medio-head"></thead><tbody id="medio-body"></tbody></table></div></div>
-
-    <div class="sec-title" id="sec-camp"><span></span>Campañas del mes<span class="sec-note">pacing: consumo real frente al esperado a la fecha · verde ±10%, ámbar ±25%</span></div>
-    <div class="card tcard">
-      <div class="tbar"><span class="sec-note" id="camp-note"></span><span class="sp"></span><input type="search" id="q" placeholder="Buscar campaña" style="width:240px"></div>
-      <div class="tscroll"><table><thead id="camp-head"></thead><tbody id="camp-body"></tbody></table></div>
-      <div class="foot-note">
-        <b>Esperado a la fecha</b>: presupuesto × días transcurridos ÷ días de campaña, contados hasta la fecha de corte de la hoja.
-        <b>Diario sugerido</b>: lo que queda por consumir ÷ días restantes, solo en campañas activas.
-        La línea negra de cada barra marca dónde debería ir el consumo hoy.
-      </div>
-    </div>
-
-    <div class="sec-title" id="sec-hist"><span></span>Histórico mensual<span class="sec-note" id="hist-note"></span></div>
-    <div class="card chart-card"><div class="chart-wrap"><canvas id="ch-hist"></canvas></div></div>
-    <div class="card tcard">
-      <div class="tscroll"><table><thead id="hist-head"></thead><tbody id="hist-body"></tbody></table></div>
-      <div class="foot-note">
-        <b>Presupuesto</b>: suma de las campañas del bloque del mes en la hoja. <b>Consumo hoja</b>: lo que registra la hoja.
-        <b>Plataformas</b>: consumo real de Meta, Google Ads y TikTok por API. <b>Hoja vs plat.</b>: diferencia entre ambos, que incluye medios sin API (X, programática).
-        Clic en un mes para verlo arriba.
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>window.CUENTA = 'baloto';</script>
-<script src="assets/js/seguimiento.js"></script>
+<body>
+<p>El seguimiento de presupuesto ahora está en el tablero: <a href="tablero-baloto.html?tab=presupuesto">Tablero Baloto · Presupuesto y pacing</a>.</p>
 </body>
 </html>

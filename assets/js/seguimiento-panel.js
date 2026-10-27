@@ -1,12 +1,17 @@
-/* Seguimiento de presupuesto de Baloto. Misma estructura que los seguimientos de
-   adcomgroupco/seguimientos-eros (resumen del mes, alertas, medios, campañas e histórico) y,
-   además, registros y compras de GA4 por campaña, medio y total (assets/js/resultados.js). */
+/* Presupuesto y pacing dentro del tablero de Baloto (pestaña "Presupuesto y pacing").
+   Mismo funcionamiento que los seguimientos de adcomgroupco/seguimientos-eros: lee la hoja de
+   seguimiento con assets/js/hoja.js (presupuesto real, pacing, alertas, cruce con plataformas e
+   histórico) y suma registros y compras GA4 por campaña con assets/js/resultados.js.
+   Todos los elementos del panel llevan el prefijo "sg-". Expone window.SGT para el resumen. */
 (function () {
   'use strict';
   const S = window.SEG, KEY = window.CUENTA, CFG = S.CUENTAS[KEY], F = S.fmt(CFG.moneda);
   const {esc, fP, div, pace, paceCol, mesLbl, mesCorto, fDate, suma} = S;
-  const $ = id => document.getElementById(id);
-  let D = null, CHARTS = {}, RESUMEN = {}, R = null;
+  const $ = id => document.getElementById('sg-' + id);
+  let D = null, CHARTS = {}, RESUMEN = {}, R = null, listo;
+  // el tablero espera este resumen para el pacing del mes y las alertas de la pestaña Resumen
+  window.SGT = {listo: new Promise(r => listo = r),
+    mes: m => { if (!D) return null; const rows = D.campanas.filter(f => f.mes === m); return rows.length ? {...suma(rows), corte: D.corte} : null }};
   const fN = n => (n && isFinite(n)) ? Math.round(n).toLocaleString('es-CO') : '—';
   const costo = (c, n) => n >= 1 ? F.full(c / n) : '—';
   const res = rows => rows.reduce((a, f) => (a.reg += f.reg || 0, a.com += f.com || 0, a), {reg: 0, com: 0});
@@ -57,16 +62,12 @@
       k('Costo por compra', costo(T.cons, com), 'consumo de la hoja ÷ compras'),
     ].join('');
     $('res-note').textContent = R.fuente === 'vivo' ? `${mesLbl(mes)} · hoja de fuente de datos en vivo` : R.fuente === 'copia' ? `${mesLbl(mes)} · copia del ${fDate(R.copia)}` : 'sin datos de resultados';
-    renderAlertas(mes); renderCruce(mes); renderMedio(rows); renderCamp(); renderHist();
+    renderAlertas(); renderCruce(mes); renderMedio(rows); renderCamp(); renderHist();
   }
 
-  function renderAlertas(mes) {
+  function renderAlertas() {
+    // siempre el mes en curso: la caja vive en la pestaña Resumen
     const A = S.alertas(D), box = $('alertas');
-    if (A.mes !== mes) {
-      box.innerHTML = `<div class="card notice">Las alertas se calculan para el mes en curso (<b>${mesLbl(A.mes)}</b>). <a href="#" id="ir-curso">Ver ${mesLbl(A.mes).toLowerCase()}</a></div>`;
-      $('ir-curso').onclick = e => { e.preventDefault(); $('f-mes').value = A.mes; render() };
-      return;
-    }
     box.innerHTML = `<div class="alert-list">${A.lista.map(a => `<div class="card alert alert-${a.sev}">
       <span class="pill ${sevCls(a.sev)}">${esc(a.tipo)}</span><p>${esc(a.txt)}</p>
       ${a.campanas ? `<small>${a.campanas.slice(0, 4).map(esc).join(' · ')}${a.campanas.length > 4 ? ' …' : ''}</small>` : ''}</div>`).join('')}</div>`;
@@ -221,9 +222,7 @@
   }
 
   (async () => {
-    document.title = `Seguimiento ${CFG.nombre}`;
-    $('cliente').textContent = `${CFG.sub} · presupuesto y resultados`;
-    if (CFG.dim) $('dim-fg').innerHTML = `<span class="fl">${CFG.dim.label}</span><select id="f-dim"><option value="">Todas</option></select>`;
+    if (CFG.dim) $('dim-fg').innerHTML = `<span class="fl">${CFG.dim.label}</span><select id="sg-f-dim"><option value="">Todas</option></select>`;
     else $('dim-fg').remove();
     [D, R] = await Promise.all([S.leer(KEY), RES.cargar()]);
     RESUMEN = RES.asignar(D, R);
@@ -234,11 +233,14 @@
     opt('f-estado', S.ESTADOS.filter(e => D.campanas.some(f => f.est === e)));
     ['f-mes', 'f-medio', 'f-dim', 'f-estado'].forEach(id => $(id) && ($(id).onchange = render));
     $('q').oninput = renderCamp; $('btn-reset').onclick = resetFilters;
-    $('corte-side').textContent = fDate(D.corte) + '/' + D.corte.slice(0, 4);
     $('last-upd').textContent = D.fuente === 'vivo' ? 'Hoja en vivo' : `Copia del ${fDate(D.copia)}`;
     const apiTxt = D.api ? ` Consumo de plataformas al <b>${fDate(D.api.hasta)}/${D.api.hasta.slice(0, 4)}</b> (${D.api.cuentas.map(c => esc(c.name)).join(', ')}).` : '';
     $('fuente-note').innerHTML = `<b>Fuente</b>: pestaña ${esc(CFG.nombre)} de la hoja de seguimiento${D.fuente === 'vivo' ? ', leída en vivo al abrir la página' : ' (copia guardada; la hoja no respondió)'}. Corte de la hoja: <b>${fDate(D.corte)}/${D.corte.slice(0, 4)}</b>.${apiTxt} ${esc(CFG.nota)} <b>Registros y compras</b>: GA4, de la hoja de fuente de datos (RESUMEN GENERAL), cruzados con las nomenclaturas por nombre de campaña.`;
+    const mesUrl = (new URLSearchParams(location.search).get('mes') || '').match(/^\d{4}-\d{2}$/)?.[0];
     resetFilters();
-    $('loading').style.display = 'none';
+    if (mesUrl && D.meses.includes(mesUrl)) { $('f-mes').value = mesUrl; render() }
+    listo(D);
+    // vuelve a pintar el resumen del tablero con el presupuesto y el pacing reales
+    if (typeof window.render === 'function' && document.getElementById('f-desde') && document.getElementById('f-desde').value) window.render();
   })();
 })();
