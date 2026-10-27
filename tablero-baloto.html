@@ -368,10 +368,29 @@ function flowDe(f){
   const share = f.total ? 1 : (a > b ? 0 : days(a, b) / days(ini, fin));
   // días del mes ya corridos con datos: base del pacing
   const hasta = D.hasta < fin ? D.hasta : fin, corrido = hasta < ini ? 0 : days(ini, hasta) / days(ini, fin);
+  const real = pptoReal(mes);
   const lineas = fl.lineas.filter(l => (!f.plat || l.medio === f.plat || camposDe(l.id).some(c => c.plat === f.plat))
-    && (!f.etapa || l.etapa === f.etapa) && (!f.marca || l.marca === f.marca));
-  return {mes, fl, share, corrido, ini, fin, a, b, lineas};
+    && (!f.etapa || l.etapa === f.etapa) && (!f.marca || l.marca === f.marca)).map(l => ajustarLinea(l, real));
+  return {mes, fl, share, corrido, ini, fin, a, b, lineas, real: !!real};
 }
+// Metas del flow ajustadas en dos pasos:
+// 1. Presupuesto real: cada línea toma el presupuesto que tiene hoy en la hoja de seguimiento (con los
+//    ajustes del mes) y sus registros y compras se escalan en la misma proporción, manteniendo el costo por
+//    resultado del flow. Una línea sin presupuesto en la hoja queda sin meta.
+// 2. GA4: el flow fija las metas con los resultados que atribuye cada plataforma. GA4 solo confirma una parte
+//    (también cuentan quien vio el anuncio y compró después). Con resultados GA4, la meta se multiplica por la
+//    parte que GA4 confirma de cada plataforma en el tramo confiable del 1 de junio al 9 de agosto de 2026.
+const GA4_CONFIRMA = {compras: {'Meta': .088, 'TikTok': .008, 'Google Ads': 1}, registros: {'Meta': .45, 'TikTok': .288, 'Google Ads': 1}};
+const MEDIO_HOJA = {Google: 'Google Ads', Meta: 'Meta', TikTok: 'TikTok'};
+function pptoReal(mes){
+  const cs = window.SGT && SGT.campanas(mes); if(!cs || !cs.length) return null;
+  const r = {};
+  cs.forEach(c => { const id = lineaNombre(MEDIO_HOJA[c.medio] || c.medio, c.nom, c.etapa); if(id) r[id] = (r[id] || 0) + c.ppto });
+  return r }
+function ajustarLinea(l, real){
+  const ppto = real ? (real[l.id] || 0) : l.ppto, esc = l.ppto ? ppto / l.ppto : 0;
+  const fc = resGA4() ? (GA4_CONFIRMA.compras[l.medio] ?? 1) : 1, fr = resGA4() ? (GA4_CONFIRMA.registros[l.medio] ?? 1) : 1;
+  return {...l, pptoFlow: l.ppto, ppto, registros: l.registros * esc * fr, compras: l.compras * esc * fc} }
 const camposDe = id => C.filter(c => c.linea === id);
 const conectada = l => CONECTADOS.includes(l.medio) || camposDe(l.id).length > 0;
 function metas(fw){ const t = {ppto:0, reg:0, com:0, pptoOff:0};
@@ -597,7 +616,9 @@ function notaFuentes(){
   const hasta = fDate(D.hasta) + ' ' + D.hasta.slice(0,4), sinApi = CONECTADOS.filter(p => !API_PLAT.includes(p));
   document.getElementById('fuentes-note').innerHTML = HOJA
     ? `<b>Fuentes:</b> inversión, impresiones, clics y alcance de Meta y TikTok por API, al ${hasta}. ${resGA4() ? '<b>Compras, registros e ingresos: GA4</b>' : '<b>Compras, registros e ingresos: plataforma</b> (píxel de Meta, eventos de TikTok)'}, desde ${SHEET_TAB} de la hoja de fuente de datos` +
-      (sinApi.length ? `, que también aporta la inversión de ${sinApi.join(', ')}.` : '.') + ` Cambia el origen de los resultados con el selector <b>Resultados</b>.`
+      (sinApi.length ? `, que también aporta la inversión de ${sinApi.join(', ')}.` : '.') + ` Cambia el origen de los resultados con el selector <b>Resultados</b>.` +
+      ` <b>Metas:</b> registros y compras del flow, recalculadas con el presupuesto real de cada línea en la hoja de seguimiento` +
+      (resGA4() ? ` y llevadas a GA4 con la parte que GA4 confirma de cada plataforma (1 jun – 9 ago): compras Meta ${fP(GA4_CONFIRMA.compras.Meta)}, TikTok ${fP(GA4_CONFIRMA.compras.TikTok)} y Google 100%; registros Meta ${fP(GA4_CONFIRMA.registros.Meta)}, TikTok ${fP(GA4_CONFIRMA.registros.TikTok)} y Google 100%.` : ', con la atribución de cada plataforma, igual que el flow.')
     : `<b>Fuentes conectadas:</b> Meta Ads y TikTok Ads por API, diario por campaña, actualizado al ${hasta}. <b>La hoja de fuente de datos no cargó</b> (${esc(HOJA_ERR)}): ` +
       `compras y registros son los de plataforma, y Google Ads, GA4, X y programática no aparecen. Para leerla, la hoja debe estar compartida como "Cualquier persona con el enlace: lector". ` +
       `<b>Ojo con el píxel de Meta:</b> del 18 al 23 de septiembre casi no registró compras (de unas 5.000 diarias a menos de 350), y desde el 24 de septiembre las compras volvieron pero llegan con valor $0.`;

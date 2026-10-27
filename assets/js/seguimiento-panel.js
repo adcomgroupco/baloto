@@ -11,7 +11,9 @@
   let D = null, CHARTS = {}, RESUMEN = {}, R = null, listo;
   // el tablero espera este resumen para el pacing del mes y las alertas de la pestaña Resumen
   window.SGT = {listo: new Promise(r => listo = r),
-    mes: m => { if (!D) return null; const rows = D.campanas.filter(f => f.mes === m); return rows.length ? {...suma(rows), corte: D.corte} : null }};
+    mes: m => { if (!D) return null; const rows = D.campanas.filter(f => f.mes === m); return rows.length ? {...suma(rows), corte: D.corte} : null },
+    // campañas del mes en la hoja, para recalcular las metas del flow con el presupuesto real
+    campanas: m => D ? D.campanas.filter(f => f.mes === m).map(f => ({nom: f.nom, medio: f.medio, etapa: f.etapa, ppto: f.ppto})) : null};
   const fN = n => (n && isFinite(n)) ? Math.round(n).toLocaleString('es-CO') : '—';
   const costo = (c, n) => n >= 1 ? F.full(c / n) : '—';
   const res = rows => rows.reduce((a, f) => (a.reg += f.reg || 0, a.com += f.com || 0, a), {reg: 0, com: 0});
