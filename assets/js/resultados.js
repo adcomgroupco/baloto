@@ -7,26 +7,44 @@
   'use strict';
 
   const SHEET_ID = '1zEv8npIyHnoaEXKZDRh-vpyo88RU0WmKUgSKwSYzaMU', TAB = 'RESUMEN GENERAL';
-  // A Date · B Campaign Name · G Compras · H Registros · P Compras GA4 · Q Registros GA4
-  const TQ = "select B, year(A), month(A), sum(P), sum(Q), sum(G), sum(H) where A >= date '2025-01-01' group by B, year(A), month(A)";
+  // A Date · B Campaign Name · G Compras · H Registros · O Source / Medium · P Compras GA4 · Q Registros GA4
+  const TQ = "select B, O, year(A), month(A), sum(P), sum(Q), sum(G), sum(H) where A >= date '2025-01-01' group by B, O, year(A), month(A)";
+  // Anuncios de TikTok que llevaron el utm_campaign de otra campaña hasta el 27 oct 2026 (ya corregidos en TikTok):
+  // MiLoto retención de TikTok usaba el nombre de la campaña de Meta, e Italia 2 el de la Italia original.
+  const MILOTO_META = 'adcom_miloto_fb_ret_conversion-rmkt-ret_miloto', MILOTO_TT = 'adcom_miloto_tiktok_ret_conversion-rmkt-ret_miloto';
+  const ITALIA = 'adcom_baloto_tiktok_act_conversion_promocional-italia', ITALIA_2 = ITALIA + '_2', ITALIA_2_DESDE = '2026-10-13';
+  const TQ_ITALIA = `select sum(P), sum(Q), sum(G), sum(H) where B = '${ITALIA}' and A >= date '${ITALIA_2_DESDE}'`;
   const clave = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, '');
   const num = v => { const n = parseFloat(String(v ?? '').replace(/[^\d.-]/g, '')); return isFinite(n) ? n : 0 };
 
   // filas [nombre, 'YYYY-MM', compras GA4, registros GA4, compras plataforma, registros plataforma]
   function desdeCsv(txt) {
     const g = Papa.parse(txt).data.slice(1);
-    return g.filter(r => r.length >= 7 && r[0]).map(r => {
-      const mes = `${r[1]}-${String(num(r[2]) + 1).padStart(2, '0')}`;  // month() de gviz empieza en 0
-      return [r[0], mes, num(r[3]), num(r[4]), num(r[5]), num(r[6])];
+    return g.filter(r => r.length >= 8 && r[0]).map(r => {
+      const mes = `${r[2]}-${String(num(r[3]) + 1).padStart(2, '0')}`;  // month() de gviz empieza en 0
+      // los resultados de MiLoto con fuente TikTok son de la campaña de TikTok
+      const nombre = r[0] === MILOTO_META && /tiktok/i.test(r[1]) ? MILOTO_TT : r[0];
+      return [nombre, mes, num(r[4]), num(r[5]), num(r[6]), num(r[7])];
     });
   }
+  const gviz = async tq => {
+    const u = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(TAB)}&headers=1&tq=${encodeURIComponent(tq)}&_=${Date.now()}`;
+    const res = await fetch(u); if (!res.ok) throw new Error(res.status);
+    const txt = await res.text(); if (/<html/i.test(txt.slice(0, 200))) throw new Error('sin acceso');
+    return txt;
+  };
 
   async function cargar() {
     try {
-      const u = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(TAB)}&headers=1&tq=${encodeURIComponent(TQ)}&_=${Date.now()}`;
-      const res = await fetch(u); if (!res.ok) throw new Error(res.status);
-      const txt = await res.text(); if (/<html/i.test(txt.slice(0, 200))) throw new Error('sin acceso');
-      const filas = desdeCsv(txt); if (!filas.length) throw new Error('vacía');
+      const filas = desdeCsv(await gviz(TQ)); if (!filas.length) throw new Error('vacía');
+      // lo que la Italia original registró desde el arranque de Italia 2 es de Italia 2
+      const it = (Papa.parse(await gviz(TQ_ITALIA)).data[1] || []).map(num);
+      if (it.some(v => v)) {
+        const mes = ITALIA_2_DESDE.slice(0, 7);
+        const resta = it.slice(0, 4);  // se descuenta una sola vez, aunque la Italia original tenga una fila por fuente
+        filas.forEach(f => { if (f[0] === ITALIA && f[1] === mes) for (let i = 2; i < 6; i++) { const d = Math.min(f[i], resta[i - 2] || 0); f[i] -= d; resta[i - 2] -= d } });
+        filas.push([ITALIA_2, mes, it[0] || 0, it[1] || 0, it[2] || 0, it[3] || 0]);
+      }
       return {filas, fuente: 'vivo'};
     } catch (e) {
       const c = window.RESULTADOS_COPIA;
