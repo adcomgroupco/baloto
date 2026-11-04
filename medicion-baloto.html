@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Baloto · Medición día a día</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/css/reportes.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+.chart-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: grid; gap: 6px; }
+.chart-card h3 { font-size: 17px; }
+.chart-card .sub { font-size: 13px; color: var(--muted); }
+.chart-wrap { position: relative; height: 340px; }
+.rangos { display: flex; gap: 8px; flex-wrap: wrap; }
+.rangos button { font: 600 13px var(--f); padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); cursor: pointer; color: var(--ink); }
+.rangos button.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+.kpi small { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.baja { color: #b91c1c; } .sube { color: #15803d; }
+#estado { font-size: 13px; color: var(--muted); }
+td.n, th.n { text-align: right; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <a class="back" href="index.html">← Master Baloto</a>
+  <div class="brand"><i></i>ADCOM <span class="sep">×</span> BALOTO</div>
+  <h1>Medición <span>día a día</span></h1>
+  <p>Compras, ingresos y registros que llegan a GA4 frente a lo que cuenta cada plataforma. Sirve para ver cuándo cambia un evento de medición y a qué fuentes afecta.</p>
+</header>
+
+<section class="section">
+  <div class="section-head">
+    <p class="eyebrow">Lectura</p>
+    <h2>Qué cambió el 29 de octubre</h2>
+  </div>
+  <div class="panel">
+    <p>Desde el despliegue de la medición de ingresos (29–30 de octubre), <b>GA4 recibe el valor de las compras</b>, pero el evento <b>Compra_Exitosa casi dejó de registrarse</b>. Las plataformas siguen contando compras con normalidad, así que la caída es de medición y no de ventas.</p>
+    <p>Google Ads importa Compra_Exitosa como su conversión de compra, por eso sus compras también caen a casi cero. Meta recibe compras y valor; TikTok, compras sin valor.</p>
+    <p><b>Pendiente:</b> actualizar el activador de la etiqueta Compra_Exitosa en Tag Manager para que escuche el nuevo evento de compra (con valor), y enviar también el valor a TikTok.</p>
+  </div>
+  <div class="rangos" role="group" aria-label="Rango de fechas">
+    <button data-r="30">Últimos 30 días</button>
+    <button data-r="2026-09-01" class="on">Desde septiembre</button>
+    <button data-r="2026-08-01">Desde agosto</button>
+  </div>
+  <p id="estado">Cargando la hoja de fuente de datos…</p>
+  <div class="kpis" id="kpis"></div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <p class="eyebrow">Compras</p>
+    <h2>GA4 frente a las plataformas</h2>
+  </div>
+  <div class="chart-card">
+    <h3>Compras por día</h3>
+    <p class="sub">GA4: evento Compra_Exitosa, todo el sitio (pauta, orgánico y directo). Plataformas: compras que reporta cada medio para las campañas de Adcom.</p>
+    <div class="chart-wrap"><canvas id="ch-compras"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>Ingresos por día</h3>
+    <p class="sub">GA4: valor del evento (Event Value). Meta: valor de compra del píxel. TikTok no recibe valor.</p>
+    <div class="chart-wrap"><canvas id="ch-ingresos"></canvas></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <p class="eyebrow">Registros</p>
+    <h2>Registros en GA4</h2>
+  </div>
+  <div class="chart-card">
+    <h3>Registros por día</h3>
+    <p class="sub">Registro_Exitoso hasta el 23 de septiembre; registro_exitoso_sin_contrasena desde el 24 de septiembre, cuando cambió el evento de registro.</p>
+    <div class="chart-wrap"><canvas id="ch-registros"></canvas></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <p class="eyebrow">Detalle</p>
+    <h2>Últimos 21 días</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Fecha</th><th class="n">GA4 compras</th><th class="n">GA4 ingresos</th><th class="n">GA4 registros</th><th class="n">Meta compras</th><th class="n">Meta ingresos</th><th class="n">TikTok compras</th><th class="n">Google compras</th></tr></thead>
+      <tbody id="tabla"></tbody>
+    </table>
+  </div>
+  <p class="note">Fuente: hoja "[Baloto] Fuente de datos" (pestañas GA4_BALOTO y RESUMEN GENERAL), leída en vivo. Valores en pesos colombianos.</p>
+</section>
+
+<footer>ADCOM · Baloto · Medición día a día</footer>
+</div>
+
+<script>
+const SHEET_ID = '1zEv8npIyHnoaEXKZDRh-vpyo88RU0WmKUgSKwSYzaMU';
+const DESDE = '2026-08-01';
+const HITOS = [['2026-09-24', 'Cambio del evento de registro'], ['2026-10-29', 'Despliegue de ingresos']];
+const ANTES = ['2026-10-22', '2026-10-28'], DESPUES = '2026-10-30';
+const C = {ga4: '#141414', meta: '#2563eb', tiktok: '#e11d48', google: '#16a34a', acc: '#FFC000'};
+let SEQ = 0, DIAS = [], charts = {};
+
+// JSONP de gviz: funciona tanto en la web como abriendo el archivo local
+function consulta(hoja, tq){
+  return new Promise((ok, ko) => {
+    const cb = `__med_${Date.now()}_${++SEQ}`, s = document.createElement('script');
+    const t = setTimeout(() => { fin(); ko(new Error('la hoja no respondió')) }, 20000);
+    const fin = () => { clearTimeout(t); s.remove(); delete window[cb] };
+    window[cb] = r => { fin(); r?.status === 'ok' ? ok(r.table.rows.map(x => x.c.map(c => c ? c.v : null))) : ko(new Error('respuesta inválida de la hoja')) };
+    const u = new URL(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq`);
+    u.searchParams.set('tqx', `out:json;responseHandler:${cb}`); u.searchParams.set('sheet', hoja); u.searchParams.set('tq', tq);
+    s.src = u.toString(); s.async = true; s.onerror = () => { fin(); ko(new Error('sin acceso a la hoja')) }; document.head.appendChild(s) }) }
+const isoD = v => { const m = String(v).match(/Date\((\d+),(\d+),(\d+)/); return m ? `${m[1]}-${String(+m[2]+1).padStart(2,'0')}-${m[3].padStart(2,'0')}` : '' };
+const fN = v => Math.round(v || 0).toLocaleString('es-CO');
+const fM = v => '$' + ((v || 0) / 1e6).toLocaleString('es-CO', {minimumFractionDigits: 1, maximumFractionDigits: 1}) + ' M';
+const fD = d => { const [y, m, dd] = d.split('-'); return `${+dd} ${['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][+m-1]}` };
+const addDays = (d, n) => { const x = new Date(d + 'T12:00:00'); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10) };
+
+async function cargar(){
+  const [ga4, plat] = await Promise.all([
+    consulta('GA4_BALOTO', `select A, sum(D), sum(E), sum(F), sum(G) where A >= date '${DESDE}' group by A order by A`),
+    consulta('RESUMEN GENERAL', `select A, K, sum(G), sum(I) where N = 'Plataforma' and A >= date '${DESDE}' group by A, K order by A`)]);
+  const g = {};
+  const dia = d => g[d] ??= {d, com: 0, ing: 0, reg: 0, meta: 0, metaIng: 0, tiktok: 0, google: 0};
+  ga4.forEach(([d, com, reg1, reg2, ing]) => { const x = dia(isoD(d)); x.com += com || 0; x.reg += (reg1 || 0) + (reg2 || 0); x.ing += ing || 0 });
+  plat.forEach(([d, medio, com, ing]) => { const x = dia(isoD(d)), m = String(medio || '').toLowerCase();
+    if(/facebook|meta/.test(m)){ x.meta += com || 0; x.metaIng += ing || 0 } else if(/tiktok/.test(m)) x.tiktok += com || 0; else if(/google/.test(m)) x.google += com || 0 });
+  // el último día suele venir incompleto: se corta en el último día con GA4 y Meta
+  DIAS = Object.values(g).filter(x => x.d).sort((a, b) => a.d < b.d ? -1 : 1);
+  while(DIAS.length && !(DIAS.at(-1).com || DIAS.at(-1).ing) ) DIAS.pop();
+}
+
+function promedio(ds, k){ return ds.length ? ds.reduce((s, x) => s + x[k], 0) / ds.length : 0 }
+function renderKpis(){
+  const a = DIAS.filter(x => x.d >= ANTES[0] && x.d <= ANTES[1]), b = DIAS.filter(x => x.d >= DESPUES);
+  if(!b.length) return;
+  const k = (lbl, key, fmt) => { const va = promedio(a, key), vb = promedio(b, key), pct = va ? (vb / va - 1) * 100 : null;
+    const cls = pct === null ? '' : pct < 0 ? 'baja' : 'sube';
+    const p = pct === null || pct > 1000 ? `antes ${fmt(va)} por día` : `${pct > 0 ? '+' : ''}${pct.toFixed(0)}% frente a ${fmt(va)}`;
+    return `<div class="kpi"><b>${fmt(vb)}</b><span>${lbl}</span><small class="${cls}">${p}</small></div>` };
+  document.getElementById('kpis').innerHTML =
+    k('GA4 compras por día', 'com', fN) + k('GA4 ingresos por día', 'ing', fM) + k('Meta compras por día', 'meta', fN) + k('Google Ads compras por día', 'google', fN);
+  document.getElementById('estado').textContent = `Promedio diario desde el ${fD(DESPUES)} (${b.length} días, hasta el ${fD(b.at(-1).d)}) frente a la semana del ${fD(ANTES[0])} al ${fD(ANTES[1])}.`;
+}
+
+// líneas verticales en las fechas de cambio de medición
+const hitos = {id: 'hitos', afterDatasetsDraw(ch){
+  const {ctx, chartArea: a, scales: {x}} = ch, labels = ch.data.labels;
+  HITOS.forEach(([d, txt]) => { const i = labels.indexOf(d); if(i < 0) return; const px = x.getPixelForValue(i);
+    ctx.save(); ctx.strokeStyle = C.acc; ctx.lineWidth = 2; ctx.setLineDash([5, 4]); ctx.beginPath(); ctx.moveTo(px, a.top); ctx.lineTo(px, a.bottom); ctx.stroke();
+    ctx.setLineDash([]); ctx.fillStyle = '#63635E'; ctx.font = '600 11px Poppins, sans-serif'; ctx.textAlign = 'right'; ctx.fillText(txt, px - 6, a.top + 12); ctx.restore() }) }};
+
+function draw(id, sets, fmt){
+  charts[id]?.destroy();
+  charts[id] = new Chart(document.getElementById(id), {type: 'line', plugins: [hitos],
+    data: {labels: VIS.map(x => x.d), datasets: sets.map(([label, key, color, dash]) => ({label, data: VIS.map(x => x[key]), borderColor: color, backgroundColor: color,
+      borderWidth: label.startsWith('GA4') ? 2.6 : 1.8, borderDash: dash ? [5, 3] : [], pointRadius: 0, pointHoverRadius: 4, tension: .2}))},
+    options: {responsive: true, maintainAspectRatio: false, interaction: {mode: 'index', intersect: false},
+      plugins: {legend: {position: 'bottom', labels: {usePointStyle: true, boxWidth: 8, font: {family: 'Poppins'}}},
+        tooltip: {callbacks: {title: i => fD(i[0].label), label: i => ` ${i.dataset.label}: ${fmt(i.parsed.y)}`}}},
+      scales: {x: {ticks: {callback: function(v){ return fD(this.getLabelForValue(v)) }, maxTicksLimit: 12, font: {family: 'Poppins'}}, grid: {display: false}},
+        y: {beginAtZero: true, ticks: {callback: v => fmt(v), font: {family: 'Poppins'}}, grid: {color: '#EEEEEA'}}}}});
+}
+
+let VIS = [];
+function render(r){
+  document.querySelectorAll('.rangos button').forEach(b => b.classList.toggle('on', b.dataset.r === r));
+  const desde = /^\d+$/.test(r) ? addDays(DIAS.at(-1).d, -(+r - 1)) : r;
+  VIS = DIAS.filter(x => x.d >= desde);
+  draw('ch-compras', [['GA4 Compra_Exitosa', 'com', C.ga4], ['Meta', 'meta', C.meta], ['TikTok', 'tiktok', C.tiktok], ['Google Ads', 'google', C.google]], fN);
+  draw('ch-ingresos', [['GA4 valor de compra', 'ing', C.ga4], ['Meta valor de compra', 'metaIng', C.meta]], fM);
+  draw('ch-registros', [['GA4 registros', 'reg', C.ga4]], fN);
+}
+
+function renderTabla(){
+  document.getElementById('tabla').innerHTML = DIAS.slice(-21).reverse().map(x => `<tr${x.d === HITOS[1][0] ? ' class="hi"' : ''}><td>${fD(x.d)}</td>` +
+    [fN(x.com), fM(x.ing), fN(x.reg), fN(x.meta), fM(x.metaIng), fN(x.tiktok), fN(x.google)].map(v => `<td class="n">${v}</td>`).join('') + '</tr>').join('');
+}
+
+document.querySelectorAll('.rangos button').forEach(b => b.addEventListener('click', () => render(b.dataset.r)));
+cargar().then(() => { renderKpis(); render('2026-09-01'); renderTabla() })
+  .catch(e => { document.getElementById('estado').textContent = 'No se pudo leer la hoja de fuente de datos: ' + e.message + '. Recarga la página en unos minutos.' });
+</script>
+</body>
+</html>
