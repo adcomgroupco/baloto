@@ -318,9 +318,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "Intereses abiertos"
     ],
-    "ppto": 4380000,
-    "registros": 1.6,
-    "compras": 0.4,
+    "ppto": 5250000,
+    "registros": 2.1,
+    "compras": 0.5,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -334,9 +334,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "Intereses abiertos"
     ],
-    "ppto": 8135000,
+    "ppto": 7327000,
     "registros": 33.8,
-    "compras": 5.7,
+    "compras": 5.1,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -351,9 +351,9 @@ window.BALOTO_FLOW = {
      "Conversión_ACQ_Tiktok Ads",
      "Conversión_ACQ_Tiktok Ads_rmkt-topfeed"
     ],
-    "ppto": 51925333,
-    "registros": 3166.2,
-    "compras": 1344.4,
+    "ppto": 46770000,
+    "registros": 2851.8,
+    "compras": 1210.9,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -367,9 +367,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "Intereses abiertos / PMAX"
     ],
-    "ppto": 13462000,
-    "registros": 820.9,
-    "compras": 905.2,
+    "ppto": 12125000,
+    "registros": 739.3,
+    "compras": 815.3,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -383,9 +383,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "Desconocidos (Interesado: Loterias, Otros)"
     ],
-    "ppto": 14424000,
-    "registros": 879.5,
-    "compras": 907.7,
+    "ppto": 17288000,
+    "registros": 1054.1,
+    "compras": 1088.0,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -399,9 +399,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "Jugadores y Registros del pixel (90D)"
     ],
-    "ppto": 4808000,
-    "registros": 17.1,
-    "compras": 533.0,
+    "ppto": 5763000,
+    "registros": 22.8,
+    "compras": 638.9,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -415,9 +415,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "Jugadores y Registros del pixel (90D)"
     ],
-    "ppto": 4808000,
-    "registros": 13.2,
-    "compras": 238.5,
+    "ppto": 4331000,
+    "registros": 13.3,
+    "compras": 214.9,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -447,9 +447,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "Jugadores y Registros del pixel (90D)"
     ],
-    "ppto": 1923000,
-    "registros": 1.9,
-    "compras": 54.3,
+    "ppto": 2305000,
+    "registros": 2.5,
+    "compras": 65.1,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -464,9 +464,9 @@ window.BALOTO_FLOW = {
      "COMPETENCIA/SEARCH",
      "CATEGORY/SEARCH"
     ],
-    "ppto": 69971334,
-    "registros": 11926.5,
-    "compras": 336710.4,
+    "ppto": 63025000,
+    "registros": 11946.5,
+    "compras": 303284.2,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -483,9 +483,9 @@ window.BALOTO_FLOW = {
      "Usuarios VIP",
      "Usuarios Medium"
     ],
-    "ppto": 3848000,
-    "registros": 27.8,
-    "compras": 2065.5,
+    "ppto": 4612000,
+    "registros": 37.1,
+    "compras": 2475.6,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -515,9 +515,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "BBDD COBRO DE PREMIOS"
     ],
-    "ppto": 2885000,
-    "registros": 14.6,
-    "compras": 3079.0,
+    "ppto": 3458000,
+    "registros": 19.4,
+    "compras": 3690.5,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -531,9 +531,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "BBDD COMPRAS MATCH"
     ],
-    "ppto": 26923333,
-    "registros": 44.9,
-    "compras": 12510.8,
+    "ppto": 32268000,
+    "registros": 59.9,
+    "compras": 14994.4,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -547,9 +547,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "BBDD COMPRAS MATCH"
     ],
-    "ppto": 10872000,
-    "registros": 327.2,
-    "compras": 162.7,
+    "ppto": 9793000,
+    "registros": 327.7,
+    "compras": 146.5,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -563,9 +563,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "BBDD COMPRAS MATCH"
     ],
-    "ppto": 7693000,
-    "registros": 30.2,
-    "compras": 1119.5,
+    "ppto": 6929000,
+    "registros": 30.3,
+    "compras": 1008.3,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -579,9 +579,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "BBDD COMPRAS MATCH"
     ],
-    "ppto": 4120000,
-    "registros": 10.0,
-    "compras": 2459.7,
+    "ppto": 4938000,
+    "registros": 13.4,
+    "compras": 2948.1,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -595,9 +595,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "BBDD COMPRAS MATCH"
     ],
-    "ppto": 17308000,
-    "registros": 429.7,
-    "compras": 6141.9,
+    "ppto": 20745000,
+    "registros": 572.7,
+    "compras": 7361.6,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -611,9 +611,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "BBDD COMPRAS MATCH"
     ],
-    "ppto": 2814000,
-    "registros": 54.9,
-    "compras": 668.9,
+    "ppto": 3373000,
+    "registros": 73.2,
+    "compras": 801.8,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    }
@@ -624,10 +624,10 @@ window.BALOTO_FLOW = {
   "total_mes": 305645000,
   "ticket": 5000,
   "etapas": {
-   "AWARENESS": 0.0480791394544756,
-   "ACQUISITION": 0.30661288129081826,
-   "ACTIVATION": 0.3663401229350749,
-   "RETENTION": 0.27896785631963117
+   "AWARENESS": 0.04831732616212063,
+   "ACQUISITION": 0.29267383787936996,
+   "ACTIVATION": 0.34589320015366887,
+   "RETENTION": 0.3131156358048406
   },
   "base": "ga4"
  }
