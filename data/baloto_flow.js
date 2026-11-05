@@ -320,7 +320,7 @@ window.BALOTO_FLOW = {
     ],
     "ppto": 4977000,
     "registros": 2.1,
-    "compras": 0.5,
+    "compras": 1986.0,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -336,7 +336,7 @@ window.BALOTO_FLOW = {
     ],
     "ppto": 6946000,
     "registros": 34.3,
-    "compras": 4.9,
+    "compras": 1266.1,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -353,7 +353,7 @@ window.BALOTO_FLOW = {
     ],
     "ppto": 44342000,
     "registros": 2703.8,
-    "compras": 1148.1,
+    "compras": 25646.0,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -369,7 +369,7 @@ window.BALOTO_FLOW = {
     ],
     "ppto": 11495000,
     "registros": 700.9,
-    "compras": 772.9,
+    "compras": 650.1,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -385,7 +385,7 @@ window.BALOTO_FLOW = {
     ],
     "ppto": 16390000,
     "registros": 999.4,
-    "compras": 1031.5,
+    "compras": 8154.2,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -401,7 +401,7 @@ window.BALOTO_FLOW = {
     ],
     "ppto": 5464000,
     "registros": 23.2,
-    "compras": 605.8,
+    "compras": 17740.3,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -417,7 +417,7 @@ window.BALOTO_FLOW = {
     ],
     "ppto": 4106000,
     "registros": 13.5,
-    "compras": 203.7,
+    "compras": 7547.8,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -449,7 +449,7 @@ window.BALOTO_FLOW = {
     ],
     "ppto": 2185000,
     "registros": 2.6,
-    "compras": 61.7,
+    "compras": 11262.9,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -466,7 +466,7 @@ window.BALOTO_FLOW = {
     ],
     "ppto": 59752000,
     "registros": 12115.5,
-    "compras": 287534.0,
+    "compras": 212640.6,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -485,7 +485,7 @@ window.BALOTO_FLOW = {
     ],
     "ppto": 4372000,
     "registros": 37.6,
-    "compras": 2346.8,
+    "compras": 22536.1,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -517,7 +517,7 @@ window.BALOTO_FLOW = {
     ],
     "ppto": 13000000,
     "registros": 55.1,
-    "compras": 1441.2,
+    "compras": 42207.8,
     "inicio": "2026-11-05",
     "fin": "2026-11-30"
    },
@@ -533,7 +533,7 @@ window.BALOTO_FLOW = {
     ],
     "ppto": 3278000,
     "registros": 19.7,
-    "compras": 3498.4,
+    "compras": 16896.9,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -549,7 +549,7 @@ window.BALOTO_FLOW = {
     ],
     "ppto": 30592000,
     "registros": 60.7,
-    "compras": 14215.6,
+    "compras": 78642.7,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -565,7 +565,7 @@ window.BALOTO_FLOW = {
     ],
     "ppto": 9284000,
     "registros": 332.4,
-    "compras": 138.9,
+    "compras": 28654.3,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -581,7 +581,7 @@ window.BALOTO_FLOW = {
     ],
     "ppto": 6569000,
     "registros": 30.7,
-    "compras": 955.9,
+    "compras": 61971.7,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -597,7 +597,7 @@ window.BALOTO_FLOW = {
     ],
     "ppto": 4682000,
     "registros": 13.6,
-    "compras": 2795.2,
+    "compras": 23178.2,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -613,7 +613,7 @@ window.BALOTO_FLOW = {
     ],
     "ppto": 19668000,
     "registros": 580.8,
-    "compras": 6979.4,
+    "compras": 38264.6,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -629,7 +629,7 @@ window.BALOTO_FLOW = {
     ],
     "ppto": 3198000,
     "registros": 74.2,
-    "compras": 760.2,
+    "compras": 7170.4,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    }
@@ -638,13 +638,12 @@ window.BALOTO_FLOW = {
   "gestion": 39045000,
   "fee": 6300000,
   "total_mes": 305645000,
-  "ticket": 5000,
+  "ticket": 4100,
   "etapas": {
    "AWARENESS": 0.04580484056857472,
    "ACQUISITION": 0.27747598924318095,
    "ACTIVATION": 0.3798655397618133,
    "RETENTION": 0.29685363042643104
-  },
-  "base": "ga4"
+  }
  }
 };
