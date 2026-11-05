@@ -317,7 +317,7 @@ function etapaNombre(n){ n = n.toLowerCase();
 function marcaNombre(n, tipo){ n = n.toLowerCase(); const t = String(tipo||'').toLowerCase();
   if(/miloto/.test(n) || t.includes('miloto')) return 'Miloto'; if(/colorloto/.test(n) || t.includes('colorloto')) return 'Colorloto'; return 'Baloto' }
 function lineaNombre(plat, n, etapa){ n = n.toLowerCase();
-  if(plat === 'Meta'){ if(n.includes('_awa_')) return 'awa_meta'; if(n.includes('_acq_')) return 'acq_meta'; if(n.includes('promocional')) return 'promo_meta';
+  if(plat === 'Meta'){ if(n.includes('_cali')) return 'cali_meta'; if(n.includes('_awa_')) return 'awa_meta'; if(n.includes('_acq_')) return 'acq_meta'; if(n.includes('promocional')) return 'promo_meta';
     if(n.includes('conversion_videos')) return 'videos'; if(n.includes('_act_')) return 'crm'; if(n.includes('cobrodepremios')) return 'cobro';
     if(n.includes('adcom_colorloto')) return 'colorloto_meta'; if(n.includes('adcom_miloto') && n.includes('ret_acumulado')) return 'miloto_acum_meta';
     if(n.includes('adcom_miloto')) return 'miloto_meta'; if(n.includes('ret_acumulado')) return 'baloto_acum_meta' }
