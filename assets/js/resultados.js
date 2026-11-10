@@ -67,7 +67,8 @@
       const t = {reg: 0, com: 0, regMap: 0, comMap: 0, sinMap: []};
       (porMes[mes] || []).forEach(([nombre, , com, reg, comP, regP]) => {
         if (nombre === '(otros)') return;                         // tráfico que no es de Adcom
-        t.reg += reg; t.com += com;
+        // compras de plataforma (medición acordada el 4 nov 2026); registros de GA4
+        com = comP; t.reg += reg; t.com += com;
         const k = clave(nombre);
         const hit = grupos[k] ? k : keys.filter(x => x.length > 8 && (k.includes(x) || x.includes(k))).sort((a, b) => b.length - a.length)[0];
         if (!hit) { if (reg || com) t.sinMap.push({nombre, reg, com}); return }

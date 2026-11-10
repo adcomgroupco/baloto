@@ -75,7 +75,7 @@
       <div class="fg"><span class="fl">Plataforma</span><select id="f-plat" onchange="render()"><option value="">Todas</option></select></div>
       <div class="fg"><span class="fl">Etapa</span><select id="f-etapa" onchange="render()"><option value="">Todas</option><option value="AWARENESS">Awareness</option><option value="ACQUISITION">Adquisición</option><option value="ACTIVATION">Activación</option><option value="RETENTION">Retención</option></select></div>
       <div class="fg"><span class="fl">Marca</span><select id="f-marca" onchange="render()"><option value="">Todas</option><option>Baloto</option><option>Miloto</option><option>Colorloto</option></select></div>
-      <div class="fg"><span class="fl">Resultados</span><select id="f-res" onchange="construir();render()" title="De dónde salen compras, registros e ingresos"><option value="ga4">GA4 · hoja</option><option value="plat">Plataforma · API</option></select></div>
+      <div class="fg"><span class="fl">Resultados</span><select id="f-res" onchange="construir();render()" title="De dónde salen compras, registros e ingresos"><option value="mix" selected>Compras plataforma · registros GA4</option><option value="ga4">Todo GA4 · hoja</option><option value="plat">Todo plataforma · API</option></select></div>
       <label class="chk" title="Encendido: la meta completa del mes del flow. Apagado: la parte proporcional a los días del rango."><input type="checkbox" id="f-total" onchange="render()">Meta completa del mes</label>
       <button class="btn-reset" onclick="resetFilters()">↺ Reset</button>
     </div>
@@ -116,8 +116,8 @@
     <div class="sec-title" id="sg-sec-kpi"><span></span>Presupuesto del mes<span class="sec-note" id="sg-kpi-note"></span></div>
     <div class="kpi-grid kpi-6" id="sg-kpi-grid"></div>
 
-    <div class="sec-title"><span></span>Registros y compras GA4<span class="sec-note" id="sg-res-note"></span></div>
-    <div class="kpi-grid kpi-4" id="sg-res-grid"></div>
+    <div class="sec-title"><span></span>Registros GA4, compras de plataforma e ingresos<span class="sec-note" id="sg-res-note"></span></div>
+    <div class="kpi-grid kpi-6" id="sg-res-grid"></div>
 
     <div class="sec-title"><span></span>Por medio</div>
     <div class="grid-2">
@@ -133,7 +133,7 @@
       <div class="foot-note">
         <b>Esperado a la fecha</b>: presupuesto × días transcurridos ÷ días de campaña, contados hasta la fecha de corte de la hoja.
         <b>Diario sugerido</b>: lo que queda por consumir ÷ días restantes, solo en campañas activas. La línea negra de cada barra marca dónde debería ir el consumo hoy.
-        <b>Registros y compras</b>: GA4, con su costo por unidad debajo (consumo de la hoja ÷ resultados).
+        <b>Registros</b>: GA4. <b>Compras</b>: plataforma. Debajo, su costo por unidad (consumo de la hoja ÷ resultados).
       </div>
     </div>
 
@@ -173,8 +173,8 @@
       <div class="tbar"><span class="sec-note" id="det-note"></span><span class="sp"></span><input type="search" id="q" placeholder="Buscar campaña" oninput="renderDetalle()" style="width:240px"></div>
       <div class="tscroll"><table><thead id="det-head"></thead><tbody id="det-body"></tbody></table></div>
       <div class="foot-note">
-        <b>Fuente</b>: APIs de Meta Ads (cuenta ADCOM 2025 - BALOTO) y TikTok Ads (ADCOM - Baloto), diario por campaña. <b>Registros y compras</b>: eventos de plataforma (píxel de Meta: CompleteRegistration y Purchase; TikTok: registro de usuario y pago completado), no GA4.
-        <b>Ingresos</b>: valor de compra del píxel de Meta; TikTok no envía valor. <b>Etapa y marca</b> salen del nombre de la campaña (awa / acq / act / ret; adcom_baloto / miloto / colorloto); los Top Feed de TikTok cuentan como awareness.
+        <b>Fuente</b>: APIs de Meta Ads (cuenta ADCOM 2025 - BALOTO) y TikTok Ads (ADCOM - Baloto), diario por campaña. <b>Medición</b> (selector Resultados, por defecto): compras de plataforma (píxel de Meta, pago completado de TikTok, conversiones de Google Ads), registros de GA4 e ingresos estimados con compras × ticket medio de $4.100.
+        Con "Todo plataforma", los ingresos son el valor de compra del píxel de Meta (TikTok no envía valor). <b>Etapa y marca</b> salen del nombre de la campaña (awa / acq / act / ret; adcom_baloto / miloto / colorloto); los Top Feed de TikTok cuentan como awareness.
         <b>Corrección de UTM</b>: los resultados GA4 de MiLoto retención en TikTok y de Italia 2 en TikTok, que llegaron con el nombre de otra campaña hasta el 27 de octubre, se reasignan a su campaña.
         <b>Metas</b>: flow de medios del mes, por línea de campaña, proporcionales a los días del rango salvo con "Meta completa del mes". El presupuesto real y el pacing están en la pestaña Presupuesto y pacing.
       </div>
@@ -245,6 +245,9 @@ const LINEA_ET = {}; Object.values(FL).forEach(m => m.lineas.forEach(l => LINEA_
 const TICKET = {'Meta':4953, 'Google Ads':5063, 'TikTok':5048, 'X':5048, 'Programática':5048}, SIN_VALOR_DESDE = '2026-08-10', SIN_VALOR_HASTA = '2026-10-29';
 const sinValor = d => d >= SIN_VALOR_DESDE && d <= SIN_VALOR_HASTA;
 const ticketDe = p => TICKET[p] || 5048;
+// Medición acordada con el cliente (tráfico del 4 nov 2026): compras de plataforma, registros de GA4 e ingresos
+// estimados con el ticket medio del flow y del reporte de octubre.
+const TICKET_MEDIO = 4100;
 
 // ── Hoja: lectura ───────────────────────────────────────────────────────────
 function num(v){ if(typeof v === 'number') return isFinite(v) ? v : 0;
@@ -348,8 +351,17 @@ function construir(){
     if(!extra.has(k)) extra.set(k, {d, ci, inv:0, imp:0, alc:0, cli:0, vid:0, reg:0, com:0, ing:0}); return extra.get(k) };
   // medios sin API: entrega desde la hoja; con "Plataforma", también sus resultados de plataforma
   HOJA.forEach(h => { if(API_PLAT.includes(h.medio)) return;
-    if(h.inv || h.imp || h.cli || (modo === 'plat' && (h.regP || h.comP))){ const r = fila(h.d, camp(h));
-      r.inv += h.inv; r.imp += h.imp; r.cli += h.cli; r.vid += h.vid; if(modo === 'plat'){ r.reg += h.regP; r.com += h.comP; r.ing += h.ingP } } });
+    if(h.inv || h.imp || h.cli || (modo === 'plat' && (h.regP || h.comP)) || (modo === 'mix' && h.comP)){ const r = fila(h.d, camp(h));
+      r.inv += h.inv; r.imp += h.imp; r.cli += h.cli; r.vid += h.vid; if(modo === 'plat'){ r.reg += h.regP; r.com += h.comP; r.ing += h.ingP }
+      if(modo === 'mix') r.com += h.comP } });
+  // mixto: las compras de Meta y TikTok son las de la API; los registros salen de GA4
+  if(modo === 'mix'){
+    const res = new Map();
+    HOJA.forEach(h => { if(!h.reg) return; const k = h.d + '|' + h.medio + '|' + h.key;
+      const t = res.get(k) || {reg:0, h}; t.reg += h.reg; res.set(k, t) });
+    ROWS.forEach(r => { const t = res.get(r.d + '|' + r.c.plat + '|' + nkey(r.c.nombre)); r.reg = t ? t.reg : 0; if(t) t.usado = true });
+    res.forEach(t => { if(!t.usado) fila(t.h.d, camp(t.h)).reg += t.reg });
+  }
   if(modo === 'ga4'){
     const res = new Map();
     HOJA.forEach(h => { if(!(h.reg || h.com || h.ing)) return; const k = h.d + '|' + h.medio + '|' + h.key;
@@ -361,6 +373,7 @@ function construir(){
     res.forEach(t => { if(t.usado) return; const r = fila(t.h.d, camp(t.h)); r.reg += t.reg; r.com += t.com; r.ing += ingDe(t, t.h.d, t.h.medio); if(t.com && sinValor(t.h.d)) r.est = true });
   }
   ROWS = ROWS.concat([...extra.values()].map(r => ({...r, c: C[r.ci]})));
+  if(modo === 'mix') ROWS.forEach(r => r.ing = r.com * TICKET_MEDIO);
   CONECTADOS = [...new Set(C.filter(c => !c.hoja || c.plat !== 'Otros').map(c => c.plat))];
 }
 const Z = () => ({inv:0, imp:0, cli:0, vid:0, reg:0, com:0, ing:0});
@@ -457,8 +470,8 @@ function renderKPIs(T, G, fw, f){
     k('Costo por registro', fCOP(T.cpr), cprM ? `<span class="${costCls(T.cpr, cprM)}">meta ${fCOP(cprM)}</span>` : ''),
     k('Compras', fN(T.com), G.com ? 'meta ' + fN(G.com) : '', bar(div(T.com, G.com), 'Cumplimiento')),
     k('Costo por compra', fCOP(T.cpa), cpaM ? `<span class="${costCls(T.cpa, cpaM)}">meta ${fCOP(cpaM)}</span>` : ''),
-    k('Compras por registro', fD(T.r2c, 1), (resGA4() ? 'compras GA4' : 'compras de plataforma') + ' sobre registros'),
-    k(resGA4() ? 'Ingresos GA4' : 'Ingresos (píxel Meta)', fCOP(T.ing), 'ROAS ' + (T.roas ? fD(T.roas, 1) + 'x' : '—') + ' sobre toda la inversión'),
+    k('Compras por registro', fD(T.r2c, 1), (resGA4() ? 'compras GA4 sobre registros' : resMix() ? 'compras de plataforma sobre registros GA4' : 'compras de plataforma sobre registros')),
+    k(resGA4() ? 'Ingresos GA4' : resMix() ? 'Ingresos estimados' : 'Ingresos (píxel Meta)', fCOP(T.ing), 'ROAS ' + (T.roas ? fD(T.roas, 1) + 'x' : '—') + (resMix() ? ` · compras × ticket ${fCOP(TICKET_MEDIO)}` : ' sobre toda la inversión')),
     k('Pacing del mes', sg && sg.pace !== null ? `<span class="pill ${pace(sg.pace)}" style="font-size:16px;padding:3px 12px">${fP(sg.pace)}</span>` : '—', sg ? `consumo de la hoja frente a lo esperado al ${fDate(sg.corte)}` : 'sin presupuesto en la hoja para este mes'),
   ].join('');
 }
@@ -629,10 +642,11 @@ function renderDetalle(){
 
 // ── Arranque ────────────────────────────────────────────────────────────────
 const resGA4 = () => !!HOJA && document.getElementById('f-res').value === 'ga4';
+const resMix = () => !!HOJA && document.getElementById('f-res').value === 'mix';
 function notaFuentes(){
   const hasta = fDate(D.hasta) + ' ' + D.hasta.slice(0,4), sinApi = CONECTADOS.filter(p => !API_PLAT.includes(p));
   document.getElementById('fuentes-note').innerHTML = HOJA
-    ? `<b>Fuentes:</b> inversión, impresiones, clics y alcance de Meta y TikTok por API, al ${hasta}. ${resGA4() ? '<b>Compras, registros e ingresos: GA4</b>' : '<b>Compras, registros e ingresos: plataforma</b> (píxel de Meta, eventos de TikTok)'}, desde ${SHEET_TAB} de la hoja de fuente de datos` +
+    ? `<b>Fuentes:</b> inversión, impresiones, clics y alcance de Meta y TikTok por API, al ${hasta}. ${resMix() ? `<b>Compras: plataforma</b> (Meta y TikTok por API; Google Ads y X desde la hoja). <b>Registros: GA4</b>. <b>Ingresos: estimados</b> con compras × ticket medio de ${fCOP(TICKET_MEDIO)}, la medición acordada con el cliente el 4 de noviembre. Google Ads registra sus compras con la conversión Compra_Exitosa importada de GA4, así que mientras GA4 no reciba el evento de compra sus compras de noviembre no se reflejan. Fuente de registros y de los medios sin API` : resGA4() ? '<b>Compras, registros e ingresos: GA4</b>' : '<b>Compras, registros e ingresos: plataforma</b> (píxel de Meta, eventos de TikTok)'}, desde ${SHEET_TAB} de la hoja de fuente de datos` +
       (sinApi.length ? `, que también aporta la inversión de ${sinApi.join(', ')}.` : '.') + ` Cambia el origen de los resultados con el selector <b>Resultados</b>.` +
       ` <b>Metas:</b> registros y compras del flow, recalculadas con el presupuesto real de cada línea en la hoja de seguimiento` +
       ((FL[CURVA] || {}).base === 'ga4' ? ', con los costos GA4 del flow.' : resGA4() ? ` y llevadas a GA4 con la parte que GA4 confirma de cada plataforma (1 jun – 9 ago): compras Meta ${fP(GA4_CONFIRMA.compras.Meta)}, TikTok ${fP(GA4_CONFIRMA.compras.TikTok)} y Google 100%; registros Meta ${fP(GA4_CONFIRMA.registros.Meta)}, TikTok ${fP(GA4_CONFIRMA.registros.TikTok)} y Google 100%.` : ', con la atribución de cada plataforma, igual que el flow.')

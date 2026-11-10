@@ -16,6 +16,8 @@
     campanas: m => D ? D.campanas.filter(f => f.mes === m).map(f => ({nom: f.nom, medio: f.medio, etapa: f.etapa, ppto: f.ppto})) : null};
   const fN = n => (n && isFinite(n)) ? Math.round(n).toLocaleString('es-CO') : '—';
   const costo = (c, n) => n >= 1 ? F.full(c / n) : '—';
+  // medición acordada con el cliente (4 nov 2026): compras de plataforma, registros GA4, ingresos = compras × ticket medio
+  const TICKET_MEDIO = 4100;
   const res = rows => rows.reduce((a, f) => (a.reg += f.reg || 0, a.com += f.com || 0, a), {reg: 0, com: 0});
 
   const pbar = f => `<div class="pbar" title="Consumo ${fP(f.pc)} · esperado ${fP(div(f.esp, f.ppto))}"><i style="width:${Math.min(f.pc || 0, 1) * 100}%;background:${paceCol(f.pace)}"></i><b style="left:${Math.min(div(f.esp, f.ppto) || 0, 1) * 100}%"></b></div>`;
@@ -54,14 +56,16 @@
     // resultados GA4: sin filtros, el total de la pauta del mes; con filtros, lo que suman las campañas filtradas
     const sinFiltro = !$('f-medio').value && !($('f-dim') && $('f-dim').value) && !$('f-estado').value;
     const Rm = RESUMEN[mes] || {reg: 0, com: 0, regMap: 0, comMap: 0, sinMap: []}, Rf = res(rows);
-    const reg = sinFiltro ? Rm.reg : Rf.reg, com = sinFiltro ? Rm.com : Rf.com;
+    const reg = sinFiltro ? Rm.reg : Rf.reg, com = sinFiltro ? Rm.com : Rf.com, ing = com * TICKET_MEDIO;
     const nSin = sinFiltro ? Rm.sinMap.length : 0;
-    const subMap = (tot, map, u) => nSin && tot - map >= 1 ? `${fN(tot - map)} ${u} de campañas fuera de la hoja` : 'GA4 · campañas de la hoja';
+    const subMap = (tot, map, u, src) => nSin && tot - map >= 1 ? `${fN(tot - map)} ${u} de campañas fuera de la hoja` : src + ' · campañas de la hoja';
     $('res-grid').innerHTML = [
-      k('Registros GA4', fN(reg), subMap(Rm.reg, Rm.regMap, 'registros')),
+      k('Registros GA4', fN(reg), subMap(Rm.reg, Rm.regMap, 'registros', 'GA4')),
       k('Costo por registro', costo(T.cons, reg), 'consumo de la hoja ÷ registros'),
-      k('Compras GA4', fN(com), subMap(Rm.com, Rm.comMap, 'compras')),
+      k('Compras plataforma', fN(com), subMap(Rm.com, Rm.comMap, 'compras', 'plataforma')),
       k('Costo por compra', costo(T.cons, com), 'consumo de la hoja ÷ compras'),
+      k('Ingresos estimados', com ? F.corto(ing) : '—', `compras × ticket ${F.full(TICKET_MEDIO)}`),
+      k('ROAS', com && T.cons ? (ing / T.cons).toLocaleString('es-CO', {maximumFractionDigits: 1}) + 'x' : '—', 'ingresos estimados ÷ consumo de la hoja'),
     ].join('');
     $('res-note').textContent = R.fuente === 'vivo' ? `${mesLbl(mes)} · hoja de fuente de datos en vivo` : R.fuente === 'copia' ? `${mesLbl(mes)} · copia del ${fDate(R.copia)}` : 'sin datos de resultados';
     renderAlertas(); renderCruce(mes); renderMedio(rows); renderCamp(); renderHist();
@@ -197,7 +201,7 @@
 
     const medios = Object.keys(S.MEDIOS_API).filter(m => H.some(h => (h.por[S.MEDIOS_API[m]] || 0) > 0));
     const filtro = $('f-medio').value || ($('f-dim') && $('f-dim').value) || $('f-estado').value;
-    $('hist-head').innerHTML = `<tr><th>Mes</th><th class="r">Presupuesto</th><th class="r">Consumo</th><th class="r">% ejecución</th><th class="r grp">Consumo hoja</th><th class="r">Plataformas</th><th class="r">Hoja vs plat.</th>${medios.map(m => `<th class="r">${m}</th>`).join('')}<th class="r grp">Registros GA4</th><th class="r">Costo por registro</th><th class="r">Compras GA4</th><th class="r">Costo por compra</th></tr>`;
+    $('hist-head').innerHTML = `<tr><th>Mes</th><th class="r">Presupuesto</th><th class="r">Consumo</th><th class="r">% ejecución</th><th class="r grp">Consumo hoja</th><th class="r">Plataformas</th><th class="r">Hoja vs plat.</th>${medios.map(m => `<th class="r">${m}</th>`).join('')}<th class="r grp">Registros GA4</th><th class="r">Costo por registro</th><th class="r">Compras plataforma</th><th class="r">Costo por compra</th></tr>`;
     $('hist-body').innerHTML = [...H].reverse().map(h => {
       const dif = div(h.hoja - h.plat, h.plat), d = dif === null ? '—' : `<span class="pill ${Math.abs(dif) <= .1 ? 'p-pos' : Math.abs(dif) <= .25 ? 'p-mid' : 'p-neg'}">${dif > 0 ? '+' : ''}${fP(dif)}</span>`;
       const pc = h.pc === null ? '—' : `<span class="pill ${h.pc > 1.05 ? 'p-neg' : h.pc >= .9 ? 'p-pos' : h.pc >= .75 ? 'p-mid' : 'p-neg'}">${fP(h.pc)}</span>`;
@@ -237,7 +241,7 @@
     $('q').oninput = renderCamp; $('btn-reset').onclick = resetFilters;
     $('last-upd').textContent = D.fuente === 'vivo' ? 'Hoja en vivo' : `Copia del ${fDate(D.copia)}`;
     const apiTxt = D.api ? ` Consumo de plataformas al <b>${fDate(D.api.hasta)}/${D.api.hasta.slice(0, 4)}</b> (${D.api.cuentas.map(c => esc(c.name)).join(', ')}).` : '';
-    $('fuente-note').innerHTML = `<b>Fuente</b>: pestaña ${esc(CFG.nombre)} de la hoja de seguimiento${D.fuente === 'vivo' ? ', leída en vivo al abrir la página' : ' (copia guardada; la hoja no respondió)'}. Corte de la hoja: <b>${fDate(D.corte)}/${D.corte.slice(0, 4)}</b>.${apiTxt} ${esc(CFG.nota)} <b>Registros y compras</b>: GA4, de la hoja de fuente de datos (RESUMEN GENERAL), cruzados con las nomenclaturas por nombre de campaña.`;
+    $('fuente-note').innerHTML = `<b>Fuente</b>: pestaña ${esc(CFG.nombre)} de la hoja de seguimiento${D.fuente === 'vivo' ? ', leída en vivo al abrir la página' : ' (copia guardada; la hoja no respondió)'}. Corte de la hoja: <b>${fDate(D.corte)}/${D.corte.slice(0, 4)}</b>.${apiTxt} ${esc(CFG.nota)} <b>Registros</b>: GA4. <b>Compras</b>: plataforma. Ambos de la hoja de fuente de datos (RESUMEN GENERAL), cruzados con las nomenclaturas por nombre de campaña. <b>Ingresos</b>: compras × ticket medio de ${F.full(TICKET_MEDIO)}.`;
     const mesUrl = (new URLSearchParams(location.search).get('mes') || '').match(/^\d{4}-\d{2}$/)?.[0];
     resetFilters();
     if (mesUrl && D.meses.includes(mesUrl)) { $('f-mes').value = mesUrl; render() }
