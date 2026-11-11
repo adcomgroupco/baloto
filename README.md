@@ -16,7 +16,7 @@ Sitio de consulta de flows, reportes, análisis y propuestas de pauta digital pa
 - `reporte-tiktok-mayo-2026.html`: TikTok Ads · may 2026.
 - `reporte-marzo-vs-abril-2026.html`: Marzo vs abril 2026.
 - `plan-post-acumulado-octubre-2026.html`: plan digital para recuperar las jugadas tras el premio del 3 de octubre (borrador para gerencia, con datos de GA4 de la hoja de fuente de datos).
-- `mejores-piezas-octubre-2026.html`: mejores piezas de octubre en Meta y TikTok, con vista previa, pilar de comunicación y medio · oct 2026.
+- `mejores-piezas-octubre-2026.html`: mejores piezas de octubre en Meta y TikTok, con vista previa, pilar de comunicación, medio y formato (estáticos, videos, Baloto general vs. Italia) · oct 2026.
 - `promo-italia-balance-2026.html`: balance de la promo Italia (Meta, TikTok, Google), 5 oct – 10 nov 2026.
 - `promo-italia-octubre-2026.html`: Promo Italia, Meta y TikTok, con anuncios y audiencias · oct 2026.
 - `top-feed-consolidado-jul-sep-2026.html`: consolidado instructivo del alcance de los 27 Top Feed de TikTok, con vistas previas · jul–sep 2026.
