@@ -499,9 +499,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "Jugadores y Registros del pixel (90D) · Baloto Revancha"
     ],
-    "ppto": 10000000,
-    "registros": 200.0,
-    "compras": 5000.0,
+    "ppto": 0,
+    "registros": 0.0,
+    "compras": 0.0,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -579,9 +579,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "BBDD COMPRAS MATCH"
     ],
-    "ppto": 6569000,
-    "registros": 30.7,
-    "compras": 61971.7,
+    "ppto": 8694000,
+    "registros": 40.6,
+    "compras": 82018.9,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -595,9 +595,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "BBDD COMPRAS MATCH"
     ],
-    "ppto": 4682000,
-    "registros": 13.6,
-    "compras": 23178.2,
+    "ppto": 6196000,
+    "registros": 18.0,
+    "compras": 30673.3,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -611,9 +611,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "BBDD COMPRAS MATCH"
     ],
-    "ppto": 19668000,
-    "registros": 580.8,
-    "compras": 38264.6,
+    "ppto": 26029000,
+    "registros": 768.7,
+    "compras": 50640.1,
     "inicio": "2026-11-01",
     "fin": "2026-11-30"
    },
@@ -642,8 +642,8 @@ window.BALOTO_FLOW = {
   "etapas": {
    "AWARENESS": 0.04580484056857472,
    "ACQUISITION": 0.27747598924318095,
-   "ACTIVATION": 0.3798655397618133,
-   "RETENTION": 0.29685363042643104
+   "ACTIVATION": 0.34144832885132537,
+   "RETENTION": 0.3352708413369189
   }
  }
 };
