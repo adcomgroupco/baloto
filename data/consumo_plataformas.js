@@ -1,7 +1,7 @@
 window.SPEND_DATA = {
- "generated_at": "2026-11-10T13:45",
+ "generated_at": "2026-11-17T09:10",
  "since": "2025-09-01",
- "until": "2026-11-10",
+ "until": "2026-11-17",
  "clients": {
   "baloto": {
    "name": "Baloto",
@@ -95,9 +95,9 @@ window.SPEND_DATA = {
    "errors": [],
    "foreign_currency": {},
    "fechas": {
-    "meta": "2026-11-10",
-    "tiktok": "2026-11-10",
-    "google": "2026-11-10"
+    "meta": "2026-11-17",
+    "tiktok": "2026-11-17",
+    "google": "2026-11-17"
    },
    "spend": {
     "2025-09": {
@@ -166,9 +166,9 @@ window.SPEND_DATA = {
      "google": 90313050.4
     },
     "2026-11": {
-     "meta": 22082171.0,
-     "tiktok": 21643376.14,
-     "google": 19170172.2
+     "meta": 44703028.0,
+     "tiktok": 28564893.28,
+     "google": 38207596.37
     }
    },
    "campaigns": {
@@ -1450,112 +1450,112 @@ window.SPEND_DATA = {
     ],
     "2026-11": [
      [
-      "tiktok",
-      "1856779037881585",
-      "adcom_baloto_tiktok_acq_conversion-registros",
-      14895147.63
-     ],
-     [
       "google",
       "23771945181",
       "adcom_baloto_gg_awa_search_category_trafico_awa_googleads",
-      9064255.18
+      21092331.85
      ],
      [
-      "google",
-      "23767709733",
-      "adcom_baloto_gg_awa_search_competencia_trafico_awa_googleads",
-      6230136.53
-     ],
-     [
-      "meta",
-      "120223284865130680",
-      "adcom_baloto_fb_acq_meta_conversion-acq_influencers_meta",
-      4950795.0
+      "tiktok",
+      "1856779037881585",
+      "adcom_baloto_tiktok_acq_conversion-registros",
+      19435202.15
      ],
      [
       "meta",
       "120217605484200680",
       "adcom_baloto_fb_ret_conversion-rmkt-ret_acumulado",
-      4749115.0
+      11119694.0
      ],
      [
       "google",
-      "23555995864",
-      "adcom_baloto_gg_traf_pmax_trafico_traf_googleads",
-      3875780.49
-     ],
-     [
-      "tiktok",
-      "1879410124717122",
-      "adcom_baloto_tiktok_ret_conversion-rmkt-ret_acumulado",
-      3193320.85
+      "23767709733",
+      "adcom_baloto_gg_awa_search_competencia_trafico_awa_googleads",
+      10449333.58
      ],
      [
       "meta",
       "120237089274450680",
       "adcom_miloto_fb_ret_conversion-rmkt-ret_acumulado",
-      2851423.0
+      8328004.0
+     ],
+     [
+      "meta",
+      "120223284865130680",
+      "adcom_baloto_fb_acq_meta_conversion-acq_influencers_meta",
+      7877639.0
+     ],
+     [
+      "google",
+      "23555995864",
+      "adcom_baloto_gg_traf_pmax_trafico_traf_googleads",
+      6665930.94
      ],
      [
       "meta",
       "120248278061500680",
       "adcom_baloto_fb_act_conversion_cali",
-      2501738.0
+      5252047.0
+     ],
+     [
+      "tiktok",
+      "1879410124717122",
+      "adcom_baloto_tiktok_ret_conversion-rmkt-ret_acumulado",
+      4171369.03
      ],
      [
       "tiktok",
       "1868190541111394",
       "adcom_miloto_tiktok_ret_conversion-rmkt-ret_miloto",
-      2208213.0
+      3183716.04
      ],
      [
       "meta",
       "120247777758400680",
       "adcom_baloto_fb_act_conversion_promocional-italia",
-      1565719.0
-     ],
-     [
-      "meta",
-      "120247968281870680",
-      "adcom_baloto_fb_awa_alcance_recordaciondemarca",
-      1366710.0
+      2612673.0
      ],
      [
       "meta",
       "120244686627750680",
       "adcom_miloto_fb_ret_conversion-rmkt-ret_miloto",
-      1358502.0
+      2505823.0
+     ],
+     [
+      "meta",
+      "120247968281870680",
+      "adcom_baloto_fb_awa_alcance_recordaciondemarca",
+      2261941.0
      ],
      [
       "tiktok",
       "1878953146799489",
       "adcom_baloto_tiktok_act_conversion_promocional-italia_2",
-      1346694.66
+      1774606.06
      ],
      [
       "meta",
       "120246246531630680",
       "adcom_baloto_fb_ret_conversion-rmkt-ret_cobrodepremios",
-      953025.0
-     ],
-     [
-      "meta",
-      "120240269554840680",
-      "adcom_baloto_fb_act_conversion_videos",
-      647726.0
+      1584885.0
      ],
      [
       "meta",
       "120238152745210680",
       "adcom_colorloto_fb_ret_conversion-rmkt-ret_acumulado",
-      600365.0
+      1232351.0
+     ],
+     [
+      "meta",
+      "120240269554840680",
+      "adcom_baloto_fb_act_conversion_videos",
+      1061652.0
      ],
      [
       "meta",
       "120231325684940680",
       "adcom_baloto_fb_act_conversion-rmkt-crm_act",
-      537053.0
+      866319.0
      ]
     ]
    }

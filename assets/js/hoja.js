@@ -11,7 +11,7 @@
   const SHEET_ID = '1VhrT6JiqnJGDxiZ6Qsz4zR4ejXrSf2Ugq9Y8eTUcx94';
   const MESES_L = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   const MES_N = {ENERO: 1, FEBRERO: 2, MARZO: 3, ABRIL: 4, MAYO: 5, JUNIO: 6, JULIO: 7, AGOSTO: 8, SEPTIEMBRE: 9, OCTUBRE: 10, NOVIEMBRE: 11, DICIEMBRE: 12};
-  const ESTADOS = ['Activado', 'Pendiente', 'Detenido', 'Finalizado'];
+  const ESTADOS = ['Activado', 'Reservado', 'Pendiente', 'Detenido', 'Finalizado'];
   const ETAPAS = ['AWARENESS', 'CONSIDERATION', 'ACQUISITION', 'ACTIVATION', 'CONVERSION', 'RETENTION', 'OTRA'];
   const ET_LBL = {AWARENESS: 'Awareness', CONSIDERATION: 'Consideración', ACQUISITION: 'Adquisición', ACTIVATION: 'Activación', CONVERSION: 'Conversión', RETENTION: 'Retención', OTRA: 'Sin etapa'};
   // medios que tienen API en el repo; X, programática y otros solo existen en la hoja
@@ -190,7 +190,7 @@
   function calc(f, corte) {
     const d = f.ini && f.fin ? Math.max(1, dias(f.ini, f.fin)) : 0;
     let t = !d ? 1 : corte < f.ini ? 0 : corte >= f.fin ? d : dias(f.ini, corte);
-    if (f.est === 'Finalizado') t = d || 1;
+    if (f.est === 'Finalizado' || f.est === 'Reservado') t = d || 1;  // reserva (R&F): el monto ya está comprometido
     f.diasTot = d; f.diasTr = t; f.diasRest = Math.max(0, d - t);
     f.esp = d ? f.ppto * t / d : f.ppto;
     f.rem = f.ppto - f.cons;
