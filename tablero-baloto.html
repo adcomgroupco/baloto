@@ -236,6 +236,7 @@ const SHEET_ID = '1zEv8npIyHnoaEXKZDRh-vpyo88RU0WmKUgSKwSYzaMU', SHEET_TAB = 'RE
 const API_PLAT = ['Meta','TikTok'];
 const API_ROWS = D ? D.diario.map(r => ({d:r[0], ci:r[1], inv:r[2], imp:r[3], alc:r[4], cli:r[5], vid:r[6], reg:r[7], com:r[8], ing:r[9]})) : [];
 let C = [], ROWS = [], HOJA = null, HOJA_ERR = '', SEQ = 0;
+const RES_CI = {};   // índice en C de cada campaña en reserva (ver reservas())
 const LINEA_ET = {}; Object.values(FL).forEach(m => m.lineas.forEach(l => LINEA_ET[l.id] = l.etapa));
 // Desde el 10 de agosto el valor de compra que llega a GA4 quedó subestimado (ticket de $2.300 a $2.900, imposible
 // con jugadas de $4.000 a $9.000) y desde el 21 de septiembre llega en $0, por un cambio en Tag Manager ya corregido.
@@ -338,6 +339,7 @@ function lineaNombre(plat, n, etapa){ n = n.toLowerCase();
 function construir(){
   const modo = HOJA ? document.getElementById('f-res').value : 'plat';
   C = D.campanas.map(c => ({...c}));
+  for(const k in RES_CI) delete RES_CI[k];   // C se rearma: los índices de las reservas se recalculan
   ROWS = API_ROWS.map(r => ({...r, c: C[r.ci]}));
   if(!HOJA){ CONECTADOS = API_PLAT.slice(); return }
   const idx = new Map(C.map((c, i) => [c.plat + '|' + nkey(c.nombre), i]));
@@ -376,17 +378,35 @@ function construir(){
   if(modo === 'mix') ROWS.forEach(r => r.ing = r.com * TICKET_MEDIO);
   CONECTADOS = [...new Set(C.filter(c => !c.hoja || c.plat !== 'Otros').map(c => c.plat))];
 }
-const Z = () => ({inv:0, imp:0, cli:0, vid:0, reg:0, com:0, ing:0});
+// res: parte de la inversión que es reserva (compras a presupuesto fijo, p. ej. TikTok R&F, estado «Reservado» en la hoja).
+// Suma en la inversión, pero los costos (CPM, CPC, CPR, CPA, ROAS) se calculan solo con lo ya entregado.
+const Z = () => ({inv:0, res:0, imp:0, cli:0, vid:0, reg:0, com:0, ing:0});
 function add(a, r){ for(const k in a) a[k] += r[k] || 0; return a }
-function M(t){ return {...t, cpm: div(t.inv*1000, t.imp), ctr: div(t.cli, t.imp), cpc: div(t.inv, t.cli), cpr: div(t.inv, t.reg),
-  cpa: div(t.inv, t.com), roas: div(t.ing, t.inv), r2c: div(t.com, t.reg)} }
+function M(t){ const e = t.inv - (t.res || 0);
+  return {...t, cpm: div(e*1000, t.imp), ctr: div(t.cli, t.imp), cpc: div(e, t.cli), cpr: div(e, t.reg),
+  cpa: div(e, t.com), roas: div(t.ing, e), r2c: div(t.com, t.reg)} }
 const sum = rows => M(rows.reduce((a, r) => add(a, r), Z()));
 function group(rows, key){ const g = {}; rows.forEach(r => { const k = key(r); (g[k] = g[k] || Z()); add(g[k], r) }); return g }
 
 function F(){ const g = id => document.getElementById(id).value;
   return {desde: g('f-desde'), hasta: g('f-hasta'), plat: g('f-plat'), etapa: g('f-etapa'), marca: g('f-marca'), total: document.getElementById('f-total').checked} }
 const pasaCamp = (c, f) => (!f.plat || c.plat === f.plat) && (!f.etapa || c.etapa === f.etapa) && (!f.marca || c.marca === f.marca);
-const filas = f => ROWS.filter(r => r.d >= f.desde && r.d <= f.hasta && pasaCamp(r.c, f));
+const filas = f => ROWS.filter(r => r.d >= f.desde && r.d <= f.hasta && pasaCamp(r.c, f)).concat(reservas(f));
+// Reservas del mes (estado «Reservado» en la hoja de seguimiento): el monto reservado menos lo que la campaña ya
+// gastó en la plataforma ese mes entra como una fila de inversión sin entrega, con la etapa de la hoja.
+function reservas(f){
+  if(!window.SGT || !SGT.campanas) return [];
+  const mes = f.hasta.slice(0,7), ini = mes + '-01', fin = monthEnd(mes);
+  if(f.desde > fin || f.hasta < ini) return [];
+  return (SGT.campanas(mes) || []).filter(x => x.est === 'Reservado' && x.cons > 0).map(x => {
+    const plat = /tik/i.test(x.medio) ? 'TikTok' : /meta|face/i.test(x.medio) ? 'Meta' : x.medio, k = nkey(x.nom);
+    const gastado = ROWS.filter(r => r.c.plat === plat && nkey(r.c.nombre).startsWith(k) && r.d >= ini && r.d <= fin && !r.c.reserva).reduce((a, r) => a + r.inv, 0);
+    const neto = Math.max(0, x.cons - gastado); if(!neto) return null;
+    const ck = plat + '|' + k;
+    if(!(ck in RES_CI)){ RES_CI[ck] = C.length;
+      C.push({plat, nombre: x.nom + ' · reserva', etapa: ETAPAS.includes(x.etapa) ? x.etapa : 'AWARENESS', marca: marcaNombre(x.nom, ''), reserva: true, hoja: true}) }
+    const c = C[RES_CI[ck]];
+    return pasaCamp(c, f) ? {d: f.hasta, ci: RES_CI[ck], c, inv: neto, res: neto, imp:0, alc:0, cli:0, vid:0, reg:0, com:0, ing:0} : null }).filter(Boolean) }
 
 // ── Flow: metas del mes que contiene la fecha final ─────────────────────────
 function flowDe(f){
@@ -463,7 +483,7 @@ function renderKPIs(T, G, fw, f){
   // presupuesto y pacing reales del mes salen de la hoja de seguimiento (pestaña Presupuesto y pacing)
   const sg = window.SGT && SGT.mes(f.hasta.slice(0,7));
   document.getElementById('kpi-grid').innerHTML = [
-    k('Inversión', fCOP(T.inv), sg ? `presupuesto del mes ${fCOP(sg.ppto)}` : 'presupuesto: cargando la hoja de seguimiento', sg ? bar(div(T.inv, sg.ppto), 'Del presupuesto del mes') : ''),
+    k('Inversión', fCOP(T.inv), (sg ? `presupuesto del mes ${fCOP(sg.ppto)}` : 'presupuesto: cargando la hoja de seguimiento') + (T.res ? ` · incluye reserva TikTok R&F ${fCOP(T.res)}` : ''), sg ? bar(div(T.inv, sg.ppto), 'Del presupuesto del mes') : ''),
     k('Impresiones', fN(T.imp), 'CPM ' + fCOP(T.cpm)),
     k('Clics', fN(T.cli), `CTR ${fP(T.ctr)} · CPC ${fCOP(T.cpc)}`),
     k('Registros', fN(T.reg), G.reg ? 'meta ' + fN(G.reg) : '', bar(div(T.reg, G.reg), 'Cumplimiento')),
@@ -497,6 +517,7 @@ function renderFunnel(rows, T, fw, G){
     return `<div class="card stage ${e === 'AWARENESS' ? 's-awa' : ''}"><div class="stage-h"><b>${ET_LBL[e]}</b><span>${fCOP(t.inv)}</span></div>
       <div class="stage-main">${main}</div><div class="stage-lbl">${lbl}</div><div class="nm-grid">${grid}</div>
       <div class="mix"><i style="width:${sh*100}%;background:${ET_COL[e]}"></i></div>
+      ${t.res ? `<div class="mix-lbl"><span>Incluye reserva TikTok R&F ${fCOP(t.res)}</span></div>` : ''}
       <div class="mix-lbl"><span>${fP(sh)} de la inversión</span><span>${ps === null ? 'sin plan' : 'plan ' + fP(ps)}${plan[e] ? ' · flow ' + fP(plan[e]) : ''}</span></div>
       ${pptoE ? bar(div(t.inv, pptoE), 'Inversión vs meta') : ''}</div>` }).join('');
   document.getElementById('funnel-note').textContent = fw ? `plan = peso de cada etapa en las líneas conectadas del flow de ${mesLbl(fw.mes).toLowerCase()} · flow = peso en el flow completo` : '';
