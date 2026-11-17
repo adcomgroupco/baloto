@@ -33,6 +33,7 @@
 <script src="data/hoja_baloto.js"></script>
 <script src="data/consumo_plataformas.js"></script>
 <script src="data/resultados_baloto.js"></script>
+<script src="data/ga4_compras_baloto.js"></script>
 <script src="assets/js/hoja.js"></script>
 <script src="assets/js/resultados.js"></script>
 </head>
@@ -292,16 +293,42 @@ function parseHoja(rows){
   const req = {d:'Date', camp:'Campaign Name', medio:'Medio', etapa:'Etapa', reg:'Registros GA4', com:'Compras GA4'};
   const c = {}; Object.entries(req).forEach(([k, l]) => { c[k] = col(l); if(c[k] < 0) throw new Error('Falta la columna ' + l + ' en ' + SHEET_TAB) });
   Object.entries({ing:'Ingresos GA4', inv:'Amount Spent', imp:'Impressions', cli:'Link Clicks', vid:'ThruPlays', tipo:'Tipo',
-    regP:'Registros', comP:'Compras', ingP:'Ingresos', fm:'Source / Medium'}).forEach(([k, l]) => c[k] = col(l));
+    regP:'Registros', comP:'Compras', ingP:'Ingresos', fm:'Source / Medium', fuente:'Fuente'}).forEach(([k, l]) => c[k] = col(l));
   const v = (x, k) => c[k] >= 0 ? num(x[c[k]]) : 0;
-  return rows.slice(1).map(x => ({d: isoD(x[c.d]), name: String(x[c.camp] || '').trim(), medio: medioDe(x[c.medio]), medioRaw: x[c.medio], etapa: norm(x[c.etapa]),
+  const base = rows.slice(1).map(x => ({d: isoD(x[c.d]), name: String(x[c.camp] || '').trim(), medio: medioDe(x[c.medio]), medioRaw: x[c.medio], etapa: norm(x[c.etapa]),
     tipo: c.tipo >= 0 ? String(x[c.tipo] || '') : '', inv: v(x,'inv'), imp: v(x,'imp'), cli: v(x,'cli'), vid: v(x,'vid'),
     reg: v(x,'reg'), com: v(x,'com'), ing: v(x,'ing'), regP: v(x,'regP'), comP: v(x,'comP'), ingP: v(x,'ingP'),
-    fm: c.fm >= 0 ? norm(x[c.fm]) : ''}))
-    .filter(r => r.d && r.name).map(corregirUtm)
+    fm: c.fm >= 0 ? norm(x[c.fm]) : '', fuente: c.fuente >= 0 ? norm(x[c.fuente]) : ''}))
+    .filter(r => r.d && r.name);
+  return comprasPurchase(base).map(corregirUtm)
     // tráfico que no es pauta de Adcom (orgánico, directo, CRM) no entra al tablero
     .filter(r => !/NO ADCOM|SIN MEDIO/.test(norm(r.medioRaw)))
     .map(r => ({...r, key: nkey(r.name)})) }
+
+// Compras GA4 con el evento purchase. Power My Analytics todavía trae a la hoja el evento viejo Compra_Exitosa,
+// que quedó casi en cero desde el despliegue de purchase (29 oct 2026). data/ga4_compras_baloto.js trae purchase
+// directo de GA4 por día, campaña y fuente / medio (scripts/clients/baloto/build_ga4_compras.py): desde su fecha
+// 'desde', las compras e ingresos GA4 de la hoja se reemplazan por esos. Si una combinación no tiene fila en la
+// hoja, se agrega con la homologación de HOMOLOGACIÓN G4.
+function comprasPurchase(rows){
+  const G = window.GA4_COMPRAS; if(!G || !G.filas) return rows;
+  const k = (d, n, fm) => d + '|' + nkey(n) + '|' + norm(fm), idx = new Map();
+  rows.forEach(r => { if(r.fuente !== 'GA4' || r.d < G.desde || r.d > G.hasta) return;
+    r.com = 0; r.ing = 0; const kk = k(r.d, r.name, r.fm); if(!idx.has(kk)) idx.set(kk, r) });
+  G.filas.forEach(([d, n, fm, com, ing]) => { const kk = k(d, n, fm), r = idx.get(kk);
+    if(r){ r.com += com; r.ing += ing; return }
+    const h = G.homol[n]; if(!h) return;
+    const nr = {d, name: n, medio: medioDe(h[0]), medioRaw: h[0], etapa: norm(h[1]), tipo: h[2] || '', inv:0, imp:0, cli:0, vid:0,
+      reg:0, com, ing, regP:0, comP:0, ingP:0, fm: norm(fm), fuente: 'GA4'};
+    rows.push(nr); idx.set(kk, nr) });
+  // Google Ads no tiene compras propias en la hoja: su columna «Compras» de plataforma copia las compras GA4
+  // (Compra_Exitosa, importada en Google Ads). Desde 'desde' toma las de purchase de la misma campaña y día.
+  const gg = new Map();
+  rows.forEach(r => { if(r.fuente === 'GA4' && r.medio === 'Google Ads' && r.d >= G.desde && r.d <= G.hasta){ const kk = r.d + '|' + nkey(r.name); gg.set(kk, (gg.get(kk) || 0) + r.com) } });
+  const visto = new Set();
+  rows.forEach(r => { if(r.fuente !== 'PLATAFORMA' || r.medio !== 'Google Ads' || r.d < G.desde || r.d > G.hasta) return;
+    const kk = r.d + '|' + nkey(r.name); r.comP = visto.has(kk) ? 0 : (gg.get(kk) || 0); visto.add(kk) });
+  return rows }
 
 // Anuncios de TikTok que llevaron el utm_campaign de otra campaña (corregidos en TikTok el 27 oct 2026):
 // MiLoto retención de TikTok usaba el nombre de la campaña de Meta, e Italia 2 el de la Italia original.
@@ -667,7 +694,7 @@ const resMix = () => !!HOJA && document.getElementById('f-res').value === 'mix';
 function notaFuentes(){
   const hasta = fDate(D.hasta) + ' ' + D.hasta.slice(0,4), sinApi = CONECTADOS.filter(p => !API_PLAT.includes(p));
   document.getElementById('fuentes-note').innerHTML = HOJA
-    ? `<b>Fuentes:</b> inversión, impresiones, clics y alcance de Meta y TikTok por API, al ${hasta}. ${resMix() ? `<b>Compras: plataforma</b> (Meta y TikTok por API; Google Ads y X desde la hoja). <b>Registros: GA4</b>. <b>Ingresos: estimados</b> con compras × ticket medio de ${fCOP(TICKET_MEDIO)}, la medición acordada con el cliente el 4 de noviembre. Google Ads registra sus compras con la conversión Compra_Exitosa importada de GA4, así que mientras GA4 no reciba el evento de compra sus compras de noviembre no se reflejan. Fuente de registros y de los medios sin API` : resGA4() ? '<b>Compras, registros e ingresos: GA4</b>' : '<b>Compras, registros e ingresos: plataforma</b> (píxel de Meta, eventos de TikTok)'}, desde ${SHEET_TAB} de la hoja de fuente de datos` +
+    ? `<b>Fuentes:</b> inversión, impresiones, clics y alcance de Meta y TikTok por API, al ${hasta}. ${resMix() ? `<b>Compras: plataforma</b> (Meta y TikTok por API; Google Ads y X desde la hoja). <b>Registros: GA4</b>. <b>Ingresos: estimados</b> con compras × ticket medio de ${fCOP(TICKET_MEDIO)}, la medición acordada con el cliente el 4 de noviembre. Las compras de Google Ads son las del evento <b>purchase</b> de GA4. Fuente de registros y de los medios sin API` : resGA4() ? '<b>Compras, registros e ingresos: GA4</b>' : '<b>Compras, registros e ingresos: plataforma</b> (píxel de Meta, eventos de TikTok)'}, desde ${SHEET_TAB} de la hoja de fuente de datos${window.GA4_COMPRAS ? ` (compras e ingresos GA4 con el evento <b>purchase</b> leído directo de GA4 desde el ${fDate(GA4_COMPRAS.desde)}, porque la hoja todavía trae el evento anterior)` : ''}` +
       (sinApi.length ? `, que también aporta la inversión de ${sinApi.join(', ')}.` : '.') + ` Cambia el origen de los resultados con el selector <b>Resultados</b>.` +
       ` <b>Metas:</b> registros y compras del flow, recalculadas con el presupuesto real de cada línea en la hoja de seguimiento` +
       ((FL[CURVA] || {}).base === 'ga4' ? ', con los costos GA4 del flow.' : resGA4() ? ` y llevadas a GA4 con la parte que GA4 confirma de cada plataforma (1 jun – 9 ago): compras Meta ${fP(GA4_CONFIRMA.compras.Meta)}, TikTok ${fP(GA4_CONFIRMA.compras.TikTok)} y Google 100%; registros Meta ${fP(GA4_CONFIRMA.registros.Meta)}, TikTok ${fP(GA4_CONFIRMA.registros.TikTok)} y Google 100%.` : ', con la atribución de cada plataforma, igual que el flow.')

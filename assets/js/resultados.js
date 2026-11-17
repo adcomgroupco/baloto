@@ -45,11 +45,32 @@
         filas.forEach(f => { if (f[0] === ITALIA && f[1] === mes) for (let i = 2; i < 6; i++) { const d = Math.min(f[i], resta[i - 2] || 0); f[i] -= d; resta[i - 2] -= d } });
         filas.push([ITALIA_2, mes, it[0] || 0, it[1] || 0, it[2] || 0, it[3] || 0]);
       }
-      return {filas, fuente: 'vivo'};
+      return {filas: conPurchase(filas), fuente: 'vivo'};
     } catch (e) {
       const c = window.RESULTADOS_COPIA;
-      return {filas: c ? c.filas : [], fuente: c ? 'copia' : 'sin datos', copia: c ? c.fecha : ''};
+      return {filas: c ? conPurchase(c.filas.map(f => f.slice())) : [], fuente: c ? 'copia' : 'sin datos', copia: c ? c.fecha : ''};
     }
+  }
+
+  // Compras GA4 con el evento purchase (data/ga4_compras_baloto.js, si la página lo carga). La hoja todavía trae
+  // el evento anterior (Compra_Exitosa), casi en cero desde el 29 oct 2026. Desde noviembre de 2026, las compras GA4
+  // de cada campaña salen de purchase, y las de plataforma de Google Ads también (Google importa sus compras de GA4).
+  const DESDE_MES = '2026-11';
+  function conPurchase(filas) {
+    const G = window.GA4_COMPRAS; if (!G || !G.filas) return filas;
+    const google = n => /_gg_|googleads/i.test(n);
+    filas.forEach(f => { if (f[1] >= DESDE_MES) { f[2] = 0; if (google(f[0])) f[4] = 0 } });
+    const suma = {};
+    G.filas.forEach(([d, n, fm, com]) => {
+      const mes = d.slice(0, 7); if (mes < DESDE_MES) return;
+      if (n === MILOTO_META && /tiktok/i.test(fm)) n = MILOTO_TT;
+      if (n === ITALIA && d >= ITALIA_2_DESDE) n = ITALIA_2;
+      const k = n + '|' + mes; suma[k] = (suma[k] || 0) + com });
+    const idx = {}; filas.forEach((f, i) => { const k = f[0] + '|' + f[1]; if (!(k in idx)) idx[k] = i });
+    Object.entries(suma).forEach(([k, com]) => { const [n, mes] = k.split('|');
+      if (k in idx) { const f = filas[idx[k]]; f[2] += com; if (google(n)) f[4] += com }
+      else filas.push([n, mes, com, 0, google(n) ? com : 0, 0]) });
+    return filas;
   }
 
   // Reparte los resultados de cada campaña entre las filas de la hoja con esa nomenclatura.
