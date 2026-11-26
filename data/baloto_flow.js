@@ -689,7 +689,7 @@ window.BALOTO_FLOW = {
     "objetivo": "Registro",
     "audiencias": [
      "Conversión_ACQ_Tiktok Ads",
-     "Conversión_ACQ_Tiktok Ads_rmkt-topfeed"
+     "Conversión_ACQ_Tiktok Ads_rmkt"
     ],
     "ppto": 41786756,
     "registros": 1942.3,

@@ -22,7 +22,7 @@ window.VIDEOS_NAVIDAD = {
   {
    "fecha": "2026-12-07",
    "titulo": "Decisión P1",
-   "detalle": "Pasa 1 de Baloto + 1 de MiLoto · se apaga N3 · TopFeed velitas"
+   "detalle": "Pasa 1 de Baloto + 1 de MiLoto · se apaga N3"
   },
   {
    "fecha": "2026-12-09",
@@ -37,7 +37,7 @@ window.VIDEOS_NAVIDAD = {
   {
    "fecha": "2026-12-16",
    "titulo": "Novena",
-   "detalle": "N1, N8, N9 directo a Awareness + Activation · TopFeed novena"
+   "detalle": "N1, N8, N9 directo a Awareness + Activation"
   },
   {
    "fecha": "2026-12-26",
@@ -106,20 +106,6 @@ window.VIDEOS_NAVIDAD = {
     "Ganadores de viajes"
    ],
    "nota": ""
-  },
-  {
-   "etapa": "ACQUISITION",
-   "objetivo": "Registro",
-   "campana": "Conversión_ACQ_Tiktok Ads · TopFeed",
-   "medio": "TikTok",
-   "semanas": [
-    "—",
-    "TopFeed lun 7 (velitas): N3",
-    "TopFeed mié 16 (novena): N1, N8 o N9",
-    "TopFeed jue 24 (Navidad): N2 o N5",
-    "TopFeed jue 31: N6, N7 o N10"
-   ],
-   "nota": "Máximo 4 TopFeed"
   },
   {
    "etapa": "ACTIVATION",
@@ -257,7 +243,7 @@ window.VIDEOS_NAVIDAD = {
    "al_aire": "jue 3 dic",
    "prueba": "3–7 dic",
    "decision": "—",
-   "pasa_a": "No pasa: solo Awareness · TopFeed velitas 7 dic",
+   "pasa_a": "No pasa: solo Awareness hasta velitas (7 dic)",
    "apaga": "7 dic",
    "anuncio": "P1_AWR_BAL_N3",
    "navidad": true,
