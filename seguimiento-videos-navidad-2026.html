@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Baloto · Videos de Navidad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/css/reportes.css">
+<style>
+  td { vertical-align: top; }
+  #plan th, #plan td, #videos th, #videos td { text-align: left; }
+  #videos td.num, #videos th.num { text-align: right; }
+  #plan td.obj, #plan td.vacio { text-align: center; }
+  td small { font-size: 12px; white-space: normal; }
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: grid; gap: 6px; }
+  .step b.n { width: 28px; height: 28px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-size: 13px; }
+  .step h3 { font-size: 17px; }
+  .step p { font-size: 14px; color: var(--muted); }
+  .cal { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+  .fecha { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: grid; gap: 4px; }
+  .fecha .d { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .fecha h3 { font-size: 15px; }
+  .fecha p { font-size: 13px; color: var(--muted); }
+  .fecha.pasada { opacity: .55; }
+  .fecha.proxima { border: 2px solid var(--accent); background: var(--accent-soft); }
+  .plan td { min-width: 170px; font-size: 13px; white-space: normal; }
+  .plan td:first-child { min-width: 110px; }
+  .obj { background: var(--accent); font-weight: 700; color: #141414; text-align: center; }
+  .etapa { font-weight: 700; font-size: 12px; letter-spacing: .04em; }
+  .e-AWARENESS { background: #CFE2F3; } .e-ACQUISITION { background: #D9EAD3; } .e-ACTIVATION { background: #FFE599; } .e-RETENTION { background: #EAD1DC; }
+  .vacio { color: #B5B5B0; text-align: center; }
+  .filtros { display: flex; flex-wrap: wrap; gap: 8px; }
+  .filtros button { font: inherit; font-size: 13px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); cursor: pointer; }
+  .filtros button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .estado { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 999px; white-space: nowrap; }
+  .st-salir { background: #EEE; color: #666; } .st-prueba { background: #CFE2F3; color: #0B5394; }
+  .st-gana { background: #D9EAD3; color: #274E13; } .st-off { background: #F4CCCC; color: #990000; } .st-aire { background: #FFF2CC; color: #7F6000; }
+  tr.nav td:first-child { box-shadow: inset 4px 0 0 var(--accent); }
+  .num { text-align: right; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <a class="back" href="index.html">← Master Baloto</a>
+  <div class="brand"><i></i>ADCOM <span class="sep">×</span> BALOTO</div>
+  <h1>Videos de Navidad <span>diciembre 2026 – enero 2027</span></h1>
+  <p>Seguimiento de los 30 videos nuevos de ONJ en Meta y TikTok: cuándo entra cada uno, contra quién compite, a qué campaña del flow pasa si gana y cómo va su hook rate.</p>
+</header>
+
+<section class="section">
+  <div class="section-head">
+    <p class="eyebrow">Resumen</p>
+    <h2>El plan en cifras</h2>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <p class="note" id="actualizado"></p>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <p class="eyebrow">La regla</p>
+    <h2>Todos los paquetes siguen los mismos 3 pasos</h2>
+  </div>
+  <div class="steps">
+    <div class="step"><b class="n">1</b><h3>Probar · días 1 a 4</h3><p>Todos los videos del paquete entran a Awareness en Meta y TikTok. Cada uno compite solo con los de su marca y su paquete.</p></div>
+    <div class="step"><b class="n">2</b><h3>Decidir · día 5</h3><p>Gana el de mejor hook rate (vistas de 3 s ÷ impresiones). Si hay empate, desempata la retención. Mínimo: 72 horas o 5.000 impresiones.</p></div>
+    <div class="step"><b class="n">3</b><h3>Escalar · día 6</h3><p>Los ganadores pasan a su campaña de conversión y los demás se apagan. Cada lunes se apaga el ganador que caiga más de 20 % en hook rate.</p></div>
+  </div>
+  <p class="note">Excepción: novena y fin de año no alcanzan a probarse. Entran directo a dos campañas y a los 2 días se apaga el peor.</p>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <p class="eyebrow">Calendario</p>
+    <h2>Las 8 fechas del plan</h2>
+  </div>
+  <div class="cal" id="cal"></div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <p class="eyebrow">Plan por campaña</p>
+    <h2>Qué videos corren en cada campaña, semana a semana</h2>
+  </div>
+  <div class="table-wrap">
+    <table class="plan" id="plan"></table>
+  </div>
+  <p class="note">Solo las campañas del <a href="flow-diciembre-2026.html">flow de diciembre</a> que llevan videos de ONJ. En los textos, «·» separa Baloto · MiLoto.</p>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <p class="eyebrow">Seguimiento</p>
+    <h2>Los 30 videos</h2>
+  </div>
+  <div class="filtros" id="filtros" role="group" aria-label="Filtrar por paquete"></div>
+  <div class="table-wrap">
+    <table id="videos">
+      <thead><tr><th>Video</th><th>Marca</th><th>Prueba</th><th>Decisión</th><th>Estado</th><th class="num">Hook Meta</th><th class="num">Hook TikTok</th><th class="num">Impresiones</th><th class="num">Inversión</th><th>Si gana pasa a</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <p class="note">Las métricas se llenan cuando los anuncios salen al aire (desde el 3 de diciembre) con <code>build_videos_navidad.py</code>, que busca los anuncios por su nombre (P1_AWR_BAL_V1). Hook Meta = vistas de 3 s ÷ impresiones. TikTok no entrega vistas de 3 s: su hook usa vistas de 2 s ÷ impresiones. Impresiones e inversión suman Meta y TikTok, todas las etapas.</p>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <p class="eyebrow">Nombres</p>
+    <h2>Cómo se llama cada anuncio</h2>
+  </div>
+  <div class="panel">
+    <p>Igual en Meta y TikTok: <b>Paquete_Etapa_Marca_Video</b>. Etapas: AWR Awareness · ACQ Acquisition · ACT Activation · RET Retention. Marcas: BAL Baloto · MIL MiLoto.</p>
+    <p class="note">Ejemplos: P1_AWR_BAL_V1 (prueba) · P2_ACQ_MIL_V7 (ganador en adquisición) · P3_RET_BAL_N6 (fin de año en retención). El 8 de diciembre es festivo: la decisión del paquete 1 es el lunes 7 y la del paquete 2, el miércoles 9.</p>
+  </div>
+</section>
+
+<footer>ADCOM · Baloto · Videos de Navidad · Fuente: plan de pauta y guiones de ONJ (25 nov 2026), flow de diciembre, Meta y TikTok</footer>
+</div>
+<script src="data/videos_navidad.js"></script>
+<script>
+(function () {
+  var D = window.VIDEOS_NAVIDAD;
+  if (!D) return;
+  var hoy = new Date().toISOString().slice(0, 10);
+  var MES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  var DIA = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]; }); }
+  function fecha(iso) { var d = new Date(iso + "T12:00:00"); return DIA[d.getDay()] + " " + d.getDate() + " " + MES[d.getMonth()]; }
+  function n(x) { return Math.round(x).toLocaleString("es-CO"); }
+  function pct(a, b) { return b ? (a / b * 100).toFixed(1).replace(".", ",") + " %" : "—"; }
+
+  var proxima = D.calendario.find(function (c) { return c.fecha >= hoy; });
+  var bal = D.videos.filter(function (v) { return v.marca === "Baloto"; }).length;
+  var nav = D.videos.filter(function (v) { return v.navidad; }).length;
+  var conDatos = D.videos.filter(function (v) { return Object.keys(v.metricas).length; }).length;
+  document.getElementById("kpis").innerHTML =
+    '<div class="kpi"><b>' + D.videos.length + '</b><span>Videos · ' + bal + ' Baloto y ' + (D.videos.length - bal) + ' MiLoto</span></div>' +
+    '<div class="kpi"><b>4</b><span>Paquetes · del 3 de diciembre al 7 de enero</span></div>' +
+    '<div class="kpi"><b>' + nav + '</b><span>De temporada (novena, Navidad y fin de año)</span></div>' +
+    '<div class="kpi"><b>' + (proxima ? fecha(proxima.fecha) : "—") + '</b><span>' + (proxima ? esc(proxima.titulo) : "Plan terminado") + '</span></div>';
+  document.getElementById("actualizado").textContent = "Datos al " + fecha(D.hasta) + " · " + conDatos + " de " + D.videos.length + " videos con anuncios al aire.";
+
+  document.getElementById("cal").innerHTML = D.calendario.map(function (c) {
+    var cls = c === proxima ? " proxima" : (c.fecha < hoy ? " pasada" : "");
+    return '<div class="fecha' + cls + '"><span class="d">' + fecha(c.fecha) + '</span><h3>' + esc(c.titulo) + '</h3><p>' + esc(c.detalle) + '</p></div>';
+  }).join("");
+
+  var semActual = -1;
+  var cortes = ["2026-12-07", "2026-12-14", "2026-12-21", "2026-12-28", "2027-01-01"];
+  if (hoy >= "2026-12-01") { semActual = cortes.findIndex(function (c) { return hoy < c; }); }
+  var th = '<thead><tr><th>Etapa</th><th>Objetivo</th><th>Campaña</th><th>Medio</th>' + D.semanas.map(function (s, i) {
+    return '<th' + (i === semActual ? ' style="background:var(--accent);color:#141414"' : '') + '>' + esc(s) + '</th>'; }).join("") + '</tr></thead>';
+  document.getElementById("plan").innerHTML = th + '<tbody>' + D.campanas.map(function (c) {
+    return '<tr><td class="etapa e-' + c.etapa + '">' + c.etapa + '</td><td class="obj">' + esc(c.objetivo) + '</td><td><b>' + esc(c.campana) + '</b>' +
+      (c.nota ? '<br><small class="muted">' + esc(c.nota) + '</small>' : '') + '</td><td>' + esc(c.medio) + '</td>' +
+      c.semanas.map(function (s) { return s === "—" ? '<td class="vacio">—</td>' : '<td>' + esc(s).replace(/\n/g, "<br>") + '</td>'; }).join("") + '</tr>';
+  }).join("") + '</tbody>';
+
+  function estado(v) {
+    var m = v.metricas, ks = Object.keys(m);
+    var conv = ks.some(function (k) { return !/\|AWR$/.test(k) && m[k].imp > 0; });
+    if (conv) return ["Ganador · en conversión", "st-gana"];
+    if (ks.length) return [v.prueba === "Directo" ? "Al aire" : "En prueba", v.prueba === "Directo" ? "st-aire" : "st-prueba"];
+    return ["Por salir · " + v.al_aire, "st-salir"];
+  }
+  function hook(v, medio) {
+    var h = 0, imp = 0;
+    Object.keys(v.metricas).forEach(function (k) { if (k.indexOf(medio + "|") === 0) { h += v.metricas[k].v_hook; imp += v.metricas[k].imp; } });
+    return pct(h, imp);
+  }
+  function suma(v, campo) { return Object.keys(v.metricas).reduce(function (a, k) { return a + v.metricas[k][campo]; }, 0); }
+  var paquetes = ["Todos", "P1", "P2", "P3", "P4"], filtro = "Todos";
+  function pinta() {
+    document.querySelector("#videos tbody").innerHTML = D.videos.filter(function (v) {
+      return filtro === "Todos" || v.paquete.slice(0, 2) === filtro;
+    }).map(function (v) {
+      var e = estado(v), imp = suma(v, "imp"), inv = suma(v, "inv");
+      return '<tr' + (v.navidad ? ' class="nav"' : '') + '><td><b>' + v.cod + '</b> · ' + esc(v.video) + '<br><small class="muted">' + esc(v.paquete) + ' · ' + esc(v.anuncio) + '</small></td>' +
+        '<td>' + v.marca + '</td><td>' + esc(v.prueba) + '</td><td>' + esc(v.decision) + '</td><td><span class="estado ' + e[1] + '">' + esc(e[0]) + '</span></td>' +
+        '<td class="num">' + hook(v, "Meta") + '</td><td class="num">' + hook(v, "TikTok") + '</td><td class="num">' + (imp ? n(imp) : "—") + '</td>' +
+        '<td class="num">' + (inv ? "$" + n(inv) : "—") + '</td><td><small>' + esc(v.pasa_a) + '<br>Se apaga: ' + esc(v.apaga) + '</small></td></tr>';
+    }).join("");
+  }
+  document.getElementById("filtros").innerHTML = paquetes.map(function (p) {
+    return '<button type="button" data-p="' + p + '" aria-pressed="' + (p === filtro) + '">' + p + '</button>'; }).join("");
+  document.getElementById("filtros").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button"); if (!b) return;
+    filtro = b.dataset.p;
+    this.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === b); });
+    pinta();
+  });
+  pinta();
+})();
+</script>
+</body>
+</html>

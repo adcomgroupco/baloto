@@ -645,5 +645,313 @@ window.BALOTO_FLOW = {
    "ACTIVATION": 0.34144832885132537,
    "RETENTION": 0.3352708413369189
   }
+ },
+ "2026-12": {
+  "lineas": [
+   {
+    "id": "awa_meta",
+    "campana": "Alcance_Awa_Meta_RecordacionDeMarca",
+    "etapa": "AWARENESS",
+    "medio": "Meta",
+    "marca": "Baloto",
+    "objetivo": "Alcance",
+    "audiencias": [
+     "Intereses abiertos"
+    ],
+    "ppto": 4690196,
+    "registros": 2.0,
+    "compras": 3443.6,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-31"
+   },
+   {
+    "id": "awa_tiktok",
+    "campana": "Alcance_AWA_ReachAndFreq_Tiktok",
+    "etapa": "AWARENESS",
+    "medio": "TikTok",
+    "marca": "Baloto",
+    "objetivo": "Alcance",
+    "audiencias": [
+     "Intereses abiertos"
+    ],
+    "ppto": 6545731,
+    "registros": 32.3,
+    "compras": 1405.9,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-31"
+   },
+   {
+    "id": "acq_tiktok",
+    "campana": "Conversión_ACQ_Tiktok Ads",
+    "etapa": "ACQUISITION",
+    "medio": "TikTok",
+    "marca": "Baloto",
+    "objetivo": "Registro",
+    "audiencias": [
+     "Conversión_ACQ_Tiktok Ads",
+     "Conversión_ACQ_Tiktok Ads_rmkt-topfeed"
+    ],
+    "ppto": 41786756,
+    "registros": 1942.3,
+    "compras": 40451.8,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-31"
+   },
+   {
+    "id": "traf_google",
+    "campana": "Tráfico_AWA_Google Ads",
+    "etapa": "ACQUISITION",
+    "medio": "Google Ads",
+    "marca": "Baloto",
+    "objetivo": "Registro",
+    "audiencias": [
+     "Intereses abiertos / PMAX"
+    ],
+    "ppto": 10832591,
+    "registros": 623.1,
+    "compras": 3258.9,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-31"
+   },
+   {
+    "id": "acq_meta",
+    "campana": "Conversión_ACQ_Meta",
+    "etapa": "ACQUISITION",
+    "medio": "Meta",
+    "marca": "Baloto",
+    "objetivo": "Registro",
+    "audiencias": [
+     "Desconocidos (Interesado: Loterias, Otros)"
+    ],
+    "ppto": 15445513,
+    "registros": 3138.1,
+    "compras": 9708.1,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-31"
+   },
+   {
+    "id": "promo_meta",
+    "campana": "Promocional_Meta",
+    "etapa": "ACTIVATION",
+    "medio": "Meta",
+    "marca": "Baloto",
+    "objetivo": "Compra",
+    "audiencias": [
+     "Jugadores y Registros del pixel (90D) + Registrados sin compra · Navidad: «Aguinaldo», «Agüeros», «Estrena tu cuenta esta Navidad»"
+    ],
+    "ppto": 6000000,
+    "registros": 25.4,
+    "compras": 55045.9,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-31"
+   },
+   {
+    "id": "promo_tiktok",
+    "campana": "Promocional_Tiktok",
+    "etapa": "ACTIVATION",
+    "medio": "TikTok",
+    "marca": "Baloto",
+    "objetivo": "Compra",
+    "audiencias": [
+     "Jugadores y Registros del pixel (90D) · Navidad: «Regala ilusión»"
+    ],
+    "ppto": 3000000,
+    "registros": 9.8,
+    "compras": 12931.0,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-31"
+   },
+   {
+    "id": "videos",
+    "campana": "Conversión_VIDEOS",
+    "etapa": "ACTIVATION",
+    "medio": "Meta",
+    "marca": "Baloto",
+    "objetivo": "Compra",
+    "audiencias": [
+     "Jugadores y Registros del pixel (90D)"
+    ],
+    "ppto": 2307552,
+    "registros": 2.7,
+    "compras": 20603.1,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-31"
+   },
+   {
+    "id": "act_google",
+    "campana": "Conversion_ACT_Google Ads",
+    "etapa": "ACTIVATION",
+    "medio": "Google Ads",
+    "marca": "Baloto",
+    "objetivo": "Compra",
+    "audiencias": [
+     "COMPETENCIA/SEARCH",
+     "CATEGORY/SEARCH"
+    ],
+    "ppto": 63103364,
+    "registros": 7681.1,
+    "compras": 211130.1,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-31"
+   },
+   {
+    "id": "crm",
+    "campana": "Conversión_RMK_ACT_CRM",
+    "etapa": "ACTIVATION",
+    "medio": "Meta",
+    "marca": "Baloto",
+    "objetivo": "Compra",
+    "audiencias": [
+     "Usuarios ligth · Navidad: «Tu jugada navideña»",
+     "Usuarios Heavy · Navidad: «Novena de la suerte»",
+     "Usuarios VIP · Navidad: «Gracias por este año»",
+     "Usuarios Medium · Navidad: «El aguinaldo que puede cambiarlo todo»"
+    ],
+    "ppto": 10617216,
+    "registros": 91.3,
+    "compras": 80433.5,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-31"
+   },
+   {
+    "id": "cali_meta",
+    "campana": "Conversión_ACT_Departamental",
+    "etapa": "ACTIVATION",
+    "medio": "Meta",
+    "marca": "Baloto",
+    "objetivo": "Compra",
+    "audiencias": [
+     "Jugadores y registros del píxel (90D) + intereses · departamento que defina Baloto cada mes (antes Cali; piezas ambientadas en la región)"
+    ],
+    "ppto": 13729143,
+    "registros": 62.1,
+    "compras": 31416.8,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-31"
+   },
+   {
+    "id": "cobro",
+    "campana": "Conversión_RMK_COBRODEPREMIOS",
+    "etapa": "RETENTION",
+    "medio": "Meta",
+    "marca": "Baloto",
+    "objetivo": "Compra",
+    "audiencias": [
+     "BBDD COBRO DE PREMIOS"
+    ],
+    "ppto": 3089103,
+    "registros": 18.6,
+    "compras": 25114.7,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-31"
+   },
+   {
+    "id": "baloto_acum_meta",
+    "campana": "Conversión_RMK_ACUMULADO_BALOTO_META",
+    "etapa": "RETENTION",
+    "medio": "Meta",
+    "marca": "Baloto",
+    "objetivo": "Compra",
+    "audiencias": [
+     "BBDD COMPRAS MATCH"
+    ],
+    "ppto": 28829111,
+    "registros": 57.2,
+    "compras": 114401.2,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-31"
+   },
+   {
+    "id": "baloto_tiktok",
+    "campana": "Conversión_RMK_BALOTO_TIKTOK",
+    "etapa": "RETENTION",
+    "medio": "TikTok",
+    "marca": "Baloto",
+    "objetivo": "Compra",
+    "audiencias": [
+     "BBDD COMPRAS MATCH"
+    ],
+    "ppto": 8749002,
+    "registros": 105.4,
+    "compras": 26116.4,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-31"
+   },
+   {
+    "id": "miloto_tiktok",
+    "campana": "Conversión_RMK_MILOTO_TIKTOK",
+    "etapa": "RETENTION",
+    "medio": "TikTok",
+    "marca": "Miloto",
+    "objetivo": "Compra",
+    "audiencias": [
+     "BBDD COMPRAS MATCH"
+    ],
+    "ppto": 8193001,
+    "registros": 38.3,
+    "compras": 32903.6,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-31"
+   },
+   {
+    "id": "miloto_meta",
+    "campana": "Conversión_RMK_MILOTO_META",
+    "etapa": "RETENTION",
+    "medio": "Meta",
+    "marca": "Miloto",
+    "objetivo": "Compra",
+    "audiencias": [
+     "BBDD COMPRAS MATCH"
+    ],
+    "ppto": 5838950,
+    "registros": 16.9,
+    "compras": 42933.5,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-31"
+   },
+   {
+    "id": "miloto_acum_meta",
+    "campana": "Conversión_RMK_ACUMULADO_MILOTO_META",
+    "etapa": "RETENTION",
+    "medio": "Meta",
+    "marca": "Miloto",
+    "objetivo": "Compra",
+    "audiencias": [
+     "BBDD COMPRAS MATCH"
+    ],
+    "ppto": 24529058,
+    "registros": 477.2,
+    "compras": 93622.4,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-31"
+   },
+   {
+    "id": "colorloto_meta",
+    "campana": "Conversión_RMK_COLORLOTO_ACUMULADO_META",
+    "etapa": "RETENTION",
+    "medio": "Meta",
+    "marca": "Colorloto",
+    "objetivo": "Compra",
+    "audiencias": [
+     "BBDD COMPRAS MATCH"
+    ],
+    "ppto": 3013713,
+    "registros": 69.9,
+    "compras": 20091.4,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-31"
+   }
+  ],
+  "ppto_campanas": 260300000,
+  "gestion": 39045000,
+  "fee": 6300000,
+  "total_mes": 305645000,
+  "ticket": null,
+  "etapas": {
+   "AWARENESS": 0.04316529923730841,
+   "ACQUISITION": 0.26148620884115364,
+   "ACTIVATION": 0.37939790652028477,
+   "RETENTION": 0.3159505854012532
+  }
  }
 };
