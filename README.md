@@ -29,6 +29,7 @@ Sitio de consulta de flows, reportes, análisis y propuestas de pauta digital pa
 - `informes/informe-telomereces-mayo-2026.html`: Videos Telomereces · may 2026.
 - `informes/informe-telomereces-abril-2026.html`: Videos Telomereces · abr 2026.
 - `planes/recomendacion-presupuesto.html`: Recomendación de presupuesto · may 2026.
+- `informes/analisis-caida-baloto-octubre-2026.html`: Análisis caída de Baloto · octubre 2026: si los jugadores migraron a MiLoto o ColorLoto tras la caída del 3 oct (apuestas del CRM en Zoho Analytics, tres bloques de 53 días, corte 25 nov). Sección Informes detallados CRM del índice.
 - `reportes/`: reporte general mensual de 2026 (febrero a agosto en PDF, septiembre en HTML), enlazado en Reportes mensuales.
 - `assets/`: recursos visuales y estilos del sitio. `master.css` agrega el negro y amarillo del índice; `reportes.css` es el estilo de las páginas de flow.
 
