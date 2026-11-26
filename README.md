@@ -5,30 +5,30 @@ Sitio de consulta de flows, reportes, análisis y propuestas de pauta digital pa
 ## Contenido
 
 - `index.html`: Master Baloto, página principal con enlace a todos los documentos.
-- `tablero-baloto.html`: tablero de seguimiento full funnel (Meta y TikTok): metas del flow por campaña, curvas de alcance, plataforma, marca y evolución.
+- `tableros/tablero-baloto.html`: tablero de seguimiento full funnel (Meta y TikTok): metas del flow por campaña, curvas de alcance, plataforma, marca y evolución.
 - `data/baloto_data.js`: datos diarios por campaña y curvas de alcance que lee el tablero.
 - `data/baloto_flow.js`: metas del flow por mes y línea de campaña.
-- `flow-octubre-2026.html`: flow de medios de octubre 2026 (Meta, TikTok y Google Ads).
-- `reporte-cobro-premios-meta.html`: Cobro de premios · Meta Ads · ago 2026.
-- `reporte-engagement-baloto-miloto.html`: Engagement Baloto y Miloto · jul 2026.
-- `dashboard-acumulado.html`: Dashboard acumulado · jun 2026.
-- `reporte-retencion-2026.html`: Campaña de retención · may 2026.
-- `reporte-tiktok-mayo-2026.html`: TikTok Ads · may 2026.
-- `reporte-marzo-vs-abril-2026.html`: Marzo vs abril 2026.
-- `plan-post-acumulado-octubre-2026.html`: plan digital para recuperar las jugadas tras el premio del 3 de octubre (borrador para gerencia, con datos de GA4 de la hoja de fuente de datos).
-- `mejores-piezas-octubre-2026.html`: mejores piezas de octubre en Meta y TikTok, con vista previa, pilar de comunicación, medio y formato (estáticos, videos, Baloto general vs. Italia) · oct 2026.
-- `promo-italia-balance-2026.html`: balance de la promo Italia (Meta, TikTok, Google), 5 oct – 10 nov 2026.
-- `promo-italia-octubre-2026.html`: Promo Italia, Meta y TikTok, con anuncios y audiencias · oct 2026.
-- `top-feed-consolidado-jul-sep-2026.html`: consolidado instructivo del alcance de los 27 Top Feed de TikTok, con vistas previas · jul–sep 2026.
-- `doce-top-feed-septiembre-2026.html`: Doce Top Feed · septiembre 2026.
-- `nueve-top-feed-jul-ago-2026.html`: Nueve Top Feed · jul–ago 2026.
-- `top-feed-branding-jul-ago-2026.html`: Cuatro Top Feed · branding jul–ago 2026.
-- `top-feed-julio-2026.html`: Top Feed · 25 y 27 de julio 2026.
-- `comparativo-videos.html`: Comparativo de nuevos videos · sep 2026.
-- `benchmark-anuncios-2026.html`: Benchmark de anuncios propios 2026.
-- `informe-telomereces-mayo-2026.html`: Videos Telomereces · may 2026.
-- `informe-telomereces-abril-2026.html`: Videos Telomereces · abr 2026.
-- `recomendacion-presupuesto.html`: Recomendación de presupuesto · may 2026.
+- `planes/flow-octubre-2026.html`: flow de medios de octubre 2026 (Meta, TikTok y Google Ads).
+- `informes/reporte-cobro-premios-meta.html`: Cobro de premios · Meta Ads · ago 2026.
+- `informes/reporte-engagement-baloto-miloto.html`: Engagement Baloto y Miloto · jul 2026.
+- `tableros/dashboard-acumulado.html`: Dashboard acumulado · jun 2026.
+- `informes/reporte-retencion-2026.html`: Campaña de retención · may 2026.
+- `informes/reporte-tiktok-mayo-2026.html`: TikTok Ads · may 2026.
+- `informes/reporte-marzo-vs-abril-2026.html`: Marzo vs abril 2026.
+- `planes/plan-post-acumulado-octubre-2026.html`: plan digital para recuperar las jugadas tras el premio del 3 de octubre (borrador para gerencia, con datos de GA4 de la hoja de fuente de datos).
+- `informes/mejores-piezas-octubre-2026.html`: mejores piezas de octubre en Meta y TikTok, con vista previa, pilar de comunicación, medio y formato (estáticos, videos, Baloto general vs. Italia) · oct 2026.
+- `informes/promo-italia-balance-2026.html`: balance de la promo Italia (Meta, TikTok, Google), 5 oct – 10 nov 2026.
+- `planes/promo-italia-octubre-2026.html`: Promo Italia, Meta y TikTok, con anuncios y audiencias · oct 2026.
+- `informes/top-feed-consolidado-jul-sep-2026.html`: consolidado instructivo del alcance de los 27 Top Feed de TikTok, con vistas previas · jul–sep 2026.
+- `informes/doce-top-feed-septiembre-2026.html`: Doce Top Feed · septiembre 2026.
+- `informes/nueve-top-feed-jul-ago-2026.html`: Nueve Top Feed · jul–ago 2026.
+- `informes/top-feed-branding-jul-ago-2026.html`: Cuatro Top Feed · branding jul–ago 2026.
+- `informes/top-feed-julio-2026.html`: Top Feed · 25 y 27 de julio 2026.
+- `informes/comparativo-videos.html`: Comparativo de nuevos videos · sep 2026.
+- `informes/benchmark-anuncios-2026.html`: Benchmark de anuncios propios 2026.
+- `informes/informe-telomereces-mayo-2026.html`: Videos Telomereces · may 2026.
+- `informes/informe-telomereces-abril-2026.html`: Videos Telomereces · abr 2026.
+- `planes/recomendacion-presupuesto.html`: Recomendación de presupuesto · may 2026.
 - `reportes/`: reporte general mensual de 2026 (febrero a agosto en PDF, septiembre en HTML), enlazado en Reportes mensuales.
 - `assets/`: recursos visuales y estilos del sitio. `master.css` agrega el negro y amarillo del índice; `reportes.css` es el estilo de las páginas de flow.
 
@@ -54,4 +54,4 @@ Cuando llegue el flow de un mes nuevo, se agrega su meta (el archivo acumula mes
 .venv/bin/python scripts/clients/baloto/build_baloto_flow.py --xlsx "~/Downloads/[Baloto] Flow de medios - Noviembre.xlsx" --mes 2026-11 --out ../GitHub/baloto/data/baloto_flow.js
 ```
 
-Compras, registros e ingresos salen de GA4, en la pestaña RESUMEN GENERAL de la hoja [Baloto] Fuente de datos, que el tablero lee en vivo; de ahí sale también la inversión de Google Ads, X y programática. La hoja debe estar compartida como "Cualquier persona con el enlace: lector". Si no carga, el tablero usa los resultados de plataforma y lo avisa. Para probar sin la hoja: `tablero-baloto.html?hoja=archivo.csv` servido por http, con las mismas columnas.
+Compras, registros e ingresos salen de GA4, en la pestaña RESUMEN GENERAL de la hoja [Baloto] Fuente de datos, que el tablero lee en vivo; de ahí sale también la inversión de Google Ads, X y programática. La hoja debe estar compartida como "Cualquier persona con el enlace: lector". Si no carga, el tablero usa los resultados de plataforma y lo avisa. Para probar sin la hoja: `tableros/tablero-baloto.html?hoja=archivo.csv` servido por http, con las mismas columnas.

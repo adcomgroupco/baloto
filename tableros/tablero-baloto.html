@@ -7,9 +7,9 @@
 <title>Tablero Baloto</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/adcom.css">
-<link rel="stylesheet" href="assets/css/tablero.css">
-<link rel="stylesheet" href="assets/css/seguimiento.css">
+<link rel="stylesheet" href="../assets/css/adcom.css">
+<link rel="stylesheet" href="../assets/css/tablero.css">
+<link rel="stylesheet" href="../assets/css/seguimiento.css">
 <style>
 /* pestañas del tablero */
 .tabs{display:flex;gap:4px;padding:0 4px;border-top:1px solid var(--gray-100);margin-top:6px;padding-top:6px;flex-wrap:wrap}
@@ -25,17 +25,17 @@
 .kpi-grid.kpi-4{grid-template-columns:repeat(4,1fr)}
 @media(max-width:900px){.kpi-grid.kpi-4{grid-template-columns:repeat(2,1fr)}}
 </style>
-<script defer src="assets/js/adcom.js"></script>
+<script defer src="../assets/js/adcom.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<script src="data/baloto_data.js"></script>
-<script src="data/baloto_flow.js"></script>
-<script src="data/hoja_baloto.js"></script>
-<script src="data/consumo_plataformas.js"></script>
-<script src="data/resultados_baloto.js"></script>
-<script src="data/ga4_compras_baloto.js"></script>
-<script src="assets/js/hoja.js"></script>
-<script src="assets/js/resultados.js"></script>
+<script src="../data/baloto_data.js"></script>
+<script src="../data/baloto_flow.js"></script>
+<script src="../data/hoja_baloto.js"></script>
+<script src="../data/consumo_plataformas.js"></script>
+<script src="../data/resultados_baloto.js"></script>
+<script src="../data/ga4_compras_baloto.js"></script>
+<script src="../assets/js/hoja.js"></script>
+<script src="../assets/js/resultados.js"></script>
 </head>
 <body class="con-shell">
 <div id="loading">
@@ -45,7 +45,7 @@
 
 <nav class="app-sidebar">
   <div class="app-sidebar-top">
-    <a class="app-sidebar-brand" href="index.html"><i></i>Master Baloto</a>
+    <a class="app-sidebar-brand" href="../index.html"><i></i>Master Baloto</a>
     <div class="app-sidebar-client">
       <span class="app-sidebar-client-label">Cliente</span>
       <strong class="app-sidebar-client-name">Baloto, Miloto y Colorloto · presupuesto y resultados</strong>
@@ -230,7 +230,7 @@ const pace = p => p === null ? 'p-off' : Math.abs(p - 1) <= .1 ? 'p-pos' : Math.
 const costCls = (c, m) => (c === null || !m) ? '' : c <= m ? 't-pos' : c <= m * 1.25 ? 't-mid' : 't-neg';
 
 // ── Datos ───────────────────────────────────────────────────────────────────
-// Inversión, impresiones, clics y alcance de Meta y TikTok vienen de las APIs (data/baloto_data.js).
+// Inversión, impresiones, clics y alcance de Meta y TikTok vienen de las APIs (../data/baloto_data.js).
 // Compras, registros e ingresos vienen de GA4 en la pestaña RESUMEN GENERAL de la hoja de fuente de datos,
 // que también trae la inversión de los medios sin API (Google Ads, X, programática).
 const SHEET_ID = '1zEv8npIyHnoaEXKZDRh-vpyo88RU0WmKUgSKwSYzaMU', SHEET_TAB = 'RESUMEN GENERAL';
@@ -317,7 +317,7 @@ function parseHoja(rows){
     .map(r => ({...r, key: nkey(r.name)})) }
 
 // Compras GA4 con el evento purchase. Power My Analytics todavía trae a la hoja el evento viejo Compra_Exitosa,
-// que quedó casi en cero desde el despliegue de purchase (29 oct 2026). data/ga4_compras_baloto.js trae purchase
+// que quedó casi en cero desde el despliegue de purchase (29 oct 2026). ../data/ga4_compras_baloto.js trae purchase
 // directo de GA4 por día, campaña y fuente / medio (scripts/clients/baloto/build_ga4_compras.py): desde su fecha
 // 'desde', las compras e ingresos GA4 de la hoja se reemplazan por esos. Si una combinación no tiene fila en la
 // hoja, se agrega con la homologación de HOMOLOGACIÓN G4.
@@ -732,7 +732,7 @@ document.addEventListener('click', e => { const a = e.target.closest('[data-tab]
 
 (function init(){
   setTab((new URLSearchParams(location.search).get('tab') || location.hash.slice(1) || 'resumen'), false);
-  if(!D){ document.getElementById('ld-msg').textContent = 'Falta data/baloto_data.js'; return }
+  if(!D){ document.getElementById('ld-msg').textContent = 'Falta ../data/baloto_data.js'; return }
   const q = [['mes','Mes actual'],['mesAnt','Mes anterior'],['30','Últimos 30 días'],['trim','Últimos 90 días'],['anio','Año']];
   document.getElementById('quick').innerHTML = q.map(([k, l]) => `<button class="qbtn" data-q="${k}" onclick="setQuick('${k}')">${l}</button>`).join('');
   const hasta = fDate(D.hasta) + ' ' + D.hasta.slice(0,4);
@@ -752,6 +752,6 @@ document.addEventListener('click', e => { const a = e.target.closest('[data-tab]
 })();
 </script>
 <script>window.CUENTA = 'baloto';</script>
-<script src="assets/js/seguimiento-panel.js"></script>
+<script src="../assets/js/seguimiento-panel.js"></script>
 </body>
 </html>
