@@ -666,7 +666,7 @@ window.BALOTO_FLOW = {
    },
    {
     "id": "awa_tiktok",
-    "campana": "Alcance_AWA_ReachAndFreq_Tiktok",
+    "campana": "Alcance_AWA_Tiktok",
     "etapa": "AWARENESS",
     "medio": "TikTok",
     "marca": "Baloto",
@@ -688,8 +688,8 @@ window.BALOTO_FLOW = {
     "marca": "Baloto",
     "objetivo": "Registro",
     "audiencias": [
-     "Conversión_ACQ_Tiktok Ads",
-     "Conversión_ACQ_Tiktok Ads_rmkt"
+     "Conversión_ACQ_Tiktok Ads + quienes vieron el 50 % de los videos de ONJ",
+     "Conversión_ACQ_Tiktok Ads_rmkt + quienes vieron el 50 % de los videos de ONJ"
     ],
     "ppto": 41786756,
     "registros": 1942.3,
@@ -721,7 +721,7 @@ window.BALOTO_FLOW = {
     "marca": "Baloto",
     "objetivo": "Registro",
     "audiencias": [
-     "Desconocidos (Interesado: Loterias, Otros)"
+     "Desconocidos (Interesado: Loterias, Otros) + quienes vieron el 50 % de los videos de ONJ"
     ],
     "ppto": 15445513,
     "registros": 3138.1,
@@ -737,7 +737,7 @@ window.BALOTO_FLOW = {
     "marca": "Baloto",
     "objetivo": "Compra",
     "audiencias": [
-     "Jugadores y Registros del pixel (90D) + Registrados sin compra · Navidad: «Aguinaldo», «Agüeros», «Estrena tu cuenta esta Navidad»"
+     "Jugadores y Registros del pixel (90D) + Registrados sin compra + quienes vieron el 75 % de los videos de ONJ · Navidad: «Aguinaldo», «Agüeros», «Estrena tu cuenta esta Navidad»"
     ],
     "ppto": 6000000,
     "registros": 25.4,
@@ -753,7 +753,7 @@ window.BALOTO_FLOW = {
     "marca": "Baloto",
     "objetivo": "Compra",
     "audiencias": [
-     "Jugadores y Registros del pixel (90D) · Navidad: «Regala ilusión»"
+     "Jugadores y Registros del pixel (90D) + quienes vieron el 75 % de los videos de ONJ · Navidad: «Regala ilusión»"
     ],
     "ppto": 3000000,
     "registros": 9.8,
@@ -769,11 +769,11 @@ window.BALOTO_FLOW = {
     "marca": "Baloto",
     "objetivo": "Compra",
     "audiencias": [
-     "Jugadores y Registros del pixel (90D)"
+     "Jugadores y Registros del pixel (90D) + registrados sin compra + quienes vieron el 75 % de los videos de ONJ"
     ],
-    "ppto": 2307552,
-    "registros": 2.7,
-    "compras": 20603.1,
+    "ppto": 6000000,
+    "registros": 7.1,
+    "compras": 53571.4,
     "inicio": "2026-12-01",
     "fin": "2026-12-31"
    },
@@ -871,9 +871,9 @@ window.BALOTO_FLOW = {
     "audiencias": [
      "BBDD COMPRAS MATCH"
     ],
-    "ppto": 8749002,
-    "registros": 105.4,
-    "compras": 26116.4,
+    "ppto": 5056554,
+    "registros": 60.9,
+    "compras": 15094.2,
     "inicio": "2026-12-01",
     "fin": "2026-12-31"
    },
@@ -950,8 +950,8 @@ window.BALOTO_FLOW = {
   "etapas": {
    "AWARENESS": 0.04316529923730841,
    "ACQUISITION": 0.26148620884115364,
-   "ACTIVATION": 0.37939790652028477,
-   "RETENTION": 0.3159505854012532
+   "ACTIVATION": 0.39358326166373925,
+   "RETENTION": 0.30176523025779867
   }
  }
 };

@@ -68,7 +68,7 @@ window.VIDEOS_NAVIDAD = {
   {
    "etapa": "AWARENESS",
    "objetivo": "Alcance · prueba de los videos (gana el mejor hook rate)",
-   "campana": "Alcance_AWA_ReachAndFreq_Tiktok",
+   "campana": "Alcance_AWA_Tiktok",
    "medio": "TikTok",
    "semanas": [
     "Prueba P1 (jue 3 – dom 6): V1, N2, N3 · V6, V9\nPrueba P2 (sáb 5 – mar 8): V2, V3, V4, V5, N4, N5 · V7, V8",
@@ -77,7 +77,7 @@ window.VIDEOS_NAVIDAD = {
     "Novena hasta jue 24 (N9 hasta vie 25)\nFin de año directo (sáb 26): N6, N7 · N10",
     "Fin de año hasta jue 31 (lun 28 se apaga el peor)\nP4 + I2 entran el sáb 2 ene"
    ],
-   "nota": "La R&F reparte la entrega entre los anuncios"
+   "nota": "Un grupo por video, mismo presupuesto"
   },
   {
    "etapa": "ACQUISITION",
@@ -411,7 +411,7 @@ window.VIDEOS_NAVIDAD = {
    "al_aire": "mié 16 dic",
    "prueba": "Directo",
    "decision": "vie 18 dic (se apaga el peor)",
-   "pasa_a": "Directo: Alcance Meta + R&F TikTok + Promocional_Meta + Promocional_Tiktok",
+   "pasa_a": "Directo: Alcance Meta + Alcance TikTok + Promocional_Meta + Promocional_Tiktok",
    "apaga": "24 dic",
    "anuncio": "P3_AWR_BAL_N1",
    "navidad": true,
@@ -425,7 +425,7 @@ window.VIDEOS_NAVIDAD = {
    "al_aire": "mié 16 dic",
    "prueba": "Directo",
    "decision": "vie 18 dic (se apaga el peor)",
-   "pasa_a": "Directo: Alcance Meta + R&F TikTok + Promocional_Meta + Promocional_Tiktok",
+   "pasa_a": "Directo: Alcance Meta + Alcance TikTok + Promocional_Meta + Promocional_Tiktok",
    "apaga": "24 dic",
    "anuncio": "P3_AWR_MIL_N8",
    "navidad": true,
@@ -439,7 +439,7 @@ window.VIDEOS_NAVIDAD = {
    "al_aire": "mié 16 dic",
    "prueba": "Directo",
    "decision": "vie 18 dic (se apaga el peor)",
-   "pasa_a": "Directo: Alcance Meta + R&F TikTok + Promocional_Meta + Promocional_Tiktok",
+   "pasa_a": "Directo: Alcance Meta + Alcance TikTok + Promocional_Meta + Promocional_Tiktok",
    "apaga": "25 dic",
    "anuncio": "P3_AWR_MIL_N9",
    "navidad": true,
@@ -453,7 +453,7 @@ window.VIDEOS_NAVIDAD = {
    "al_aire": "sáb 26 dic",
    "prueba": "Directo",
    "decision": "lun 28 dic (se apaga el peor)",
-   "pasa_a": "Directo: Alcance Meta + R&F TikTok + RMK_ACUMULADO_BALOTO_META + RMK_BALOTO_TIKTOK",
+   "pasa_a": "Directo: Alcance Meta + Alcance TikTok + RMK_ACUMULADO_BALOTO_META + RMK_BALOTO_TIKTOK",
    "apaga": "31 dic",
    "anuncio": "P3_AWR_BAL_N6",
    "navidad": true,
@@ -467,7 +467,7 @@ window.VIDEOS_NAVIDAD = {
    "al_aire": "sáb 26 dic",
    "prueba": "Directo",
    "decision": "lun 28 dic (se apaga el peor)",
-   "pasa_a": "Directo: Alcance Meta + R&F TikTok + RMK_ACUMULADO_BALOTO_META + RMK_BALOTO_TIKTOK",
+   "pasa_a": "Directo: Alcance Meta + Alcance TikTok + RMK_ACUMULADO_BALOTO_META + RMK_BALOTO_TIKTOK",
    "apaga": "31 dic",
    "anuncio": "P3_AWR_BAL_N7",
    "navidad": true,
@@ -481,7 +481,7 @@ window.VIDEOS_NAVIDAD = {
    "al_aire": "sáb 26 dic",
    "prueba": "Directo",
    "decision": "lun 28 dic (se apaga el peor)",
-   "pasa_a": "Directo: Alcance Meta + R&F TikTok + RMK_MILOTO_META + RMK_MILOTO_TIKTOK",
+   "pasa_a": "Directo: Alcance Meta + Alcance TikTok + RMK_MILOTO_META + RMK_MILOTO_TIKTOK",
    "apaga": "31 dic",
    "anuncio": "P3_AWR_MIL_N10",
    "navidad": true,
